@@ -341,33 +341,37 @@
         </footer>
     @endif
 @endsection
-
+@php
+    $zipcode = $customer->zipcode ?? null;
+    $name = $customer->name ?? '';
+    $public_place = $customer->public_place ?? '';
+    $city = $customer->city ?? '';
+    $state = $customer->state ?? '';
+    $number = $customer->number ?? '';
+    $neighborhood = $customer->neighborhood ?? '';
+@endphp
 @section('scripts')
     <script>
-        function redirectToCart() {
-            // Verifica se o cliente possui zip_code
+       function redirectToCart() {
+        const customerZipcode = @json($zipcode);
+        console.log(customerZipcode);
+        if (customerZipcode) {
+            const customerName = @json($name);
+            const customerAddress = @json($public_place);
+            const customerCity = @json($city);
+            const customerState = @json($state);
+            const customerNumber = @json($number);
+            const customerNeighborhood = @json($neighborhood);
 
-            const customerZipcode = @json($customer['zipcode']);
-            console.log(customerZipcode);
-            if (customerZipcode) {
-                const customerName = @json($customer['name']);
-                const customerAddress = @json($customer['public_place']);
-                const customerCity = @json($customer['city']);
-                const customerState = @json($customer['state']);
-                const customerNumber = @json($customer['number']);
-                const customerNeighborhood = @json($customer['neighborhood']);
-                // Preenche as informações do endereço no modal
-                document.getElementById('addressInfo').innerText = `
+            document.getElementById('addressInfo').innerText = `
                 ${customerAddress}, N° ${customerNumber}\nBairro: ${customerNeighborhood}\nCEP: ${customerZipcode}
             `;
-                // Exibe o modal
-                document.getElementById('addressModal').style.display = 'block';
-            } else {
 
-                // Redireciona para a rota de adicionar endereço
-                window.location.href = "{{ route('cart.show') }}";
-            }
+            document.getElementById('addressModal').style.display = 'block';
+        } else {
+            window.location.href = "{{ route('cart.show') }}";
         }
+    }
 
         // Fecha o modal ao clicar no botão de fechar
         document.querySelector('.close').addEventListener('click', function() {
