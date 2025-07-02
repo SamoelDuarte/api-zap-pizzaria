@@ -36,7 +36,7 @@ class WebhookController extends Controller
         }
 
         // Monta o link e mensagem
-        $link = "https://fornadapronta.com.br/pedido/{$numero}";
+        $link = "https://fornadapronta.com.br/checkout/pedido/{$numero}";
         $mensagem = "🍕 Olá! Que tal fazer seu pedido pelo nosso app? 😄 Acesse agora: $link\n\nEstamos te esperando com muito carinho e sabor! ❤️";
 
         // Pega sessão ativa do device
