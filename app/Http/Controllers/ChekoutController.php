@@ -24,30 +24,41 @@ use GuzzleHttp\Client;
 
 class ChekoutController extends Controller
 {
-    public function index($phone)
-    {
+    public function index(Request $request)
+{
+    $phone = $request->query('phone');
 
+    $customer = null;
+    $semCadastro = false;
+    $taxaEntrega = 0;
 
-        if ($phone) {
-            $customer = Customer::where('jid', $phone)->first();
+    if ($phone) {
+        $customer = Customer::where('jid', $phone)->first();
 
-            // session()->put('taxa_entrega', $customer->delivery_fee);
-            // session()->put('customer', $customer);
-            // $categories = Categories::with('products')->get();
-            // $cart = session()->get('cart', []);
-            return view('front.checkout.index');
+        if ($customer) {
+            session()->put('customer', $customer);
+            $taxaEntrega = $customer->delivery_fee ?? 0;
         } else {
-            // Recuperar o customer da sessão
-            $customer = session()->get('customer');
-            if ($customer) {
-                $categories = Categories::with('products')->get();
-                $cart = session()->get('cart', []);
-                return view('front.checkout.index', compact('categories', 'cart', 'customer'));
-            } else {
-                return view('front.checkout.va_pro_zap');
-            }
+            session()->forget('customer');
+            $semCadastro = true;
+        }
+    } else {
+        $customer = session()->get('customer');
+        if ($customer) {
+            $taxaEntrega = $customer->delivery_fee ?? 0;
+        } else {
+            $semCadastro = true;
         }
     }
+
+    session()->put('taxa_entrega', $taxaEntrega);
+
+    $categories = Categories::with('products')->get();
+    $cart = session()->get('cart', []);
+
+    return view('front.checkout.index', compact('categories', 'cart', 'customer', 'semCadastro'));
+}
+
     public function addProduto($id)
     {
         $product = Product::findOrFail($id);
