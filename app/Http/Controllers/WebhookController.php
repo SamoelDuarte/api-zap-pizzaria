@@ -9,6 +9,8 @@ use App\Models\Pedido;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Request as GuzzleRequest;
 
 class WebhookController extends Controller
 {
@@ -38,7 +40,7 @@ class WebhookController extends Controller
         $mensagem = "🍕 Olá! Que tal fazer seu pedido pelo nosso app? 😄 Acesse agora: $link\n\nEstamos te esperando com muito carinho e sabor! ❤️";
 
         // Pega sessão ativa do device
-        $device = Device::where('ativo', 1)->first();
+        $device = Device::where('status', "open")->first();
         if (!$device) {
             return response()->json(['erro' => 'Nenhum dispositivo ativo encontrado'], 500);
         }
