@@ -13,24 +13,18 @@ class WebhookController extends Controller
 {
     public function evento(Request $request)
     {
-        // Captura o corpo cru da requisição
         $raw = $request->getContent();
-
-        // Decodifica o JSON
         $data = json_decode($raw, true);
 
         if (json_last_error() !== JSON_ERROR_NONE) {
             return response()->json(['erro' => 'JSON inválido'], 400);
         }
 
-        // Extrai dados principais
         $numeroCompleto = $data['data']['key']['remoteJid'] ?? null;
-
         if (!$numeroCompleto) {
             return response()->json(['erro' => 'Número não encontrado'], 422);
         }
 
-        // Limpa o número (ex: "5511986123660@s.whatsapp.net" => "11986123660")
         $numero = preg_replace('/[^0-9]/', '', $numeroCompleto);
         if (str_starts_with($numero, '55')) {
             $numero = substr($numero, 2);
@@ -38,33 +32,46 @@ class WebhookController extends Controller
 
         // Cria link personalizado
         $link = "https://fornadapronta.com.br/pedido/" . $numero;
+        $mensagemTexto = "🍕 Olá! Que tal fazer seu pedido pelo nosso app? 😄 Acesse agora: $link\n\nEstamos te esperando com muito carinho e sabor! ❤️";
 
-        // Monta mensagem simpática com emojis
-        $mensagem = "🍕 Olá! Que tal fazer seu pedido pelo nosso app? 😄 Acesse agora: $link\n\nEstamos te esperando com muito carinho e sabor! ❤️";
+        // Busca a primeira sessão disponível (ajuste isso se tiver lógica de seleção)
+        $device = \App\Models\Device::where('ativo', 1)->first(); // ou qualquer outra lógica
 
-        // Simula envio da mensagem de volta para o WhatsApp (você adapta conforme seu sistema)
-        $response = Http::post('http://147.79.111.119:8080/send-message', [
-            'apikey' =>  env('TOKEN_EVOLUTION'),
-            'number' => "55$numero",
-            'message' => $mensagem,
-        ]);
-
-        if ($response->failed()) {
-            // Opcional: loga a resposta com detalhes
-            Log::error('Erro ao enviar mensagem WhatsApp', [
-                'status' => $response->status(),
-                'body' => $response->body(),
-            ]);
-
-            // Retorna erro com o conteúdo recebido da API
-            return response()->json([
-                'erro' => 'Falha ao enviar mensagem',
-                'status_code' => $response->status(),
-                'resposta' => $response->body(),
-            ], 200); // Use 200 se quiser ver no navegador/ferramenta de webhook
+        if (!$device) {
+            return response()->json(['erro' => 'Nenhum dispositivo ativo encontrado'], 500);
         }
 
+        $session = $device->session;
+        $url = "http://147.79.111.119:8080/message/sendText/{$session}";
 
-        return response()->json(['status' => 'Mensagem enviada com sucesso']);
+        $headers = [
+            'Content-Type' => 'application/json',
+            'apikey' => env('TOKEN_EVOLUTION'),
+        ];
+
+        $body = json_encode([
+            'number' => "55$numero",
+            'text' => $mensagemTexto,
+        ]);
+
+        $client = new Client();
+        $requestGuzzle = new GuzzleRequest('POST', $url, $headers, $body);
+
+        try {
+            $response = $client->sendAsync($requestGuzzle)->wait();
+            $status = $response->getStatusCode();
+            $bodyResp = $response->getBody()->getContents();
+
+            Log::info("Webhook: Mensagem enviada com status $status: $bodyResp");
+
+            return response()->json(['status' => 'Mensagem enviada com sucesso', 'resposta' => json_decode($bodyResp, true)]);
+        } catch (\Exception $e) {
+            Log::error("Webhook: Erro ao enviar mensagem: " . $e->getMessage());
+
+            return response()->json([
+                'erro' => 'Falha ao enviar mensagem',
+                'mensagem' => $e->getMessage(),
+            ]);
+        }
     }
 }
