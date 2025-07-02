@@ -32,7 +32,7 @@ class ChekoutController extends Controller
         if ($request->phone) {
             $customer = Customer::where('jid', $request->phone)->first();
 
-            session()->put('taxa_entrega', $customer->delivery_fee);
+            // session()->put('taxa_entrega', $customer->delivery_fee);
 
 
             session()->put('customer', $customer);
