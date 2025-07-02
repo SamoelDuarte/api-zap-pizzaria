@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Cliente;
+use App\Models\Device;
 use App\Models\Messagen;
 use App\Models\Pedido;
 use Illuminate\Http\Request;
@@ -13,6 +14,7 @@ class WebhookController extends Controller
 {
     public function evento(Request $request)
     {
+        // Captura o JSON bruto e decodifica
         $raw = $request->getContent();
         $data = json_decode($raw, true);
 
@@ -20,6 +22,7 @@ class WebhookController extends Controller
             return response()->json(['erro' => 'JSON inválido'], 400);
         }
 
+        // Extrai número do cliente
         $numeroCompleto = $data['data']['key']['remoteJid'] ?? null;
         if (!$numeroCompleto) {
             return response()->json(['erro' => 'Número não encontrado'], 422);
@@ -30,41 +33,42 @@ class WebhookController extends Controller
             $numero = substr($numero, 2);
         }
 
-        // Cria link personalizado
-        $link = "https://fornadapronta.com.br/pedido/" . $numero;
-        $mensagemTexto = "🍕 Olá! Que tal fazer seu pedido pelo nosso app? 😄 Acesse agora: $link\n\nEstamos te esperando com muito carinho e sabor! ❤️";
+        // Monta o link e mensagem
+        $link = "https://fornadapronta.com.br/pedido/{$numero}";
+        $mensagem = "🍕 Olá! Que tal fazer seu pedido pelo nosso app? 😄 Acesse agora: $link\n\nEstamos te esperando com muito carinho e sabor! ❤️";
 
-        // Busca a primeira sessão disponível (ajuste isso se tiver lógica de seleção)
-        $device = \App\Models\Device::where('ativo', 1)->first(); // ou qualquer outra lógica
-
+        // Pega sessão ativa do device
+        $device = Device::where('ativo', 1)->first();
         if (!$device) {
             return response()->json(['erro' => 'Nenhum dispositivo ativo encontrado'], 500);
         }
 
-        $session = $device->session;
-        $url = "http://147.79.111.119:8080/message/sendText/{$session}";
-
+        // Prepara envio
+        $url = "http://147.79.111.119:8080/message/sendText/{$device->session}";
         $headers = [
             'Content-Type' => 'application/json',
             'apikey' => env('TOKEN_EVOLUTION'),
         ];
 
         $body = json_encode([
-            'number' => "55$numero",
-            'text' => $mensagemTexto,
+            'number' => "55{$numero}",
+            'text' => $mensagem,
         ]);
 
-        $client = new Client();
-        $requestGuzzle = new GuzzleRequest('POST', $url, $headers, $body);
-
         try {
+            $client = new Client();
+            $requestGuzzle = new GuzzleRequest('POST', $url, $headers, $body);
             $response = $client->sendAsync($requestGuzzle)->wait();
+
             $status = $response->getStatusCode();
-            $bodyResp = $response->getBody()->getContents();
+            $resposta = $response->getBody()->getContents();
 
-            Log::info("Webhook: Mensagem enviada com status $status: $bodyResp");
+            Log::info("Webhook: Mensagem enviada para {$numero} com status {$status}");
 
-            return response()->json(['status' => 'Mensagem enviada com sucesso', 'resposta' => json_decode($bodyResp, true)]);
+            return response()->json([
+                'status' => 'Mensagem enviada com sucesso',
+                'resposta_api' => json_decode($resposta, true),
+            ]);
         } catch (\Exception $e) {
             Log::error("Webhook: Erro ao enviar mensagem: " . $e->getMessage());
 
