@@ -24,13 +24,12 @@ use GuzzleHttp\Client;
 
 class ChekoutController extends Controller
 {
-    public function index(Request $request)
+    public function index($phone)
     {
 
-        $request->all();
 
-        if ($request->phone) {
-            $customer = Customer::where('jid', $request->phone)->first();
+        if ($phone) {
+            $customer = Customer::where('jid', $phone)->first();
 
             // session()->put('taxa_entrega', $customer->delivery_fee);
             session()->put('customer', $customer);
