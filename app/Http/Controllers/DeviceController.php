@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Device;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -18,22 +19,41 @@ class DeviceController extends Controller
     {
         return view('admin.device.index');
     }
+
     public function create()
     {
+        // Apaga os dispositivos antigos
+        Device::whereNull('status')->delete();
 
-        $devicesComStatusNull = Device::whereNull('status')->get();
-        $devicesComStatusNull->each->delete();
-
-
+        // Cria o dispositivo com apenas a session
         $device = new Device();
-
         $device->session = Utils::createCode();
         $device->save();
 
+        return view('admin.device.create', compact('device'));
+    }
+    public function store(Request $request)
+    {
+        // Apaga os dispositivos antigos
+        Device::whereNull('status')->delete();
+        $request->validate([
+            'nome' => 'required|string|max:255'
+        ]);
 
-        $qrcodeImgSrc = $this->getQrCode($device->session);
+        // Cria nova sessão
+        $device = new Device();
+        $device->session = Utils::createCode();
+        $device->name = $request->nome;
+        $device->save();
 
-        return view('admin.device.create', compact('device', 'qrcodeImgSrc'));
+        // Gera o QR Code da sessão
+        $qrcode = $this->getQrCode($device->session);
+
+        return response()->json([
+            'session' => $device->session,
+            'id' => $device->id,
+            'qrcode' => $qrcode
+        ]);
     }
 
     public function getDevices()
@@ -67,26 +87,27 @@ class DeviceController extends Controller
 
     function getQrCode($session)
     {
-
         // URL da requisição
-        $url = env('APP_URL_ZAP').'/sessions/add';
+        $url = env('APP_URL_ZAP') . '/instance/create';
 
         // Dados da requisição
-        $data = array(
-            'sessionId' => $session // Substitua $session pela sua variável contendo os dados
-        );
+        $data = [
+            "instanceName" => $session,
+            "qrcode"       => true,
+            "integration"  => "WHATSAPP-BAILEYS"
+        ];
 
         // Configuração da requisição
-        $options = array(
-            CURLOPT_URL => $url,
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => json_encode($data),
+        $options = [
+            CURLOPT_URL            => $url,
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => json_encode($data),
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HTTPHEADER => array(
-                'secret: $2a$12$VruN7Mf0FsXW2mR8WV0gTO134CQ54AmeCR.ml3wgc9guPSyKtHMgC',
+            CURLOPT_HTTPHEADER     => [
+                'apikey: ' . env('TOKEN_EVOLUTION'),
                 'Content-Type: application/json'
-            )
-        );
+            ]
+        ];
 
         // Inicializar a sessão curl
         $ch = curl_init();
@@ -100,64 +121,61 @@ class DeviceController extends Controller
         // Verificar se ocorreu algum erro
         if (curl_errno($ch)) {
             echo 'Erro na requisição: ' . curl_error($ch);
+            curl_close($ch);
+            return false;
         }
 
         // Fechar a sessão curl
         curl_close($ch);
 
-        // Tratar a resposta (no caso de JSON, decodificar o JSON)
+        // Tratar a resposta (decodificar JSON)
         $result = json_decode($response, true);
 
-        // Exemplo de utilização dos dados da resposta
-        if (isset($result['qr'])) {
-            return   $result['qr'];
-            // Faça o que for necessário com a imagem do QR code
+        // Verificar se veio o QR Code
+        if (isset($result['qrcode']['base64'])) {
+            return $result['qrcode']['base64'];
         }
 
         return false;
     }
 
-    public function getStatus(Request $request)
+     public function getStatus(Request $request)
     {
-      
+        $client = new Client();
 
-        $url = env('APP_URL_ZAP')."/sessions/" . $request->sessionId . "/status";
+        try {
+            $response = $client->request('GET',  env('APP_URL_ZAP')."/instance/connectionState/{$request->sessionId}", [
+                'headers' => [
+                    'apikey' => env('TOKEN_EVOLUTION') // Substitua pela sua chave real
+                ]
+            ]);
 
-        $headers = array(
-            'secret: $2a$12$VruN7Mf0FsXW2mR8WV0gTO134CQ54AmeCR.ml3wgc9guPSyKtHMgC'
-        );
+            $body = json_decode($response->getBody(), true);
 
-        $ch = curl_init();
-
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-        $response = curl_exec($ch);
-
-        if (curl_errno($ch)) {
-            echo 'Erro na requisição cURL: ' . curl_error($ch);
+            // Retorna como JSON
+            return response()->json([
+                'status' => true,
+                'data' => $body
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        curl_close($ch);
-
-        // A variável $response contém a resposta da requisição
-        // Você pode processar os dados recebidos conforme necessário
-        echo $response;
     }
 
 
 
-    public function delete(Request $request){
+    public function delete(Request $request)
+    {
 
-      
-        $device = Device::where('id',$request->id_device)->first();
+
+        $device = Device::where('id', $request->id_device)->first();
 
         $device->delete();
 
 
-        return back()->with('success','Deletado Com Sucesso.');
-
-
+        return back()->with('success', 'Deletado Com Sucesso.');
     }
 }

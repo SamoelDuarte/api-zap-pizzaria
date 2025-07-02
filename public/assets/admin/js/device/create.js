@@ -1,11 +1,136 @@
+const inputNome = document.getElementById('device_name');
+const btnGerar = document.getElementById('createDeviceBtn');
+const qrCard = document.getElementById('qrCard');
+const qrExpired = document.getElementById("qr-expired");
+
+let session = '';
+let id_device = '';
+let conectado = false;
+
+// Habilita botão se nome for válido
+inputNome.addEventListener('input', () => {
+    const nome = inputNome.value.trim();
+    btnGerar.disabled = nome.length === 0 || nome.toLowerCase() === 'zaxio';
+});
+
+btnGerar.addEventListener('click', function () {
+    const nome = inputNome.value.trim();
+    qrExpired.style.display = "none";
+    if (nome === '' || nome.toLowerCase() === 'zaxio') return;
+
+    // Desabilita campo e esconde botão
+    inputNome.disabled = true;
+    btnGerar.style.display = 'none';
+
+    // Requisição AJAX
+    $.ajax({
+        url: "/dispositivo/criar",
+        type: "POST",
+        data: {
+            nome: nome,
+            _token: $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function (data) {
+            session = data.session;
+            id_device = data.id;
+            $('#session_device').val(session);
+            $('#id_device').val(id_device);
+
+            const qrImg = document.getElementById('qrcode-img');
+            qrImg.src = data.qrcode;
+            qrImg.style.display = 'block';
+
+            document.getElementById('qr-timer').style.display = 'block';
+            qrCard.style.display = 'block';
+
+            startCountdown();
+            startVerificacao();
+        }
+    });
+});
+
+function startCountdown() {
+    let countdown = 10;
+    const countdownSpan = document.getElementById("countdown");
+    const qrTimer = document.getElementById("qr-timer");
+   
+    const qrcodeImg = document.getElementById("qrcode-img");
+
+    // Garante que o texto comece em 10
+    countdownSpan.innerText = countdown;
+
+    const interval = setInterval(() => {
+        if (conectado) return clearInterval(interval);
+        countdown--;
+        countdownSpan.innerText = countdown;
+
+        if (countdown <= 0) {
+            clearInterval(interval);
+            qrTimer.style.display = "none";
+            qrcodeImg.style.display = "none";
+            qrExpired.style.display = "block";
+        
+            if (!conectado) {
+                inputNome.disabled = false;
+                btnGerar.style.display = 'inline-block';
+            }
+        }
+        
+    }, 1000);
+}
 
 
-var session = $("#session_device").val();
-var id_device = $("#id_device").val();
+// Verificação status
+function startVerificacao() {
+    const footerQrCode = document.getElementById("footer-qr-code");
 
-const qrcodeImg = document.getElementById("qrcode-img");
-const footerQrCode = document.getElementById("footer-qr-code");
+    const intervalId = setInterval(() => {
+        if (conectado) return clearInterval(intervalId);
 
+      $.ajax({
+                url: "/dispositivo/getStatus",
+        type: "GET",
+        data: { sessionId: session },
+        success: function (response) {
+            let res = response.data; // Corrigido: acessar a chave 'data'
+            
+            if (res.instance && res.instance.state === 'open') {
+                conectado = true;
+                $('#qrcode-img').hide();
+                $('#qr-timer').hide();
+                $('#footer-qr-code').show();
+
+                $.ajax({
+                    url: "updateStatus",
+                    method: "POST",
+                    data: JSON.stringify({
+                        id: id_device,
+                        status: res.instance.state,
+                        jid: res.instance.instanceName,
+                        picture: null, // Sem picture na resposta atual
+                        nome: inputNome.value
+                    }),
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr('content')
+                    }
+                });
+
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: "Conectado com sucesso.",
+                    showConfirmButton: false,
+                    timer: 5000,
+                        });
+                    }
+                }
+            });
+
+
+    }, 1000);
+}
 
 // var newSession = {
 //     "url": "http://localhost:3333/sessions/add",
@@ -26,97 +151,6 @@ const footerQrCode = document.getElementById("footer-qr-code");
 // });
 
 
-// Simulando carregamento assíncrono do QR Code em base64 (exemplo)
-setTimeout(function () {
-
-    qrcodeImg.style.display = "block";
-
-    const preload = document.getElementById("preload");
-    preload.style.display = "none";
-}, 2000); // Simula um carregamento de 3 segundos. Substitua pelo seu carregamento real.
-
-
-var count = 0;
-
-function verificarCondicao() {
-    var parametro = "valor_do_parametro"; // Substitua "valor_do_parametro" pelo valor real do parâmetro que você deseja passar
-
-    $.ajax({
-        url: "/dispositivo/getStatus",
-        type: "GET",
-        data: { sessionId: session }, // Aqui passamos o parâmetro na requisição GET
-        success: function (response) {
-            // Ação a ser executada em caso de sucesso
-            let resposeJson = JSON.parse(response); // Aqui você pode acessar a resposta do servidor
-            if (resposeJson['status'] == 'AUTHENTICATED') {
-
-                qrcodeImg.style.display = "none";
-                footerQrCode.style.display = "block";
-    
-                count = 6;
-    
-                clearInterval(intervalId); // Limpar o intervalo para parar a verificação
-    
-    
-    
-                var updateStatus = {
-                    "url": "updateStatus",
-                    "method": "POST",
-                    "timeout": 0,
-                    "data": JSON.stringify({
-                        "status": resposeJson['status'],
-                        "name": resposeJson['me']['name'],
-                        "jid": resposeJson['me']['jid'],
-                        "picture": resposeJson['me']['picture'],
-                        "id": id_device,
-    
-                    }),
-                    "headers": {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    }
-                };
-    
-                $.ajax(updateStatus).done(function (response) {
-    
-    
-    
-                    const Toast = Swal.mixin({
-                        toast: true,
-                        position: 'top-end',
-                        showConfirmButton: false,
-                        timer: 5000,
-                        timerProgressBar: true,
-                        didOpen: (toast) => {
-                            toast.addEventListener('mouseenter', Swal.stopTimer)
-                            toast.addEventListener('mouseleave', Swal.resumeTimer)
-                        }
-                    })
-    
-                    Toast.fire({
-                        icon: 'success',
-                        title: "Conectado com sucesso.",
-                    })
-    
-                });
-    
-    
-            }
-            if (count == 3) {
-                location.reload();
-    
-            }
-            console.log(count);
-            count++;
-        },
-        error: function (xhr, status, error) {
-            // Ação a ser executada em caso de erro
-            console.error("Erro na requisição:", error);
-        }
-    });
-}
-
-const intervalId = setInterval(verificarCondicao, 3000);
 
 // Função de verificação que será executada a cada 5 segundos
 // function verificarCondicaos() {

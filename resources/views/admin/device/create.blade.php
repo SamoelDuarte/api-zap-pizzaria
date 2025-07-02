@@ -6,48 +6,63 @@
 @endsection
 
 @section('content')
-    <section>
+    <div class="container mt-4">
         <div class="page-header-content py-3">
 
             <ol class="breadcrumb mb-0 mt-4">
-                <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="/">Início</a></li>
                 <li class="breadcrumb-item"><a href="{{ route('admin.device.index') }}">Dispositivos</a></li>
                 <li class="breadcrumb-item active" aria-current="page">Novo Dispositivo</li>
             </ol>
 
         </div>
         <div class="row">
-            <div class="col-md-6 ">
+            <div class="col-md-6">
                 <div class="card-header">
-                    <h4>{{ __('How To Scan?') }}</h4>
-                    <div class="card-header-action">
-                        <a href="#" class="btn btn-sm btn-neutral">
-                            <i class="fas fa-lightbulb"></i>&nbsp{{ __('Guide') }}
-                        </a>
-                    </div>
                 </div>
-                <div class="card qr-code">
-                    
-                    <div id="preload">
+                <div class="card qr-code" id="qrCard">
+                    <div id="preload" style="display: none;">
                         <div class="loader"></div>
                     </div>
-                    <img id="qrcode-img" src="{{ $qrcodeImgSrc }}" alt="QR Code" />
-                    <div class="card-footer server_connect " id="footer-qr-code" style="display: none">
-                        <div class=" ">
-                            {{ __('Conectado  😎 ') }}
+
+                    <img id="qrcode-img" src="" alt="QR Code" style="display: none;" />
+
+
+                    <div id="qr-timer" class="text-center text-muted mt-2" style="display: none;">
+                        O código expira em <span id="countdown">10</span> segundos
+                    </div>
+                    <div id="qr-expired" class="text-center text-danger mt-2" style="display: none;">
+                        QR Code expirado. Clique novamente para gerar outro.
+                    </div>
+
+                    <div class="form-group p-3">
+                        <label for="device_name">Nome do dispositivo:</label>
+                        <input type="text" id="device_name" class="form-control" placeholder="Ex: Celular João" required>
+                    </div>
+
+                    <div class="text-center mb-3">
+                        <button id="createDeviceBtn" class="btn btn-primary" disabled>
+                            <i class="fas fa-qrcode"></i> Gerar QR Code
+                        </button>
+                    </div>
+
+                    <div class="card-footer server_connect" id="footer-qr-code" style="display: none;">
+                        <div>
+                            Conectado 😎
                         </div>
                     </div>
                 </div>
+
 
             </div>
             <div class="col-md-6">
                 <div class="col-sm-12">
                     <div class="card">
                         <div class="card-header">
-                            <h4>{{ __('How To Scan?') }}</h4>
+                            <h4>Como Escanear?</h4>
                             <div class="card-header-action">
                                 <a href="#" class="btn btn-sm btn-neutral">
-                                    <i class="fas fa-lightbulb"></i>&nbsp{{ __('Guide') }}
+                                    <i class="fas fa-lightbulb"></i>&nbspGuia
                                 </a>
                             </div>
                         </div>
@@ -62,10 +77,10 @@
                                     </div>
                                     <div class="activity-detail">
                                         <div class="mb-2">
-                                            <span class="text-job text-primary">{{ __('Step 1') }}</span>
+                                            <span class="text-job text-primary">Passo 1</span>
                                             <span class="bullet"></span>
                                         </div>
-                                        <p>{{ __('Open WhatsApp on your phone') }}</p>
+                                        <p>Abra o WhatsApp no seu celular</p>
                                     </div>
                                 </div>
                                 <div class="activity">
@@ -74,10 +89,10 @@
                                     </div>
                                     <div class="activity-detail">
                                         <div class="mb-2">
-                                            <span class="text-job text-primary">{{ __('Step 2') }}</span>
+                                            <span class="text-job text-primary">Passo 2</span>
                                             <span class="bullet"></span>
                                         </div>
-                                        <p>{{ __('Tap Menu or Settings and select Linked Devices') }}</p>
+                                        <p>Toque no Menu ou Configurações e selecione Dispositivos Vinculados</p>
                                     </div>
                                 </div>
                                 <div class="activity">
@@ -86,10 +101,10 @@
                                     </div>
                                     <div class="activity-detail">
                                         <div class="mb-2">
-                                            <span class="text-job text-primary">{{ __('Step 3') }}</span>
+                                            <span class="text-job text-primary">Passo 3</span>
                                             <span class="bullet"></span>
                                         </div>
-                                        <p>{{ __('Tap on Link a Device') }}</p>
+                                        <p>Toque em Vincular um Dispositivo</p>
                                     </div>
                                 </div>
                                 <div class="activity">
@@ -98,10 +113,10 @@
                                     </div>
                                     <div class="activity-detail">
                                         <div class="mb-2">
-                                            <span class="text-job text-primary">{{ __('Step 4') }}</span>
+                                            <span class="text-job text-primary">Passo 4</span>
                                             <span class="bullet"></span>
                                         </div>
-                                        <p>{{ __('Point your phone to this screen to capture the code') }}</p>
+                                        <p>Aponte seu celular para esta tela para capturar o código</p>
                                     </div>
                                 </div>
                             </div>
@@ -109,14 +124,11 @@
                     </div>
                 </div>
 
-
                 <input type="hidden" name="id" id="id_device" value="{{ $device->id }}">
                 <input type="hidden" name="session" id="session_device" value="{{ $device->session }}">
-
-
             </div>
         </div>
-    </section>
+    </div>
 @endsection
 
 @section('scripts')

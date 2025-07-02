@@ -12,8 +12,11 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-       '/events',
-       '/events/mensagemEmMassa',
-       '/events/carrinhoAbandonado'
+        '/events',
+        '/events/mensagemEmMassa',
+        '/events/carrinhoAbandonado',
+        'git-webhook',
+        '/git-webhook',
+        'webhook',
     ];
 }

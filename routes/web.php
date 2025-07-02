@@ -13,6 +13,7 @@ use App\Http\Controllers\DeliverymenController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\EventsController;
 use App\Http\Controllers\FormController;
+use App\Http\Controllers\GitWebhookController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NotificacaoController;
 use App\Http\Controllers\OrderController;
@@ -49,7 +50,7 @@ use GuzzleHttp\Client;
 
 
 
-
+Route::post('/git-webhook', [GitWebhookController::class, 'handle']);
 Route::get('/notificacoes', 'NotificacaoController@index')->name('notificacoes.index');
 Route::post('/marcar-como-lida/{id}', 'NotificacaoController@marcarComoLida')->name('notificacoes.marcar_como_lida');
 
@@ -136,7 +137,9 @@ Route::middleware(['auth.user'])->group(function () {
             Route::get('/', 'index')->name('admin.device.index');
             Route::get('/novo', 'create')->name('admin.device.create');
             Route::post('/delete', 'delete')->name('admin.device.delete');
+            Route::post('/gerarQr', 'gerarQr')->name('dispositivo.gerarQr');
             Route::get('/getDevices', 'getDevices');
+             Route::post('/criar', 'store');
             Route::post('/updateStatus', 'updateStatus');
             Route::post('/updateName', 'updateName');
             Route::get('/getStatus', 'getStatus');
