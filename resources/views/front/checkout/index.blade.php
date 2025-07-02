@@ -262,12 +262,15 @@
 @endsection
 
 @section('content')
-    @if ($customer->delivery_fee)
+    @php
+        $taxaEntrega = session('taxa_entrega', 0);
+    @endphp
+
+    @if ($taxaEntrega > 0)
         <div class="delivery">
             <div class="img-delivery">
                 <img src="https://cdn-icons-png.freepik.com/512/5889/5889439.png" alt="">
-                <small>R$ {{ number_format($customer->delivery_fee, 2, ',', '.') }}</small>
-
+                <small>R$ {{ number_format($taxaEntrega, 2, ',', '.') }}</small>
             </div>
         </div>
     @endif
@@ -343,7 +346,7 @@
     <script>
         function redirectToCart() {
             // Verifica se o cliente possui zip_code
-         
+
             const customerZipcode = @json($customer['zipcode']);
             console.log(customerZipcode);
             if (customerZipcode) {
@@ -398,7 +401,7 @@
             }, 3000);
         });
 
-        
+
 
         const categoryHeader = document.getElementById('category-header');
         const categories = document.querySelectorAll('.category-header div');
