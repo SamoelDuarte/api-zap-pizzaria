@@ -19,6 +19,7 @@ use App\Http\Controllers\NotificacaoController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\RouteController;
+use App\Http\Controllers\WebhookController;
 use App\Models\ChatBot;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -48,6 +49,11 @@ use GuzzleHttp\Client;
 |
 */
 
+
+
+Route::prefix('/webhook')->controller(WebhookController::class)->group(function () {
+    Route::get('/', 'evento');
+});
 
 
 Route::post('/git-webhook', [GitWebhookController::class, 'handle']);
@@ -139,7 +145,7 @@ Route::middleware(['auth.user'])->group(function () {
             Route::post('/delete', 'delete')->name('admin.device.delete');
             Route::post('/gerarQr', 'gerarQr')->name('dispositivo.gerarQr');
             Route::get('/getDevices', 'getDevices');
-             Route::post('/criar', 'store');
+            Route::post('/criar', 'store');
             Route::post('/updateStatus', 'updateStatus');
             Route::post('/updateName', 'updateName');
             Route::get('/getStatus', 'getStatus');
