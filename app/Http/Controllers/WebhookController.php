@@ -6,68 +6,53 @@ use App\Models\Cliente;
 use App\Models\Messagen;
 use App\Models\Pedido;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class WebhookController extends Controller
 {
     public function evento(Request $request)
     {
-        // Captura todo o conteúdo JSON recebido
-        $data = $request->all();
+        // Captura o corpo cru da requisição
+        $raw = $request->getContent();
 
-        // Loga no storage/logs/laravel.log
-        Log::info('📩 Webhook recebido:', $data);
+        // Decodifica o JSON
+        $data = json_decode($raw, true);
 
-        //     // Lê o corpo cru da requisição
-        //     $raw = $request->getContent();
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return response()->json(['erro' => 'JSON inválido'], 400);
+        }
 
-        //     // Tenta decodificar o JSON
-        //     $data = json_decode($raw, true);
+        // Extrai dados principais
+        $numeroCompleto = $data['data']['key']['remoteJid'] ?? null;
 
-        //     if (json_last_error() !== JSON_ERROR_NONE) {
-        //         return response()->json(['erro' => 'JSON inválido'], 400);
-        //     }
+        if (!$numeroCompleto) {
+            return response()->json(['erro' => 'Número não encontrado'], 422);
+        }
 
-        //     $numeroCompleto = $data['data']['key']['remoteJid'] ?? null;
-        //     $mensagemTexto = $data['data']['message']['conversation'] ?? null;
+        // Limpa o número (ex: "5511986123660@s.whatsapp.net" => "11986123660")
+        $numero = preg_replace('/[^0-9]/', '', $numeroCompleto);
+        if (str_starts_with($numero, '55')) {
+            $numero = substr($numero, 2);
+        }
 
-        //     if (!$numeroCompleto || !$mensagemTexto) {
-        //         return response()->json(['erro' => 'Dados incompletos'], 422);
-        //     }
+        // Cria link personalizado
+        $link = "https://fornadapronta.com.br/pedido/" . $numero;
 
-        //     // Remove prefixo "55" e "@s.whatsapp.net"
-        //     $numero = preg_replace('/[^0-9]/', '', $numeroCompleto);
-        //     if (str_starts_with($numero, '55')) {
-        //         $numero = substr($numero, 2);
-        //     }
+        // Monta mensagem simpática com emojis
+        $mensagem = "🍕 Olá! Que tal fazer seu pedido pelo nosso app? 😄 Acesse agora: $link\n\nEstamos te esperando com muito carinho e sabor! ❤️";
 
-        //     // Codifica o número como está salvo no banco
-        //     $numeroCodificado = base64_encode($numero);
+        // Simula envio da mensagem de volta para o WhatsApp (você adapta conforme seu sistema)
+        $response = Http::post('http://147.79.111.119:8080/send-message', [
+            'apikey' =>  env('TOKEN_EVOLUTION'),
+            'number' => "55$numero",
+            'message' => $mensagem,
+        ]);
 
-        //     $cliente = Client::where('telefone', 'like', "%$numeroCodificado")->first();
-        //     if (!$cliente) {
-        //         return response()->json(['erro' => 'Cliente não encontrado'], 404);
-        //     }
+        if ($response->failed()) {
+            return response()->json(['erro' => 'Falha ao enviar mensagem'], 500);
+        }
 
-        //     $pedido = Pedido::where('cliente_id', $cliente->id)
-        //         ->where('status_pedido_id', 8)
-        //         ->orderByDesc('id')
-        //         ->first();
-
-        //     if (!$pedido) {
-
-        //         return response()->json(['erro' => 'Pedido não encontrado'], 404);
-        //     }
-
-        //     $mensagem = new Messagen();
-        //     $mensagem->pedido_id = $pedido->id;
-        //     $mensagem->usuario_id = $pedido->entregador_id;
-        //     $mensagem->messagem = $mensagemTexto;
-        //     $mensagem->direcao = 'recebido';
-        //     $mensagem->enviado = true;
-        //     $mensagem->save();
-
-
-        //     return response()->json(['status' => 'ok']);
+        return response()->json(['status' => 'Mensagem enviada com sucesso']);
     }
 }
