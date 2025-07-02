@@ -52,7 +52,7 @@ use GuzzleHttp\Client;
 
 
 Route::prefix('/webhook')->controller(WebhookController::class)->group(function () {
-    Route::get('/', 'evento');
+    Route::post('/', 'evento');
 });
 
 

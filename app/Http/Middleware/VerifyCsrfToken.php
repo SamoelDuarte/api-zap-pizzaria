@@ -17,6 +17,6 @@ class VerifyCsrfToken extends Middleware
         '/events/carrinhoAbandonado',
         'git-webhook',
         '/git-webhook',
-        'webhook',
+        '/webhook',
     ];
 }
