@@ -32,10 +32,10 @@ class ChekoutController extends Controller
             $customer = Customer::where('jid', $phone)->first();
 
             // session()->put('taxa_entrega', $customer->delivery_fee);
-            session()->put('customer', $customer);
-            $categories = Categories::with('products')->get();
-            $cart = session()->get('cart', []);
-            return view('front.checkout.index', compact('categories', 'cart', 'customer'));
+            // session()->put('customer', $customer);
+            // $categories = Categories::with('products')->get();
+            // $cart = session()->get('cart', []);
+            return view('front.checkout.index');
         } else {
             // Recuperar o customer da sessão
             $customer = session()->get('customer');
