@@ -50,8 +50,20 @@ class WebhookController extends Controller
         ]);
 
         if ($response->failed()) {
-            return response()->json(['erro' => 'Falha ao enviar mensagem'], 500);
+            // Opcional: loga a resposta com detalhes
+            Log::error('Erro ao enviar mensagem WhatsApp', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+
+            // Retorna erro com o conteúdo recebido da API
+            return response()->json([
+                'erro' => 'Falha ao enviar mensagem',
+                'status_code' => $response->status(),
+                'resposta' => $response->body(),
+            ], 200); // Use 200 se quiser ver no navegador/ferramenta de webhook
         }
+
 
         return response()->json(['status' => 'Mensagem enviada com sucesso']);
     }
