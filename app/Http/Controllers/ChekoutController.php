@@ -27,7 +27,7 @@ class ChekoutController extends Controller
     public function index(Request $request)
     {
 
-         dd($request->all());
+        $request->all();
 
         if ($request->phone) {
             $customer = Customer::where('jid', $request->phone)->first();
