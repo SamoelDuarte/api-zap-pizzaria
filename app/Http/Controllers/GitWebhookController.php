@@ -1,5 +1,3 @@
-<?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -13,12 +11,17 @@ class GitWebhookController extends Controller
        $projectPath = base_path();
 
        // Comando para resetar e limpar mudanças locais antes do pull
-       $cmd = "cd {$projectPath} && whoami && /usr/bin/git reset --hard && /usr/bin/git clean -fd && /usr/bin/git pull origin main 2>&1";
+       $cmd = "cd {$projectPath} && /usr/bin/git reset --hard && /usr/bin/git clean -fd && /usr/bin/git pull origin main 2>&1";
 
+       // Executa o comando
        exec($cmd, $output, $returnVar);
 
+       // Verifica qual usuário o comando está sendo executado
+       $executedAs = exec('whoami');
+
+       // Retorna a resposta em formato JSON
        return response()->json([
-           'executed_as' => exec('whoami'),
+           'executed_as' => $executedAs,
            'executed_command' => $cmd,
            'output' => $output,
            'return_var' => $returnVar
