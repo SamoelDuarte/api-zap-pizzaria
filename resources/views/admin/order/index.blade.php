@@ -23,8 +23,13 @@
     <section id="device">
         <!-- Page Heading -->
         <div class="page-header-content py-3">
-
-
+            <div class="d-sm-flex align-items-center justify-content-between">
+                <h1 class="h3 mb-0 text-gray-800">Pedidos</h1>
+                <a href="{{ route('admin.product.create') }}"
+                    class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
+                    <i class="fas fa-plus text-white-50"></i> Retirar Pedido
+                </a>
+            </div>
 
             <ol class="breadcrumb mb-0 mt-4">
                 <li class="breadcrumb-item"><a href="/">Inicio</a></li>

@@ -25,39 +25,39 @@ use GuzzleHttp\Client;
 class ChekoutController extends Controller
 {
     public function index(Request $request)
-{
-    $phone = $request->query('phone');
+    {
+        $phone = $request->query('phone');
 
-    $customer = null;
-    $semCadastro = false;
-    $taxaEntrega = 0;
+        $customer = null;
+        $semCadastro = false;
+        $taxaEntrega = 0;
 
-    if ($phone) {
-        $customer = Customer::where('jid', $phone)->first();
+        if ($phone) {
+            $customer = Customer::where('jid', $phone)->first();
 
-        if ($customer) {
-            session()->put('customer', $customer);
-            $taxaEntrega = $customer->delivery_fee ?? 0;
+            if ($customer) {
+                session()->put('customer', $customer);
+                $taxaEntrega = $customer->delivery_fee ?? 0;
+            } else {
+                session()->forget('customer');
+                $semCadastro = true;
+            }
         } else {
-            session()->forget('customer');
-            $semCadastro = true;
+            $customer = session()->get('customer');
+            if ($customer) {
+                $taxaEntrega = $customer->delivery_fee ?? 0;
+            } else {
+                $semCadastro = true;
+            }
         }
-    } else {
-        $customer = session()->get('customer');
-        if ($customer) {
-            $taxaEntrega = $customer->delivery_fee ?? 0;
-        } else {
-            $semCadastro = true;
-        }
+
+        session()->put('taxa_entrega', $taxaEntrega);
+
+        $categories = Categories::with('products')->get();
+        $cart = session()->get('cart', []);
+
+        return view('front.checkout.index', compact('categories', 'cart', 'customer', 'semCadastro'));
     }
-
-    session()->put('taxa_entrega', $taxaEntrega);
-
-    $categories = Categories::with('products')->get();
-    $cart = session()->get('cart', []);
-
-    return view('front.checkout.index', compact('categories', 'cart', 'customer', 'semCadastro'));
-}
 
     public function addProduto($id)
     {
@@ -194,26 +194,25 @@ class ChekoutController extends Controller
 
     public function showCart()
     {
-        $customer = session('customer');
+        $customer = optional(session('customer')); // Evita erro se for null
 
         if (!$customer->zip_code) {
             return view('front.checkout.cadastro', compact('customer'));
         }
-        // Obter o carrinho da sessão
+
         $cart = session()->get('cart', []);
 
-        // Verificar se o carrinho está vazio
         if (empty($cart)) {
             return view('front.checkout.va_pro_zap');
         }
 
-        // Obter produtos da categoria 'bebidas'
         $produtosBebidas = Product::whereHas('category', function ($query) {
             $query->where('name', 'bebidas');
         })->get();
 
-        return view('front.checkout.cart', compact('cart', 'produtosBebidas'));
+        return view('front.checkout.cart', compact('cart', 'produtosBebidas', 'customer'));
     }
+
 
     public function removeCartItem($index)
     {
@@ -477,84 +476,97 @@ class ChekoutController extends Controller
     }
     public function pagamento(Request $request)
     {
-        $customer = session()->get('customer');
-        $customer = Customer::find($customer->id);
-        session()->put('taxa_entrega', $customer->delivery_fee);
+        $data = $request->all();
 
-        $customer->update($request->all());
+        // Cria ou atualiza o cliente
+        if (!empty($data['id'])) {
+            $customer = Customer::find($data['id']);
+
+            if (!$customer) {
+                return redirect()->back()->withErrors('Cliente não encontrado.');
+            }
+
+            $customer->update($data);
+        } else {
+            $customer = Customer::create($data);
+        }
+
+        // Já existe: salva na sessão o cliente e a taxa de entrega dele
         session()->put('customer', $customer);
-        // Obter o carrinho da sessão
+        session()->put('taxa_entrega', $customer->delivery_fee ?? 0);
+
+        // Obter carrinho
         $cart = session()->get('cart', []);
 
-        // Verificar se o carrinho está vazio
         if (empty($cart)) {
             return view('front.checkout.va_pro_zap');
         }
 
-        // Obter produtos da categoria 'bebidas'
         $produtosBebidas = Product::whereHas('category', function ($query) {
             $query->where('name', 'bebidas');
         })->get();
 
         return view('front.checkout.payments', compact('produtosBebidas', 'cart'));
     }
+
+
     public function gerarPix(Request $request)
-{
-    // Valores do pedido
-    $amount = $request->input('amount');
-    $cpf = '37785652813';
-    $phone = '986123660';
-    $reference_id = uniqid('pix_'); // ID único para referência do pedido
+    {
+        // Valores do pedido
+        $amount = $request->input('amount');
+        $cpf = '37785652813';
+        $phone = '986123660';
+        $reference_id = uniqid('pix_'); // ID único para referência do pedido
 
-    // Configure o cliente Pagar.me
-    $client = new \GuzzleHttp\Client();
+        // Configure o cliente Pagar.me
+        $client = new \GuzzleHttp\Client();
 
-    // Crie a transação PIX
-    $response = $client->request('POST', 'https://api.pagar.me/core/v5/orders', [
-        'body' => json_encode([
-            'customer' => [
-                'phones' => [
-                    'home_phone' => [
-                        'country_code' => '55',
-                        'area_code' => '11',
-                        'number' => $phone
+        // Crie a transação PIX
+        $response = $client->request('POST', 'https://api.pagar.me/core/v5/orders', [
+            'body' => json_encode([
+                'customer' => [
+                    'phones' => [
+                        'home_phone' => [
+                            'country_code' => '55',
+                            'area_code' => '11',
+                            'number' => $phone
+                        ]
+                    ],
+                    'name' => 'Cliente',
+                    'email' => 'cliente@example.com',
+                    'document' => $cpf,
+                    'type' => 'individual'
+                ],
+                'items' => [
+                    [
+                        'amount' => $amount,
+                        'description' => 'Descrição do Pedido',
+                        'quantity' => 1,
+                        'code' => $reference_id
                     ]
                 ],
-                'name' => 'Cliente',
-                'email' => 'cliente@example.com',
-                'document' => $cpf,
-                'type' => 'individual'
-            ],
-            'items' => [
-                [
-                    'amount' => $amount,
-                    'description' => 'Descrição do Pedido',
-                    'quantity' => 1,
-                    'code' => $reference_id
-                ]
-            ],
-            'payments' => [
-                [
-                    'payment_method' => 'pix',
-                    'pix' => [
-                        'expires_in' => 3600 // Tempo de expiração do PIX em segundos
+                'payments' => [
+                    [
+                        'payment_method' => 'pix',
+                        'pix' => [
+                            'expires_in' => 3600 // Tempo de expiração do PIX em segundos
+                        ]
                     ]
                 ]
-            ]
-        ]),
-        'headers' => [
-            'accept' => 'application/json',
-            'authorization' => 'Basic ' . base64_encode(env('PAGARME_API_KEY') . ':'),
-            'content-type' => 'application/json',
-        ],
-    ]);
+            ]),
+            'headers' => [
+                'accept' => 'application/json',
+                'authorization' => 'Basic ' . base64_encode(env('PAGARME_API_KEY') . ':'),
+                'content-type' => 'application/json',
+            ],
+        ]);
 
-    $data = json_decode($response->getBody(), true);
+        $data = json_decode($response->getBody(), true);
 
-    // dd($data);
-    // Retorne o código "copia e cola"
-    return response()->json([
-        'pix_code' => $data['charges'][0]['last_transaction']['qr_code']
-    ]);
-}
+        // dd($data);
+        // Retorne o código "copia e cola"
+        return response()->json([
+            'pix_code' => $data['charges'][0]['last_transaction']['qr_code']
+        ]);
+    }
 }

@@ -162,7 +162,10 @@ Route::middleware(['auth.user'])->group(function () {
             Route::post('/store', 'store')->name('admin.customer.store');
             Route::put('/update/{customer}', 'update')->name('admin.customer.update');
             Route::get('/getCustomers', 'getCustomers');
+             Route::get('/buscar-por-telefone', 'buscarPorTelefone')->name('cliente.buscar.telefone');
         });
+
+        
 
         Route::prefix('/chat-bot')->controller(ChatBotController::class)->group(function () {
             Route::get('/', 'index')->name('admin.chatbot.index');
@@ -177,6 +180,7 @@ Route::middleware(['auth.user'])->group(function () {
 
         Route::prefix('/pedidos')->controller(OrderController::class)->group(function () {
             Route::get('/', 'index')->name('admin.order.index');
+            Route::get('/novo', 'create')->name('admin.order.create');
             Route::get('/getOrders', 'getOrders');
             Route::get('/getOrdersCount', 'getOrdersCount');
             Route::post('/atualizar-status', 'updateStatus');
@@ -216,6 +220,8 @@ Route::middleware(['auth.user'])->group(function () {
             Route::delete('/destroy/{product}', 'destroy')->name('admin.product.destroy');
             Route::put('/destroy/{product}', 'update')->name('admin.product.update');
             Route::get('/edita', 'edit')->name('admin.product.edit');
+            Route::get('/buscar-por-nome', 'buscarPorNome');
+
         });
     });
 });

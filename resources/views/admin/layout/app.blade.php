@@ -61,13 +61,21 @@
 
             <!-- Na sidebar -->
             @if (session('authenticated') && session('userData') && session('userData')->role == 'admin')
+                
                 <li class="nav-item">
-                    <a href="{{ route('admin.order.index') }}" class="nav-link">
-                        <i class="fas fa-users"></i>
+                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#orders"
+                        aria-expanded="true" aria-controls="orders">
+                        <i class="fas fa-mail-bulk"></i>
                         <span>Pedidos</span>
-                        <span class="badge badge-danger badge-counter notification-count"
-                            id="sidebar-notification-count">0</span>
                     </a>
+
+                    <div id="orders" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                        <div class="bg-white py-2 collapse-inner rounded">
+                            <a class="collapse-item" href="{{ route('admin.order.index') }}">Lista Pedidos</a>
+                            <a class="collapse-item" href="{{ route('admin.order.create') }}">retirar Pedido</a>
+                        </div>
+                    </div>
+
                 </li>
             @endif
 

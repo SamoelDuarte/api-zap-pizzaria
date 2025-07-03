@@ -34,26 +34,26 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
         $product = Product::find($id);
-    
+
         if (!$product) {
             // Lidar com o produto não encontrado, redirecionar ou mostrar um erro
             return redirect()->route('admin.product.index')->with('error', 'Produto não encontrado.');
         }
-    
+
         $data = $request->validate([
             'name' => 'required',
             'price' => 'required',
             'description' => '',
         ]);
-    
+
         $data['price'] = Utils::prepareMoneyForDatabase($data['price']);
-    
+
         if (!$request->input('sistem')) {
             $additionalData = $request->validate([
                 'category_id' => 'required',
                 'imageInput' => 'image|mimes:jpeg,png,jpg,gif,avif|max:2048', // Verifica se é uma imagem válida
             ]);
-    
+
             if ($request->hasFile('imageInput')) {
                 // Se uma nova imagem foi enviada, exclua a imagem anterior
                 if ($product->image) {
@@ -65,19 +65,19 @@ class ProductController extends Controller
                 $image->move(public_path('assets/images/products'), $imageName);
                 $additionalData['image'] = 'assets/images/products/' . $imageName; // Salvar o caminho da imagem
             }
-    
+
             $data = array_merge($data, $additionalData);
         }
-     
-         // Remove 'imageInput' do array $additionalData
-         unset($data['imageInput']);
-         
+
+        // Remove 'imageInput' do array $additionalData
+        unset($data['imageInput']);
+
         $product->update($data);
-    
+
         return redirect()->route('admin.product.index')
             ->with('success', 'Produto atualizado com sucesso.');
     }
-    
+
 
 
     public function store(Request $request)
@@ -91,7 +91,7 @@ class ProductController extends Controller
             'imageInput' => 'image|mimes:jpeg,png,jpg,gif|max:2048|required', // Verifique os requisitos da imagem
         ]);
 
-  
+
 
         $image = $request->file('imageInput');
         if ($image) {
@@ -159,5 +159,15 @@ class ProductController extends Controller
         }
 
         return redirect()->route('admin.product.index')->with('error', 'Produto não encontrado.');
+    }
+    public function buscarPorNome(Request $request)
+    {
+        $nome = $request->get('nome');
+        $produtos = Product::where('name', 'like', "%{$nome}%")
+            ->select('id', 'name', 'price')
+            ->limit(10)
+            ->get();
+
+        return response()->json($produtos);
     }
 }

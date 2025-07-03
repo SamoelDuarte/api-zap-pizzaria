@@ -5,8 +5,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
-        
-
         .form-container {
             width: 80%;
             max-width: 500px;
@@ -78,6 +76,7 @@
             align-items: stretch;
             flex-direction: column;
         }
+
         .checkout-footer {
             position: fixed;
             bottom: 0;
@@ -92,6 +91,7 @@
             color: #fff;
             box-sizing: border-box;
         }
+
         .checkout-button {
             padding: 10px 20px;
             background-color: #ff4500;
@@ -121,40 +121,49 @@
                 @csrf
                 <div class="form-group">
                     <label for="name">Nome</label>
-                    <input type="text" id="name" class="title-case" name="name" placeholder="Nome Completo" value="{{ $customer->name }}" required>
+                    <input type="text" id="name" class="title-case" name="name" placeholder="Nome Completo"
+                        value="{{ $customer->name }}" required>
                 </div>
                 <input type="hidden" name="id" value="{{ $customer->id }}">
                 <div class="form-group">
                     <label for="phone">Telefone</label>
-                    <input type="text" id="phone" name="phone" placeholder="Telefone" value="{{ $customer->phone }}" required>
+                    <input type="text" id="phone" name="phone" placeholder="Telefone"
+                        value="{{ $customer->phone }}" required>
                 </div>
                 <div class="form-group">
                     <label for="zipcode">CEP</label>
-                    <input type="text" id="zipcode" name="zipcode" placeholder="CEP" value="{{ $customer->zipcode }}" required>
+                    <input type="text" id="zipcode" name="zipcode" placeholder="CEP" value="{{ $customer->zipcode }}"
+                        required>
                 </div>
                 <div class="form-group">
                     <label for="public_place">Logradouro</label>
-                    <input type="text" id="public_place" name="public_place" readonly placeholder="Rua" value="{{ $customer->public_place }}" required>
+                    <input type="text" id="public_place" name="public_place" readonly placeholder="Rua"
+                        value="{{ $customer->public_place }}" required>
                 </div>
                 <div class="form-group">
                     <label for="number">Número</label>
-                    <input type="text" id="number" name="number" placeholder="Número" value="{{ $customer->number }}" required>
+                    <input type="text" id="number" name="number" placeholder="Número" value="{{ $customer->number }}"
+                        required>
                 </div>
                 <div class="form-group">
                     <label for="complement">Complemento</label>
-                    <input type="text" id="complement" name="complement" placeholder="Complemento" value="{{ $customer->complement }}">
+                    <input type="text" id="complement" name="complement" placeholder="Complemento"
+                        value="{{ $customer->complement }}">
                 </div>
                 <div class="form-group">
                     <label for="neighborhood">Bairro</label>
-                    <input type="text" id="neighborhood" name="neighborhood" readonly placeholder="Bairro" value="{{ $customer->neighborhood }}" required>
+                    <input type="text" id="neighborhood" name="neighborhood" readonly placeholder="Bairro"
+                        value="{{ $customer->neighborhood }}" required>
                 </div>
                 <div class="form-group" style="display: none;">
                     <label for="city">Cidade</label>
-                    <input type="text" id="city" name="city" placeholder="Cidade" value="{{ $customer->city }}" required>
+                    <input type="text" id="city" name="city" placeholder="Cidade" value="{{ $customer->city }}"
+                        required>
                 </div>
                 <div class="form-group" style="display: none;">
                     <label for="state">Estado</label>
-                    <input type="text" id="state" name="state" placeholder="Estado" value="{{ $customer->state }}" required>
+                    <input type="text" id="state" name="state" placeholder="Estado" value="{{ $customer->state }}"
+                        required>
                 </div>
                 <div class="checkout-footer">
                     <button type="submit" class="btn checkout-button">Pagamento</button>
@@ -165,10 +174,10 @@
 @endsection
 
 @section('scripts')
-<script src="{{ asset('/assets/admin/vendor/jquery/jquery.min.js') }} "></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.6/jquery.inputmask.min.js"></script>
-<script src="{{ asset('/assets/utils.js') }}"></script>
+    <script src="{{ asset('/assets/admin/vendor/jquery/jquery.min.js') }} "></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.6/jquery.inputmask.min.js"></script>
+    <script src="{{ asset('/assets/utils.js') }}"></script>
     <script>
         $(document).ready(function() {
             $('#zipcode').mask('00000-000');
@@ -190,13 +199,16 @@
             });
 
             var phoneMaskBehavior = function(val) {
-                    return val.replace(/\D/g, '').length === 9 ? '00000-0000' : '0000-00009';
+                val = val.replace(/\D/g, '');
+                return val.length === 11 ? '(00) 0 0000-0000' : '(00) 0000-00009';
+            };
+
+            var phoneOptions = {
+                onKeyPress: function(val, e, field, options) {
+                    field.mask(phoneMaskBehavior.apply({}, arguments), options);
                 },
-                phoneOptions = {
-                    onKeyPress: function(val, e, field, options) {
-                        field.mask(phoneMaskBehavior.apply({}, arguments), options);
-                    }
-                };
+                clearIfNotMatch: true
+            };
 
             $('#phone').mask(phoneMaskBehavior, phoneOptions);
         });

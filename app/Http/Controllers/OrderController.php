@@ -15,15 +15,22 @@ class OrderController extends Controller
     public function index()
     {
         // Buscar todas as ordens com notify igual a 0
-    $orders = Order::where('notify', 0)->get();
+        $orders = Order::where('notify', 0)->get();
 
-    // Atualizar notify para 1
-    foreach ($orders as $order) {
-        $order->notify = 1;
-        $order->save();
-    }
+        // Atualizar notify para 1
+        foreach ($orders as $order) {
+            $order->notify = 1;
+            $order->save();
+        }
         return view('admin.order.index');
     }
+
+    public function create()
+{
+    $crusts = \App\Models\Crust::all(); // busca todas as bordas do banco
+    return view('admin.order.create', compact('crusts'));
+}
+
 
 
     public function getOrders()
@@ -37,8 +44,9 @@ class OrderController extends Controller
 
         return DataTables::of($orders)->make(true);
     }
-    public function getOrdersCount(){
-        $orders = Order::where('notify',0)->count();
+    public function getOrdersCount()
+    {
+        $orders = Order::where('notify', 0)->count();
         return $orders;
     }
 
