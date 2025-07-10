@@ -11,15 +11,23 @@ $(document).on('click', '.btn-ver-pedido', function () {
     $('#customer-address').text(pedido.customer_address ?? '---');
 
 
-    // Limpa tabela antes
     $('#table-items').empty();
+
+    let subtotal = 0;
 
     pedido.items.forEach(function (item) {
         let crustHtml = '';
+        let itemTotal = parseFloat(item.total) || 0;
+        let crustPrice = parseFloat(item.crust_price) || 0;
 
         if (item.crust) {
-            crustHtml = `<br><small class="text-muted">Borda: ${item.crust} (+R$ ${parseFloat(item.crust_price).toFixed(2).replace('.', ',')})</small>`;
+            crustHtml = `<br><small class="text-muted">Borda: ${item.crust} (+R$ ${crustPrice.toFixed(2).replace('.', ',')})</small>`;
         }
+
+        // Somar o valor da borda ao item total
+        let totalItemComBorda = itemTotal + crustPrice;
+
+        subtotal += totalItemComBorda;
 
         const row = `
         <tr>
@@ -27,11 +35,12 @@ $(document).on('click', '.btn-ver-pedido', function () {
                 ${item.name} ${item.quantity > 1 ? `x${item.quantity}` : ''}
                 ${crustHtml}
             </td>
-            <td>R$ ${parseFloat(item.total).toFixed(2).replace('.', ',')}</td>
+            <td>R$ ${totalItemComBorda.toFixed(2).replace('.', ',')}</td>
         </tr>
     `;
         $('#table-items').append(row);
     });
+
 
 
     // Adiciona linha com formas de pagamento
