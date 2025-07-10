@@ -66,12 +66,15 @@ class Order extends Model
         return $data->format('d/m/Y');
     }
 
-    // =================== TOTAL COM TAXA DE ENTREGA ===================
     public function getTotalGeralAttribute()
-    {
-        $somaItens = $this->items->sum('total');
-        return $somaItens + ($this->delivery_fee ?? 0);
-    }
+{
+    $somaItens = $this->items->sum(function ($item) {
+        return $item->total + ($item->crust_price ?? 0);
+    });
+
+    return $somaItens + ($this->delivery_fee ?? 0);
+}
+
 
     // =================== FORMAS DE PAGAMENTO ===================
     public function getFormasPagamentoAttribute()
