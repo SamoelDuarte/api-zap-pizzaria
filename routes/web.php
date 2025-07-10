@@ -2,14 +2,13 @@
 
 use App\Http\Controllers\admin\ConfigController;
 use App\Http\Controllers\admin\MenssageController;
+use App\Http\Controllers\Admin\MotoboyController;
 use App\Http\Controllers\admin\ProductController;
 use App\Http\Controllers\admin\ScheduleController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ChatBotController;
 use App\Http\Controllers\ChekoutController;
-use App\Http\Controllers\ColaboradorController;
 use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\DeliverymenController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\EventsController;
 use App\Http\Controllers\FormController;
@@ -17,23 +16,12 @@ use App\Http\Controllers\GitWebhookController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NotificacaoController;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\PaymentMethodController;
 use App\Http\Controllers\RouteController;
 use App\Http\Controllers\WebhookController;
-use App\Models\ChatBot;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Schema;
 use App\Models\Customer;
-use App\Models\Order;
-use App\Models\OrderItem;
 use Illuminate\Support\Facades\Http;
 use League\Csv\Reader;
-use Mike42\Escpos\PrintConnectors\FilePrintConnector;
-use Mike42\Escpos\PrintConnectors\WindowsPrintConnector;
-use Mike42\Escpos\Printer;
-use App\Notifications\NewOrderNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use GuzzleHttp\Client;
@@ -130,6 +118,15 @@ Route::middleware(['auth.user'])->group(function () {
 
     Route::middleware('auth.admin')->group(function () {
 
+        Route::prefix('/motoboy')->controller(MotoboyController::class)->group(function () {
+            Route::get('/', 'index')->name('admin.motoboy.index');
+            Route::get('/novo', 'create')->name('admin.motoboy.create');
+            Route::post('/criar', 'store')->name('admin.motoboy.store');
+            Route::get('/editar/{motoboy}', 'edit')->name('admin.motoboy.edit');
+            Route::put('/atualizar/{motoboy}', 'update')->name('admin.motoboy.update');
+            Route::delete('/deletar/{motoboy}', 'destroy')->name('admin.motoboy.destroy');
+        });
+
 
         Route::prefix('/agenda')->controller(ScheduleController::class)->group(function () {
             Route::get('/', 'index')->name('admin.schedule.index');
@@ -162,10 +159,10 @@ Route::middleware(['auth.user'])->group(function () {
             Route::post('/store', 'store')->name('admin.customer.store');
             Route::put('/update/{customer}', 'update')->name('admin.customer.update');
             Route::get('/getCustomers', 'getCustomers');
-             Route::get('/buscar-por-telefone', 'buscarPorTelefone')->name('cliente.buscar.telefone');
+            Route::get('/buscar-por-telefone', 'buscarPorTelefone')->name('cliente.buscar.telefone');
         });
 
-        
+
 
         Route::prefix('/chat-bot')->controller(ChatBotController::class)->group(function () {
             Route::get('/', 'index')->name('admin.chatbot.index');
@@ -186,6 +183,10 @@ Route::middleware(['auth.user'])->group(function () {
             Route::post('/atualizar-status', 'updateStatus');
             Route::post('/atualizar-notify', 'updateNotify')->name('admin.notifications.markAllRead');
             Route::get('/getOrder', 'getOrder');
+            Route::post('/calcular-taxa-entrega', 'calcularEntrega');
+            Route::post('/novo-pedido', 'storeFromAdmin')->name('admin.pedidos.finalizar');
+            Route::get('/motoboys/lista','motoboyLista');
+            Route::post('/atribuir-motoboy','atribuirMotoboy');  
         });
 
         Route::prefix('/config')->controller(ConfigController::class)->group(function () {
@@ -220,8 +221,8 @@ Route::middleware(['auth.user'])->group(function () {
             Route::delete('/destroy/{product}', 'destroy')->name('admin.product.destroy');
             Route::put('/destroy/{product}', 'update')->name('admin.product.update');
             Route::get('/edita', 'edit')->name('admin.product.edit');
-            Route::get('/buscar-por-nome', 'buscarPorNome');
-
+            Route::get('/buscar-pizza-por-nome', 'buscarPizzaPorNome');
+            Route::get('/buscar-produto-por-nome', 'buscarProdutoPorNome');
         });
     });
 });

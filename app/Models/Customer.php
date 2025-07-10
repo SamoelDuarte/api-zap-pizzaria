@@ -39,25 +39,23 @@ class Customer extends Model
     }
 
 
-    // Adicione este método ao seu modelo Customer
     public function setJidAttribute($value)
     {
-        // Remover todos os caracteres que não sejam números
         $value = preg_replace('/[^0-9]/', '', $value);
 
-        // Verificar se o valor começa com "5511"
-        if (strpos($value, '5511') !== 0) {
-            $value = '5511' . $value;
+        if (!str_starts_with($value, '55')) {
+            $value = '55' . $value;
         }
 
         $this->attributes['jid'] = $value;
     }
 
+
     // Modifique o método getPhoneAttribute
     public function getPhoneAttribute()
     {
         // Remova os primeiros 4 caracteres ("5511") antes de retornar o número de telefone
-        return substr($this->jid, 4);
+        return substr($this->jid, 2);
     }
 
 
@@ -68,12 +66,12 @@ class Customer extends Model
 
     public function getLocationAttribute()
     {
-        return 'CEP: ' . $this->zipcode . " \n " .
-            '' . $this->public_place . " \n " .
-            'N° : ' . $this->number . " \n " .
+        return 'CEP: ' . $this->zipcode . " " .
+            '' . $this->public_place . " " .
+            'N° : ' . $this->number . " -- " .
             'Bairro: ' . $this->neighborhood . " \n " .
-            'Cidade: ' . $this->city . " \n " .
-            'Estado: ' . $this->state . " \n ";
+            'Cidade: ' . $this->city . "-- " .
+            'Estado: ' . $this->state ;
     }
 
     public function getDeliveryFeeAttribute()
@@ -94,7 +92,7 @@ class Customer extends Model
 
     public function getLocationLink()
     {
-        $address1 = 'Rua Nova Providência, 593, Parque Bologne, SP';
+        $address1 = 'Rua José Alves da silva , 429, Parque Novo Santo Amaro, SP';
         $origin = urlencode($address1);
         $destination = urlencode($this->location);
         return "https://www.google.com/maps/dir/?api=1&origin={$origin}&destination={$destination}";

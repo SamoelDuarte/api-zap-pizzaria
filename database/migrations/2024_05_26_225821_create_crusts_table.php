@@ -26,7 +26,10 @@ return new class extends Migration
         $crustsData = [
             ['name' => 'Tradicional', 'price' => 0.00],
             ['name' => 'Cheddar', 'price' => 3.00],
-            ['name' => 'Chocolate', 'price' => 5.00]
+            ['name' => 'Calabresa Moida', 'price' => 5.00],
+            ['name' => 'Catupiry', 'price' => 5.00],
+            ['name' => 'Catupiry original', 'price' => 5.00],
+            ['name' => 'Chocolate', 'price' => 5.00],
         ];
 
         // Insira os dados na tabela de bordas

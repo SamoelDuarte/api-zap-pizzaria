@@ -26,194 +26,197 @@ return new class extends Migration
         $categoryPizzaClassicasId = DB::table('categories')->where('name', 'Pizzas Clássica')->value('id');
 
         $pizzasClassicas = [
-            ['name' => 'Mussarela', 'description' => 'Pizza de Mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Mussarela e Tomate', 'description' => 'Pizza de Mussarela e Tomate', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Calabresa', 'description' => 'Pizza de Calabresa', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Calabresa e Cebola', 'description' => 'Pizza de Calabresa e Cebola', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Atum', 'description' => 'Pizza de Atum', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Atum e Cebola', 'description' => 'Pizza de Atum e Cebola', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Milho', 'description' => 'Pizza de Milho', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Milho e Mussarela ou Catupiry', 'description' => 'Pizza de Milho com Mussarela ou Catupiry', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Baiana 1', 'description' => 'Pizza Baiana 1 - Calabresa, Pimenta, Ovo e Cebola', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Alho', 'description' => 'Mussarela e alho frito', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Americana', 'description' => 'Ovos e bacon coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Atum', 'description' => 'Atum com cebola', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Atum com mussarela', 'description' => 'Atum e cebola coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Bacon', 'description' => 'Mussarela com bacon', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Baiana', 'description' => 'Calabresa, ovos, cebola e pimenta calabresa', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Baiana com mussarela', 'description' => 'Calabresa, ovos e cebola, coberto com mussarela e pimenta calabresa', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Bauru', 'description' => 'Presunto e tomates coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Bonança', 'description' => 'Frango, milho, calabresa, lombo, catupiry e cheddar coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Brócolis com catupiry', 'description' => 'Brócolis, bacon, catupiry e alho frito', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Brócolis com mussarela', 'description' => 'Brócolis e bacon coberto com mussarela e alho frito', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Caipira', 'description' => 'Frango, milho e catupiry', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Caipira com mussarela', 'description' => 'Frango e milho coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Calabresa especial', 'description' => 'Calabresa e catupiry', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Calabresa', 'description' => 'Calabresa e cebola', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Calabria', 'description' => 'Calabresa, cebola e bacon coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Calamussa', 'description' => 'Calabresa assada coberta com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Camarão', 'description' => 'Camarão cozido com mussarela ou catupiry', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Canadense', 'description' => 'Lombo canadense com catupiry ou mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Carne seca', 'description' => 'Carne seca desfiada e cebola coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Carne seca especial', 'description' => 'Carne seca desfiada, cebola e catupiry coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Catumilho', 'description' => 'Milho coberto com catupiry', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Champignon', 'description' => 'Champignon com mussarela ou catupiry', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Cinco queijos', 'description' => 'Mussarela, provolone, parmesão, catupiry e gorgonzola', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Costela', 'description' => 'Costela desfiada, cebola, catupiry, coberto com mussarela e pimentão', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Cremosa', 'description' => 'Presunto e catupiry coberto mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Crocante', 'description' => 'Frango desfiado e catupiry coberto com batata palha', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Dois queijos', 'description' => 'Mussarela e catupiry', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Escarola 1', 'description' => 'Escarola coberto com mussarela e alho frito', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Escarola 2', 'description' => 'Escarola, bacon e catupiry coberto com mussarela e alho frito', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Ferrary', 'description' => 'Calabresa, cheddar e parmesão', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Frango catupiry', 'description' => 'Frango desfiado com catupiry', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Frango com cheddar', 'description' => 'Frango desfiado com cheddar', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Frango com mussarela', 'description' => 'Frango desfiado coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Frango original', 'description' => 'Frango desfiado com catupiry original', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Íntegra', 'description' => 'Frango desfiado, palmito, catupiry, mussarela e tomate seco', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Jardineira', 'description' => 'Frango, presunto, milho e ervilha coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Marguerita', 'description' => 'Mussarela, tomate, parmesão e manjericão', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Milho', 'description' => 'Milho com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Moda da casa', 'description' => 'Carne seca e brócolis com catupiry', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Moda do pizziola', 'description' => 'Peito de peru ralado e catupiry coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Mussarela Tradicional', 'description' => 'Mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Palmito', 'description' => 'Palmito coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Peito de peru com mussarela', 'description' => 'Peito de peru ralado e tomate coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Peperone', 'description' => 'Mussarela e rodelas de peperoni', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Portuguesa de peru', 'description' => 'Peito de peru ralado, milho, cebola e ovo coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Portuguesa', 'description' => 'Presunto, ervilha, ovos e cebola coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Quatro queijos', 'description' => 'Mussarela, provolone, parmesão e catupiry', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Romanesca', 'description' => 'Presunto, bacon, champignon, catupiry e mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Rúcula', 'description' => 'Mussarela, rúcula e tomate seco', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Tomate seco', 'description' => 'Mussarela e tomate seco', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Toscana', 'description' => 'Calabresa moída, mussarela, tomate e parmesão', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Três queijos', 'description' => 'Mussarela, parmesão e catupiry', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Vegetariana 1', 'description' => 'Escarola, ervilha, palmito, mussarela e tomate seco', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
+            ['name' => 'Vegetariana 2', 'description' => 'Brócolis, milho, palmito, mussarela e tomate seco', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 33.99, 'category_id' => $categoryPizzaClassicasId],
         ];
 
         foreach ($pizzasClassicas as $pizza) {
             DB::table('products')->insert($pizza);
         }
+        // Adicionar produtos para a categoria "Pizzas Broto"
+        $categoryPizzaBrotoId = DB::table('categories')->where('name', 'Pizzas Broto')->value('id');
 
-        // Adicionar produtos para a categoria "Pizzas Tradicionais"
-        $categoryPizzaClassicasId = DB::table('categories')->where('name', 'Pizzas Tradicionais')->value('id');
-
-        $pizzasTradicionais = [
-            ['name' => 'Alemã', 'description' => 'Frango, Bacon, Catupiry e Mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 38.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Americana', 'description' => 'Presunto, Bacon, Ovo e Mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 38.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Bacon', 'description' => 'Mussarela e Bacon', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 37.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Baiana I', 'description' => 'Mussarela, Calabresa, Cebola, Ovo e Pimenta', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 38.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Bauru', 'description' => 'Presunto, Tomate e Mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 36.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Brócolis I', 'description' => 'Brócolis e Mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 37.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Caipira I', 'description' => 'Frango, Milho e Catupiry', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 38.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Chilena', 'description' => 'Frango, Bacon, Milho e Cheddar', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 39.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Escarola', 'description' => 'Escarola, Bacon e Mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 37.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Espanhola', 'description' => 'Presunto, Tomate, Catupiry e Parmesão', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 39.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Frango', 'description' => 'Frango e Catupiry', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 37.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Grega', 'description' => 'Presunto, Palmito, Ervilha e Mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 38.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Jardinheira', 'description' => 'Frango, Cebola, Bacon e Mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 37.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Margarita', 'description' => 'Mussarela, Parmesão, Tomate e Manjericão', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 36.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Napolitana', 'description' => 'Mussarela, Molho e Parmesão', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 36.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Palmito', 'description' => 'Palmito e Mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 37.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Portuguesa', 'description' => 'Presunto, Ovo, Cebola e Mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 38.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Verona I', 'description' => 'Calabresa, Catupiry e Parmesão', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 39.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Dois Queijos', 'description' => 'Mussarela e Catupiry', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 37.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Caruzo', 'description' => 'Frango, Bacon e Catupiry', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 39.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Frango com Cheddar', 'description' => 'Frango e Cheddar', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 39.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Ki-Delícia', 'description' => 'Calabresa, Bacon, Cebola e Mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 38.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Peruana', 'description' => 'Atum, Cebola e Mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 37.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Caipira II', 'description' => 'Frango, Milho, Catupiry e Mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 38.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Brócolis II', 'description' => 'Brócolis, Bacon, Mussarela e Alho Frito', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 38.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Atumpiry', 'description' => 'Atum e Catupiry', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 37.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Três Queijos', 'description' => 'Mussarela, Catupiry e Parmesão', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 38.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Strogonoff', 'description' => 'Frango, Catupiry, Mussarela e Batata Palha', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 39.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Apollo', 'description' => 'Frango, Cheddar, Mussarela e Batata Palha', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 39.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Francesa', 'description' => 'Presunto, Ervilha, Milho e Mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 38.00, 'category_id' => $categoryPizzaClassicasId],
-            ['name' => 'Verona II', 'description' => 'Calabresa, Cheddar e Parmesão', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 39.00, 'category_id' => $categoryPizzaClassicasId],
+        $pizzasBroto =  [
+            ['name' => 'Alho (Broto)', 'description' => 'Mussarela e alho frito', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Americana (Broto)', 'description' => 'Ovos e bacon coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Atum (Broto)', 'description' => 'Atum com cebola', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Atum com mussarela (Broto)', 'description' => 'Atum e cebola coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Bacon (Broto)', 'description' => 'Mussarela com bacon', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Baiana (Broto)', 'description' => 'Calabresa, ovos, cebola e pimenta calabresa', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Baiana com mussarela (Broto)', 'description' => 'Calabresa, ovos e cebola, coberto com mussarela e pimenta calabresa', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Bauru (Broto)', 'description' => 'Presunto e tomates coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Bonança (Broto)', 'description' => 'Frango, milho, calabresa, lombo, catupiry e cheddar coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Brócolis com catupiry (Broto)', 'description' => 'Brócolis, bacon, catupiry e alho frito', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Brócolis com mussarela (Broto)', 'description' => 'Brócolis e bacon coberto com mussarela e alho frito', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Caipira (Broto)', 'description' => 'Frango, milho e catupiry', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Caipira com mussarela (Broto)', 'description' => 'Frango e milho coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Calabresa especial (Broto)', 'description' => 'Calabresa e catupiry', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Calabresa (Broto)', 'description' => 'Calabresa e cebola', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Calabria (Broto)', 'description' => 'Calabresa, cebola e bacon coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Calamussa (Broto)', 'description' => 'Calabresa assada coberta com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Camarão (Broto)', 'description' => 'Camarão cozido com mussarela ou catupiry', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Canadense (Broto)', 'description' => 'Lombo canadense com catupiry ou mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Carne seca (Broto)', 'description' => 'Carne seca desfiada e cebola coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Carne seca especial (Broto)', 'description' => 'Carne seca desfiada, cebola e catupiry coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Catumilho (Broto)', 'description' => 'Milho coberto com catupiry', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Champignon (Broto)', 'description' => 'Champignon com mussarela ou catupiry', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Cinco queijos (Broto)', 'description' => 'Mussarela, provolone, parmesão, catupiry e gorgonzola', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Costela (Broto)', 'description' => 'Costela desfiada, cebola, catupiry, coberto com mussarela e pimentão', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Cremosa (Broto)', 'description' => 'Presunto e catupiry coberto mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Crocante (Broto)', 'description' => 'Frango desfiado e catupiry coberto com batata palha', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Dois queijos (Broto)', 'description' => 'Mussarela e catupiry', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Escarola 1 (Broto)', 'description' => 'Escarola coberto com mussarela e alho frito', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Escarola 2 (Broto)', 'description' => 'escarola, bacon e catupiry coberto com mussarela e alho frito', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Ferrary (Broto)', 'description' => 'calabresa ,cheddar e parmesão', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Frango catupiry (Broto)', 'description' => 'frango desfiado com catupiry', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Frango com cheddar (Broto)', 'description' => 'frango desfiado com cheddar', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Frango com mussarela (Broto)', 'description' => 'frango desfiado coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Frango original (Broto)', 'description' => 'frango desfiado com catupiry original', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Íntegra (Broto)', 'description' => 'frango desfiado,palmito,catupiry, mussarela e tomate seco', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Jardineira (Broto)', 'description' => 'frango, presunto,milho e ervilha coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Marguerita (Broto)', 'description' => 'mussarela,tomate,parmesão e manjericão', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Milho (Broto)', 'description' => 'milho com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Moda da casa (Broto)', 'description' => 'carne seca e brócolis com catupiry', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Moda do pizziola (Broto)', 'description' => 'peito de peru ralado e catupiry coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Mussarela (Broto)', 'description' => 'mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Palmito (Broto)', 'description' => 'palmito coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Peito de peru com mussarela (Broto)', 'description' => 'peito de peru ralado e tomate coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Peperone (Broto)', 'description' => 'mussarela e rodelas de peperoni', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Portuguesa de peru (Broto)', 'description' => 'peito de peru ralado ,milho ,cebola e ovo coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Portuguesa (Broto)', 'description' => 'presunto,ervilha,ovos e cebola coberto com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Quatro queijos (Broto)', 'description' => 'mussarela ,provolone,parmesão e catupiry', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Romanesca (Broto)', 'description' => 'presunto,bacon, champignon, catupiry e mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Rúcula (Broto)', 'description' => 'mussarela,rúcula e tomate seco', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Tomate seco (Broto)', 'description' => 'mussarela e tomate seco', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Toscana (Broto)', 'description' => 'calabresa moída ,mussarela, tomate e parmesão', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Três queijos (Broto)', 'description' => 'mussarela, parmesão e catupiry', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Vegetariana 1 (Broto)', 'description' => 'escarola,ervilha ,palmito,mussarela e tomate seco', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
+            ['name' => 'Vegetariana 2 (Broto)', 'description' => 'brócolis,milho,palmito,mussarela e tomate seco', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaBrotoId],
         ];
 
-        foreach ($pizzasTradicionais as $pizza) {
+        foreach ($pizzasBroto as $pizza) {
             DB::table('products')->insert($pizza);
         }
 
-        // Inserir produtos para Pizzas Premium
-        $premiumCategoryId = DB::table('categories')->where('name', 'Pizzas Premium')->value('id');
+        // Adicionar produtos para a categoria "Pizzas Broto"
+        $categoryPizzaDocesBrotoId = DB::table('categories')->where('name', 'Pizzas Doces Broto')->value('id');
 
-        $premiumPizzas = [
-            ['name' => 'A Moda do Chef', 'description' => 'Lombo, frango, palmito, bacon e catupiry', 'price' => 41.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-            ['name' => 'A Moda da Casa', 'description' => 'Calabresa, frango, cebola, catupiry e parmesão', 'price' => 43.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-            ['name' => 'Benjamin', 'description' => 'Lombo, tomate, milho, cheddar e mussarela', 'price' => 44.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-            ['name' => 'Fornello\'s', 'description' => 'Pepperoni, cheddar, bacon, cebola e mussarela', 'price' => 45.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-            ['name' => 'Batata', 'description' => 'Mussarela, batata frita, cheddar e bacon', 'price' => 43.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-            ['name' => 'Carne Seca', 'description' => 'Carne seca e mussarela', 'price' => 45.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-            ['name' => 'Italiana', 'description' => 'Pepperoni, bacon, palmito, cebola e mussarela', 'price' => 46.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-            ['name' => 'Pepperoni', 'description' => 'Pepperoni, catupiry e mussarela', 'price' => 42.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-            ['name' => 'Primavera', 'description' => 'Escarola, palmito, milho, ervilha e mussarela', 'price' => 41.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-            ['name' => 'Suprema', 'description' => 'Frango, calabresa, atum, milho e mussarela', 'price' => 44.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-            ['name' => 'Vegetariana', 'description' => 'Escarola, brócolis, palmito, milho, ervilha e mussarela', 'price' => 41.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-            ['name' => 'Quatro Queijos', 'description' => 'Mussarela, catupiry, provolone e parmesão', 'price' => 41.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-            ['name' => 'A Moda do Pizzaiolo', 'description' => 'Peito de peru, tomate, catupiry, bacon e mussarela', 'price' => 47.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-            ['name' => 'Cinco Queijos', 'description' => 'Mussarela, catupiry, provolone, parmesão e cheddar', 'price' => 45.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-            ['name' => 'Carne Seca II', 'description' => 'Carne seca, cebola, ovo e mussarela', 'price' => 48.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-            ['name' => 'Camarão I', 'description' => 'Camarão, cream cheese e mussarela', 'price' => 50.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-            ['name' => 'Camarão II', 'description' => 'Camarão, cream cheese, cebola, tomate e mussarela', 'price' => 56.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
+        $pizzasDocesBroto = [
+            ['name' => 'Banamussa (Broto)', 'description' => 'banana coberta com mussarela, leite condensado e canela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaDocesBrotoId],
+            ['name' => 'Banela (Broto)', 'description' => 'banana, leite condensado e canela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaDocesBrotoId],
+            ['name' => 'Brigadeiro (Broto)', 'description' => 'chocolate coberto com granulado e leite condensado', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaDocesBrotoId],
+            ['name' => 'Chocolate (Broto)', 'description' => 'chocolate', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaDocesBrotoId],
+            ['name' => 'Choconana (Broto)', 'description' => 'banana com chocolate', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaDocesBrotoId],
+            ['name' => 'Chocouva (Broto)', 'description' => 'uva verde com chocolate e leite condensado', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaDocesBrotoId],
+            ['name' => 'Confette (Broto)', 'description' => 'chocolate coberto com confette e leite condensado', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaDocesBrotoId],
+            ['name' => 'Prestigio (Broto)', 'description' => 'chocolate coberto com coco ralado e leite condensado', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaDocesBrotoId],
+            ['name' => 'Romeu e Julieta (Broto)', 'description' => 'goiabada coberta com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaDocesBrotoId],
+            ['name' => 'Sensacao (Broto)', 'description' => 'chocolate com morango e leite condensado', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 26.99, 'category_id' => $categoryPizzaDocesBrotoId],
         ];
 
-        foreach ($premiumPizzas as $pizza) {
-            $pizza['category_id'] = $premiumCategoryId;
-            $pizza['created_at'] = now();
-            $pizza['updated_at'] = now();
+        foreach ($pizzasDocesBroto as $pizza) {
             DB::table('products')->insert($pizza);
         }
 
-         // Inserir produtos para Doces
-         $docesCategoryId = DB::table('categories')->where('name', 'Pizzas Doces')->value('id');
+         // Adicionar produtos para a categoria "Pizzas Broto"
+        $categoryPizzaDocesId = DB::table('categories')->where('name', 'Pizzas Doces')->value('id');
 
-         $doces = [
-             ['name' => 'Brigadeiro', 'description' => 'Chocolate e brigadeiro', 'price' => 35.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-             ['name' => 'Prestígio', 'description' => 'Chocolate e coco ralado', 'price' => 37.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-             ['name' => 'Beijinho', 'description' => 'Chocolate branco e coco ralado', 'price' => 36.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-             ['name' => 'Sensação', 'description' => 'Chocolate, morango, granulado, morango e granulado', 'price' => 41.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-             ['name' => 'Sedução', 'description' => 'Chocolate branco, morango e raspas de chocolate preto', 'price' => 42.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-             ['name' => 'M&M', 'description' => 'Chocolate e M&M', 'price' => 43.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-             ['name' => 'Maracujá', 'description' => 'Base chocolate branco e maracujá', 'price' => 39.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-             ['name' => 'Dois Amores', 'description' => 'Chocolate branco e preto', 'price' => 36.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-             ['name' => 'Banana', 'description' => 'Banana, leite condensado e canela', 'price' => 37.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-             ['name' => 'Banana I', 'description' => 'Banana, leite condensado, mussarela e canela', 'price' => 39.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-             ['name' => 'Oreo', 'description' => 'Chocolate e Oreo', 'price' => 41.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-             ['name' => 'Romeu e Julieta', 'description' => 'Goiabada e mussarela', 'price' => 37.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-             ['name' => 'Chocobanana', 'description' => 'Banana, chocolate preto e doce de leite', 'price' => 39.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-             ['name' => 'Doce de Leite I', 'description' => 'Chocolate branco e doce de leite', 'price' => 38.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-         ];
- 
-         foreach ($doces as $doce) {
-             $doce['category_id'] = $docesCategoryId;
-             $doce['created_at'] = now();
-             $doce['updated_at'] = now();
-             DB::table('products')->insert($doce);
-         }
- 
-         // Inserir produtos para Calzone
-         $calzoneCategoryId = DB::table('categories')->where('name', 'Calzone')->value('id');
- 
-         $calzones = [
-             ['name' => 'Frango', 'description' => 'Frango e catupiry', 'price' => 25.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-             ['name' => 'Calabresa', 'description' => 'Calabresa e mussarela', 'price' => 25.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-             ['name' => 'Bauru', 'description' => 'Presunto, tomate e mussarela', 'price' => 25.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-             ['name' => 'Mussarela', 'description' => 'Mussarela', 'price' => 25.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-             ['name' => 'Presunto', 'description' => 'Presunto e mussarela', 'price' => 25.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-             ['name' => 'Bacon', 'description' => 'Bacon e mussarela', 'price' => 25.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-             ['name' => 'Marguerita', 'description' => 'Mussarela, tomate e manjericão', 'price' => 25.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-             ['name' => 'Palmito', 'description' => 'Palmito e mussarela', 'price' => 25.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-             ['name' => 'Dois Queijos', 'description' => 'Mussarela e catupiry', 'price' => 25.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-             ['name' => 'Peruana', 'description' => 'Atum, cebola e mussarela', 'price' => 25.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-             ['name' => 'Calabresa II', 'description' => 'Calabresa, bacon, cebola e mussarela', 'price' => 25.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-             ['name' => 'Frango II', 'description' => 'Frango, milho e catupiry', 'price' => 25.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-             ['name' => 'Americana', 'description' => 'Presunto, ovo, cebola e mussarela', 'price' => 25.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-             ['name' => 'Baiana II', 'description' => 'Calabresa, bacon, cebola e mussarela', 'price' => 25.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-         ];
- 
-         foreach ($calzones as $calzone) {
-             $calzone['category_id'] = $calzoneCategoryId;
-             $calzone['created_at'] = now();
-             $calzone['updated_at'] = now();
-             DB::table('products')->insert($calzone);
-         }
-          // Inserir produtos para Calzone Doce
-        $calzoneDoceCategoryId = DB::table('categories')->where('name', 'Calzone Doce')->value('id');
-
-        $calzoneDoces = [
-            ['name' => 'Brigadeiro', 'description' => 'Chocolate granulado', 'price' => 25.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-            ['name' => 'Prestígio', 'description' => 'Chocolate e coco ralado', 'price' => 25.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-            ['name' => 'M&M\'s', 'description' => 'Chocolate e M&M\'s', 'price' => 25.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-            ['name' => 'Dois Amores', 'description' => 'Chocolate preto e chocolate branco', 'price' => 25.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-            ['name' => 'Beijinho', 'description' => 'Chocolate branco e coco ralado', 'price' => 25.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
+        $pizzasDoces = [
+            ['name' => 'Banamussa', 'description' => 'banana coberta com mussarela, leite condensado e canela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 42.99, 'category_id' => $categoryPizzaDocesId],
+            ['name' => 'Banela', 'description' => 'banana, leite condensado e canela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 42.99, 'category_id' => $categoryPizzaDocesId],
+            ['name' => 'Brigadeiro', 'description' => 'chocolate coberto com granulado e leite condensado', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 42.99, 'category_id' => $categoryPizzaDocesId],
+            ['name' => 'Chocolate', 'description' => 'chocolate', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 42.99, 'category_id' => $categoryPizzaDocesId],
+            ['name' => 'Choconana', 'description' => 'banana com chocolate', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 42.99, 'category_id' => $categoryPizzaDocesId],
+            ['name' => 'Chocouva', 'description' => 'uva verde com chocolate e leite condensado', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 42.99, 'category_id' => $categoryPizzaDocesId],
+            ['name' => 'Confette', 'description' => 'chocolate coberto com confette e leite condensado', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 42.99, 'category_id' => $categoryPizzaDocesId],
+            ['name' => 'Prestigio', 'description' => 'chocolate coberto com coco ralado e leite condensado', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 42.99, 'category_id' => $categoryPizzaDocesId],
+            ['name' => 'Romeu e Julieta', 'description' => 'goiabada coberta com mussarela', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 42.99, 'category_id' => $categoryPizzaDocesId],
+            ['name' => 'Sensacao', 'description' => 'chocolate com morango e leite condensado', 'image' => 'assets/imagens/img_pizza_padrao.png', 'price' => 42.99, 'category_id' => $categoryPizzaDocesId],
         ];
 
-        foreach ($calzoneDoces as $calzoneDoce) {
-            $calzoneDoce['category_id'] = $calzoneDoceCategoryId;
-            $calzoneDoce['created_at'] = now();
-            $calzoneDoce['updated_at'] = now();
-            DB::table('products')->insert($calzoneDoce);
+        foreach ($pizzasDoces as $pizza) {
+            DB::table('products')->insert($pizza);
         }
 
-        // Inserir produtos para Porções
-        $porcoesCategoryId = DB::table('categories')->where('name', 'Porções')->value('id');
-
-        $porcoes = [
-            ['name' => 'Batata Frita', 'description' => 'Batata frita', 'price' => 20.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-            ['name' => 'Batata com Bacon e Cheddar', 'description' => 'Batata com bacon e cheddar', 'price' => 25.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-        ];
-
-        foreach ($porcoes as $porcao) {
-            $porcao['category_id'] = $porcoesCategoryId;
-            $porcao['created_at'] = now();
-            $porcao['updated_at'] = now();
-            DB::table('products')->insert($porcao);
-        }
-
-        // Inserir produtos para Bebidas
-        $bebidasCategoryId = DB::table('categories')->where('name', 'Bebidas')->value('id');
-
+        $categoryBebidasId = DB::table('categories')->where('name', 'Bebidas')->value('id');
         $bebidas = [
-            ['name' => 'Dolly Guaraná', 'description' => '', 'price' => 8.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-            ['name' => 'Dolly Limão', 'description' => '', 'price' => 8.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-            ['name' => 'Guaraná Antarctica', 'description' => '', 'price' => 12.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-            ['name' => 'Coca Cola', 'description' => '', 'price' => 14.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-            ['name' => 'Fanta Uva', 'description' => '', 'price' => 12.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
-            ['name' => 'Fanta Laranja', 'description' => '', 'price' => 12.00, 'image' => 'assets/imagens/img_pizza_padrao.png'],
+            // Refrigerantes 2 Litros
+            ['name' => 'Coca Cola 2L', 'description' => 'Refrigerante Coca Cola 2 litros', 'image' => 'assets/imagens/img_bebida_padrao.png', 'price' => 12.99, 'category_id' => $categoryBebidasId],
+            ['name' => 'Coca Cola Zero 2L', 'description' => 'Refrigerante Coca Cola Zero 2 litros', 'image' => 'assets/imagens/img_bebida_padrao.png', 'price' => 12.99, 'category_id' => $categoryBebidasId],
+            ['name' => 'Dolly Guaraná 2L', 'description' => 'Refrigerante Dolly Guaraná 2 litros', 'image' => 'assets/imagens/img_bebida_padrao.png', 'price' => 12.99, 'category_id' => $categoryBebidasId],
+            ['name' => 'Dolly Laranja 2L', 'description' => 'Refrigerante Dolly Laranja 2 litros', 'image' => 'assets/imagens/img_bebida_padrao.png', 'price' => 12.99, 'category_id' => $categoryBebidasId],
+            ['name' => 'Dolly Limão 2L', 'description' => 'Refrigerante Dolly Limão 2 litros', 'image' => 'assets/imagens/img_bebida_padrao.png', 'price' => 12.99, 'category_id' => $categoryBebidasId],
+            ['name' => 'Fanta Laranja 2L', 'description' => 'Refrigerante Fanta Laranja 2 litros', 'image' => 'assets/imagens/img_bebida_padrao.png', 'price' => 12.99, 'category_id' => $categoryBebidasId],
+            ['name' => 'Fanta Uva 2L', 'description' => 'Refrigerante Fanta Uva 2 litros', 'image' => 'assets/imagens/img_bebida_padrao.png', 'price' => 12.99, 'category_id' => $categoryBebidasId],
+            ['name' => 'Guaraná Antarctica 2L', 'description' => 'Refrigerante Guaraná Antarctica 2 litros', 'image' => 'assets/imagens/img_bebida_padrao.png', 'price' => 12.99, 'category_id' => $categoryBebidasId],
+
+            // Refrigerantes 600ml
+            ['name' => 'Coca Cola 600ml', 'description' => 'Refrigerante Coca Cola 600ml', 'image' => 'assets/imagens/img_bebida_padrao.png', 'price' => 9.99, 'category_id' => $categoryBebidasId],
+            ['name' => 'Coca Cola Zero 600ml', 'description' => 'Refrigerante Coca Cola Zero 600ml', 'image' => 'assets/imagens/img_bebida_padrao.png', 'price' => 9.99, 'category_id' => $categoryBebidasId],
+            ['name' => 'Guaraná Antarctica 600ml', 'description' => 'Refrigerante Guaraná Antarctica 600ml', 'image' => 'assets/imagens/img_bebida_padrao.png', 'price' => 9.99, 'category_id' => $categoryBebidasId],
+
+            // Refrigerante Lata
+            ['name' => 'Coca Cola Lata', 'description' => 'Refrigerante Coca Cola lata 350ml', 'image' => 'assets/imagens/img_bebida_padrao.png', 'price' => 7.99, 'category_id' => $categoryBebidasId],
+            ['name' => 'Coca Cola Zero Lata', 'description' => 'Refrigerante Coca Cola Zero lata 350ml', 'image' => 'assets/imagens/img_bebida_padrao.png', 'price' => 7.99, 'category_id' => $categoryBebidasId],
+            ['name' => 'Fanta Laranja Lata', 'description' => 'Refrigerante Fanta Laranja lata 350ml', 'image' => 'assets/imagens/img_bebida_padrao.png', 'price' => 7.99, 'category_id' => $categoryBebidasId],
+            ['name' => 'Fanta Uva Lata', 'description' => 'Refrigerante Fanta Uva lata 350ml', 'image' => 'assets/imagens/img_bebida_padrao.png', 'price' => 7.99, 'category_id' => $categoryBebidasId],
+            ['name' => 'Guaraná Antarctica Lata', 'description' => 'Refrigerante Guaraná Antarctica lata 350ml', 'image' => 'assets/imagens/img_bebida_padrao.png', 'price' => 7.99, 'category_id' => $categoryBebidasId],
         ];
 
         foreach ($bebidas as $bebida) {
-            $bebida['category_id'] = $bebidasCategoryId;
-            $bebida['created_at'] = now();
-            $bebida['updated_at'] = now();
             DB::table('products')->insert($bebida);
         }
     }

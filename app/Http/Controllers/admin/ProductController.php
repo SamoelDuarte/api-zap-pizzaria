@@ -160,13 +160,28 @@ class ProductController extends Controller
 
         return redirect()->route('admin.product.index')->with('error', 'Produto não encontrado.');
     }
-    public function buscarPorNome(Request $request)
+    public function buscarPizzaPorNome(Request $request)
     {
         $nome = $request->get('nome');
         $produtos = Product::where('name', 'like', "%{$nome}%")
+            ->whereIn('category_id', [1, 2, 3, 4])
             ->select('id', 'name', 'price')
             ->limit(10)
             ->get();
+
+
+        return response()->json($produtos);
+    }
+
+    public function buscarProdutoPorNome(Request $request)
+    {
+        $nome = $request->get('nome');
+        $produtos = Product::where('name', 'like', "%{$nome}%")
+            ->whereNotIn('category_id', [1, 2, 3, 4])
+            ->select('id', 'name', 'price')
+            ->limit(10)
+            ->get();
+
 
         return response()->json($produtos);
     }

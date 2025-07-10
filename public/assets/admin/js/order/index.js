@@ -1,195 +1,104 @@
 var url = window.location.origin;
 
-$('#table-order').DataTable({
-    processing: true,
-    serverSide: true,
-    "ajax": {
-        "url": url + "/pedidos/getOrders",
-        "type": "GET"
-    },
-    "columns": [{
-        "data": "id"
-    },
-    {
-        "data": "customer.name"
-    },
-    {
-        "data": "total_price"
-    },
-    {
-        "data": "status.name",
-    },
-    {
-        "data": "payment_method",
-    },
-    {
-        "data": "display_data"
-    },
-    {
-        "data": "total_price"
-    }
-    ],
-    'columnDefs': [{
-        targets: [2],
-        className: 'dt-body-center'
-    }],
-    'rowCallback': function (row, data, index) {
-        $('td:eq(1)', row).html('<label>' + data['customer'].name + ' / ' + data['customer'].phone + '</label>');
-        $('td:eq(5)', row).html('<label>' + data['display_data'] + '</label>');
-        $('td:eq(6)', row).html('<a href="javascript:;" data-toggle="modal" onClick="configModal(' + data["id"] + ')" data-target="#modalInfo" class="btn btn-sm btn-gray delete"><i class="fa fa-eye"></i></a>');
-        // Adicionando botões para selecionar o status
-        $('td:eq(3)', row).html('<div class="div-circulo"><select class="form-control status-select" data-order-id="' + data['id'] + '">' +
-            '<option value="1" style="color: red;" ' + (data['status'].id == 1 ? 'selected' : '') + '>Pendente</option>' +
-            '<option value="2" style="color: orange;" ' + (data['status'].id == 2 ? 'selected' : '') + '>Processando</option>' +
-            '<option value="3" style="color: green;" ' + (data['status'].id == 3 ? 'selected' : '') + '>Completo</option>' +
-            '<option value="4" style="color: grey;" ' + (data['status'].id == 4 ? 'selected' : '') + '>Cancelado</option>' +
-            '<option value="5" style="color: blue;" ' + (data['status'].id == 5 ? 'selected' : '') + '>Saiu Para Entrega</option>' +
-            '</select><span class="status-dot" style="background-color:' + getStatusColor(data['status'].id) + '"></span></div>');
+$(document).on('click', '.btn-ver-pedido', function () {
+    const pedido = $(this).data('pedido');
+    // console.log(pedido);
+    // return
 
-        // Função para obter a cor do status
-        function getStatusColor(statusId) {
-            switch (statusId) {
-                case 1:
-                    return 'red';
-                case 2:
-                    return 'orange';
-                case 3:
-                    return 'green';
-                case 4:
-                    return 'grey';
-                case 5:
-                    return 'blue';
-                default:
-                    return 'black';
-            }
-        }
+    // Preenche dados do cliente
+    $('#customer-name').val(pedido.customer_name);
+    $('#customer-phone').val(pedido.customer_phone);
+    $('#customer-address').text(pedido.customer_address ?? '---');
 
-        // Evento de mudança para o select
-        $('td:eq(3) select', row).on('change', function () {
-            var selectedStatus = $(this).val();
-            var statusColor;
 
-            // Determinar a cor do status selecionado
-            switch (selectedStatus) {
-                case '1':
-                    statusColor = 'red';
-                    break;
-                case '2':
-                    statusColor = 'orange';
-                    break;
-                case '3':
-                    statusColor = 'green';
-                    break;
-                case '4':
-                    statusColor = 'grey';
-                    break;
-                case '5':
-                    statusColor = 'blue';
-                    break;
-                default:
-                    statusColor = 'black';
-                    break;
-            }
+    // Limpa tabela antes
+    $('#table-items').empty();
 
-            // Atualizar a classe da bola de status para refletir a cor do status selecionado
-            $(this).siblings('.status-dot').css('background-color', statusColor);
-
-        });
-    },
-    "order": [[ 0, "desc" ]]
-});
-
-// Evento de mudança de status
-$(document).on('change', '.status-select', function () {
-    var orderId = $(this).data('order-id');
-    var newStatus = $(this).val();
-
-    // Verifica se o novo status é 'Saiu Para Entrega'
-    if (newStatus === '5') {
-        // Exibe o modal de confirmação
-        $('#confirmModal').modal('show');
-
-        // Define a ação a ser executada quando o usuário confirmar
-        $('#confirmModal').on('click', '#confirmBtn', function () {
-            // Fecha o modal de confirmação
-            $('#confirmModal').modal('hide');
-
-            // Requisição AJAX para atualizar o status do pedido
-            $.ajax({
-                url: '/pedidos/atualizar-status', // Substitua pela sua rota de atualização de status
-                type: 'POST', // Use POST ou PATCH, dependendo da sua configuração
-                data: {
-                    orderId: orderId,
-                    newStatus: newStatus
-                },
-                success: function (response) {
-
-                    console.log('Pedido #response' + newStatus);
-                },
-                error: function (xhr, status, error) {
-                    console.error('Erro ao atualizar status do pedido:', error);
-                }
-            });
-        });
-    } else {
-        // Requisição AJAX para atualizar o status do pedido diretamente
-        $.ajax({
-            url: '/pedidos/atualizar-status', // Substitua pela sua rota de atualização de status
-            type: 'POST', // Use POST ou PATCH, dependendo da sua configuração
-            data: {
-                orderId: orderId,
-                newStatus: newStatus
-            },
-            success: function (response) {
-                console.log('Pedido #' + orderId + ': Status alterado para ' + newStatus);
-            },
-            error: function (xhr, status, error) {
-                console.error('Erro ao atualizar status do pedido:', error);
-            }
-        });
-    }
-});
-
-function configModal(id) {
-    const dados = {
-        id: id
-    };
-    // Fazendo a requisição AJAX POST
-    $.ajax({
-        url: "pedidos/getOrder", // Substitua pela URL do seu servidor
-        type: "GET",
-        data: dados,
-        success: function (responseJson) {
-            const response = JSON.parse(responseJson);
-
-            $('#customer-name').val(response.customer.name);
-            $('#customer-phone').val(response.customer.phone);
-            $("#customer-address").text(response.customer.location);
-            // Ação a ser executada em caso de sucesso
-            $("#resposta").html("Requisição bem-sucedida: " + response);
-
-            $("#table-items").empty();
-            response.items.forEach(function (item) {
-                console.log(item);
-                // Dados do novo item a serem adicionados
-                const nomeItem = item.name;
-                const valorItem = item.price;
-
-                // Criação do novo elemento <tr> com as células <td> contendo os dados do item
-                const novoItem = `
+    // Adiciona itens
+    pedido.items.forEach(function (item) {
+        const row = `
                 <tr>
-                    <td>${nomeItem}</td>
-                    <td>${valorItem}</td>
-                </tr>
-                `;
-
-                // Adiciona o novo item à tabela, no final do <tbody> com ID "table-items"
-                $("#table-items").append(novoItem);
-            });
-        },
-        error: function (xhr, status, error) {
-            // Ação a ser executada em caso de erro
-            $("#resposta").html("Erro na requisição: " + error);
-        }
+                    <td>${item.name} ${item.quantity > 1 ? `x${item.quantity}` : ''}</td>
+                    <td>R$ ${parseFloat(item.total).toFixed(2).replace('.', ',')}</td>
+                </tr>`;
+        $('#table-items').append(row);
     });
-}
+
+    // Adiciona linha com formas de pagamento
+    $('#table-items').append(`
+            <tr>
+                <td><strong>Pagamento</strong></td>
+                <td>${pedido.formas_pagamento}</td>
+            </tr>
+        `);
+
+    // Adiciona entrega se houver
+    if (pedido.delivery_fee > 0) {
+        $('#table-items').append(`
+                <tr>
+                    <td><strong>Taxa de entrega</strong></td>
+                    <td>R$ ${parseFloat(pedido.delivery_fee).toFixed(2).replace('.', ',')}</td>
+                </tr>
+            `);
+    }
+
+    // Adiciona total geral
+    $('#table-items').append(`
+            <tr class="table-success">
+                <td><strong>Total Geral</strong></td>
+                <td><strong>R$ ${parseFloat(pedido.total_geral).toFixed(2).replace('.', ',')}</strong></td>
+            </tr>
+        `);
+
+    // Abre o modal
+    $('#modalInfo').modal('show');
+});
+$(document).ready(function () {
+    let pedidoIdSelecionado = null;
+
+    // Abrir modal e carregar motoboys
+    $(document).on('click', '.btn-add-motoboy, .btn-alterar-motoboy', function () {
+        pedidoIdSelecionado = $(this).data('id');
+
+        $.get('/pedidos/motoboys/lista', function (motoboys) {
+            let lista = '';
+            motoboys.forEach(function (motoboy) {
+                lista += `
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        🛵 ${motoboy.name} - ${motoboy.phone}
+                        <button class="btn btn-sm btn-primary selecionar-motoboy" data-id="${motoboy.id}" data-nome="${motoboy.name}">
+                            Selecionar
+                        </button>
+                    </li>
+                `;
+            });
+            $('#lista-motoboys').html(lista);
+            $('#modalMotoboy').modal('show');
+        });
+    });
+
+    // Quando clicar no botão "Selecionar" do motoboy
+    $(document).on('click', '.selecionar-motoboy', function () {
+        const motoboyId = $(this).data('id');
+        const motoboyNome = $(this).data('nome');
+
+        $.post('/pedidos/atribuir-motoboy', {
+            _token: $('meta[name="csrf-token"]').attr('content'),
+            order_id: pedidoIdSelecionado,
+            motoboy_id: motoboyId
+        }, function (res) {
+            if (res.success) {
+                const btn = $(`button[data-id="${pedidoIdSelecionado}"]`);
+                btn.removeClass('btn-warning')
+                   .addClass('btn-success btn-alterar-motoboy')
+                   .html('🛵 ' + motoboyNome);
+
+                $('#modalMotoboy').modal('hide');
+            } else {
+                alert('Erro ao atribuir motoboy');
+            }
+        });
+    });
+});
+
+

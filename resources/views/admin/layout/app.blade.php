@@ -61,21 +61,11 @@
 
             <!-- Na sidebar -->
             @if (session('authenticated') && session('userData') && session('userData')->role == 'admin')
-                
                 <li class="nav-item">
-                    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#orders"
-                        aria-expanded="true" aria-controls="orders">
+                    <a href="{{ route('admin.order.index') }}" class="nav-link">
                         <i class="fas fa-mail-bulk"></i>
                         <span>Pedidos</span>
                     </a>
-
-                    <div id="orders" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                        <div class="bg-white py-2 collapse-inner rounded">
-                            <a class="collapse-item" href="{{ route('admin.order.index') }}">Lista Pedidos</a>
-                            <a class="collapse-item" href="{{ route('admin.order.create') }}">retirar Pedido</a>
-                        </div>
-                    </div>
-
                 </li>
             @endif
 
@@ -122,7 +112,15 @@
                 </a>
             </li>
 
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
 
+            <li class="nav-item">
+                <a href="{{ route('admin.motoboy.index') }}" class="nav-link">
+                    <i class="fas fa-motorcycle"></i>
+                    <span>Motoboys</span>
+                </a>
+            </li>
 
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
@@ -148,13 +146,6 @@
                 </div>
 
             </li>
-
-
-
-
-
-
-
 
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
@@ -362,7 +353,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.3/howler.min.js"></script>
 
 
-
+    <script>
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+    </script>
 
     @yield('scripts')
     <script>
@@ -371,30 +368,30 @@
         });
         var newOrderModal = $('#newOrderModal');
 
-        function getOrdersCount() {
-            $.ajax({
-                url: 'pedidos/getOrdersCount',
-                method: 'GET',
-                success: function(response) {
-                    console.log(response);
-                    var countElement = document.querySelector('.notification-count');
-                    var currentCount = parseInt(countElement.textContent);
+        // function getOrdersCount() {
+        //     $.ajax({
+        //         url: 'pedidos/getOrdersCount',
+        //         method: 'GET',
+        //         success: function(response) {
+        //             console.log(response);
+        //             var countElement = document.querySelector('.notification-count');
+        //             var currentCount = parseInt(countElement.textContent);
 
-                    if (response > currentCount) {
-                        som2.play();
-                        newOrderModal.modal('show');
-                    }
+        //             if (response > currentCount) {
+        //                 som2.play();
+        //                 newOrderModal.modal('show');
+        //             }
 
-                    countElement.textContent = response;
-                },
-                error: function(xhr, status, error) {
-                    console.error('Erro ao obter a contagem de pedidos:', error);
-                }
-            });
-        }
+        //             countElement.textContent = response;
+        //         },
+        //         error: function(xhr, status, error) {
+        //             console.error('Erro ao obter a contagem de pedidos:', error);
+        //         }
+        //     });
+        // }
 
-        // Executar a função de verificação a cada 10 segundos.
-        setInterval(getOrdersCount, 10000);
+        // // Executar a função de verificação a cada 10 segundos.
+        // setInterval(getOrdersCount, 10000);
 
         // Desativar som e modal ao clicar nos botões
         $('#closeModalButton, #dismissModalButton, #goToOrdersButton').on('click', function() {
