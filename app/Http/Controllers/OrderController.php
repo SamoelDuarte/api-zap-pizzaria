@@ -139,9 +139,7 @@ class OrderController extends Controller
 
         return response()->json(['success' => true]);
     }
-
-
-
+    
     public function create()
     {
         $crusts = \App\Models\Crust::all(); // busca todas as bordas do banco

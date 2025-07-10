@@ -14,15 +14,25 @@ $(document).on('click', '.btn-ver-pedido', function () {
     // Limpa tabela antes
     $('#table-items').empty();
 
-    // Adiciona itens
     pedido.items.forEach(function (item) {
+        let crustHtml = '';
+
+        if (item.crust) {
+            crustHtml = `<br><small class="text-muted">Borda: ${item.crust} (+R$ ${parseFloat(item.crust_price).toFixed(2).replace('.', ',')})</small>`;
+        }
+
         const row = `
-                <tr>
-                    <td>${item.name} ${item.quantity > 1 ? `x${item.quantity}` : ''}</td>
-                    <td>R$ ${parseFloat(item.total).toFixed(2).replace('.', ',')}</td>
-                </tr>`;
+        <tr>
+            <td>
+                ${item.name} ${item.quantity > 1 ? `x${item.quantity}` : ''}
+                ${crustHtml}
+            </td>
+            <td>R$ ${parseFloat(item.total).toFixed(2).replace('.', ',')}</td>
+        </tr>
+    `;
         $('#table-items').append(row);
     });
+
 
     // Adiciona linha com formas de pagamento
     $('#table-items').append(`
@@ -90,8 +100,8 @@ $(document).ready(function () {
             if (res.success) {
                 const btn = $(`button[data-id="${pedidoIdSelecionado}"]`);
                 btn.removeClass('btn-warning')
-                   .addClass('btn-success btn-alterar-motoboy')
-                   .html('🛵 ' + motoboyNome);
+                    .addClass('btn-success btn-alterar-motoboy')
+                    .html('🛵 ' + motoboyNome);
 
                 $('#modalMotoboy').modal('hide');
             } else {
