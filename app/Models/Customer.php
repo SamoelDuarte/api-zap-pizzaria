@@ -71,7 +71,7 @@ class Customer extends Model
             'N° : ' . $this->number . " -- " .
             'Bairro: ' . $this->neighborhood . " \n " .
             'Cidade: ' . $this->city . "-- " .
-            'Estado: ' . $this->state ;
+            'Estado: ' . $this->state;
     }
 
     public function getDeliveryFeeAttribute()
@@ -94,8 +94,15 @@ class Customer extends Model
     {
         $address1 = 'Rua José Alves da silva , 429, Parque Novo Santo Amaro, SP';
         $origin = urlencode($address1);
-        $destination = urlencode($this->location);
+        $destination = urlencode($this->address_for_maps);
         return "https://www.google.com/maps/dir/?api=1&origin={$origin}&destination={$destination}";
+    }
+    public function getAddressForMapsAttribute()
+    {
+        return $this->public_place . ' ' . $this->number . ', ' .
+            $this->neighborhood . ', ' .
+            $this->city . ', ' .
+            $this->state;
     }
 
     public function getDistanceInKilometers()
