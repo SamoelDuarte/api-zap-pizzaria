@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\admin\ConfigController;
 use App\Http\Controllers\admin\MenssageController;
-use App\Http\Controllers\Admin\MotoboyController;
+use App\Http\Controllers\admin\MotoboyController;
 use App\Http\Controllers\admin\ProductController;
 use App\Http\Controllers\admin\ScheduleController;
 use App\Http\Controllers\AdminController;
