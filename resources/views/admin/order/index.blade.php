@@ -37,6 +37,33 @@
             <div class="col-lg-12 mb-4">
                 <div class="card shadow mb-4">
                     <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-3">
+                                <input type="text" id="filtro-cliente" class="form-control"
+                                    placeholder="🔍 Nome ou Telefone">
+                            </div>
+                            <div class="col-md-2">
+                                <select id="filtro-status" class="form-select">
+                                    <option value="">🟢 Todos os Status</option>
+                                    @foreach ($statuses as $status)
+                                        <option value="{{ $status->name }}">{{ $status->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <select id="filtro-motoboy" class="form-select">
+                                    <option value="">🛵 Todos Motoboys</option>
+                                    @foreach ($motoboys as $motoboy)
+                                        <option value="{{ $motoboy->name }}">{{ $motoboy->name }}</option>
+                                    @endforeach
+                                </select>
+
+                            </div>
+                            <div class="col-md-1">
+                                <button id="limpar-filtros" class="btn btn-secondary w-100">Limpar</button>
+                            </div>
+                        </div>
+
                         <div class="table-device">
                             <table class="table table-bordered" id="table-order">
                                 <thead>
@@ -56,17 +83,35 @@
                                     @foreach ($orders as $order)
                                         <tr>
                                             <td>#{{ $order->id }}</td>
-                                            <td>{{ $order->customer_name }} <br> 📞 {{ $order->customer_phone }}</td>
-                                            <td>R$ {{ $order->total_geral }}</td>
-                                            <td>R$ {{ $order->delivery_fee }}</td>
-                                            <td>{{ $order->status }}</td>
-                                            <td>{!! $order->formas_pagamento !!}</td>
-                                            <td>{{ $order->data }}</td>
+                                            <td>{{ $order->customer->name }} <br> 📞 {{ $order->customer->phone }}</td>
+                                            <td>R$ {{ number_format($order->total_geral, 2, ',', '.') }}</td>
+                                            <td>R$ {{ number_format($order->delivery_fee, 2, ',', '.') }}</td>
+                                            <td>
+                                                <button class="btn btn-status"
+                                                    style="background-color: {{ $order->status->color ?? '#6c757d' }}; color: #fff"
+                                                    data-id="{{ $order->id }}"
+                                                    data-current-status="{{ $order->status_id }}"
+                                                    @if ($order->status->name === 'Cancelado') disabled @endif>
+                                                    {{ $order->status->name ?? 'Sem status' }}
+                                                </button>
+                                            </td>
+                                            <td>
+                                                {!! $order->payments->map(function ($p) {
+                                                        return "{$p->paymentMethod->name} (R$ " . number_format($p->amount, 2, ',', '.') . ')';
+                                                    })->implode(', ') !!}
+                                                @if ($order->change_for)
+                                                    <br><span class="text-danger">Troco: R$
+                                                        {{ number_format($order->change_for, 2, ',', '.') }}</span>
+                                                @endif
+                                            </td>
+                                            <td>{{ $order->created_at->format('d/m/Y H:i') }}</td>
                                             <td>
                                                 <button
-                                                    class="btn btn-sm {{ $order->motoboy_name ? 'btn-success btn-alterar-motoboy' : 'btn-warning btn-add-motoboy' }}"
-                                                    data-id="{{ $order->id }}">
-                                                    {{ $order->motoboy_name ? '🛵 ' . $order->motoboy_name : 'Adicionar Motoboy' }}
+                                                    class="btn btn-sm {{ $order->motoboy ? 'btn-success btn-alterar-motoboy' : 'btn-warning btn-add-motoboy' }} btn-motoboy"
+                                                    data-id="{{ $order->id }}"
+                                                    data-nome="{{ $order->motoboy->name ?? '' }}"
+                                                    @if ($order->status->name === 'Cancelado') disabled @endif>
+                                                    {{ $order->motoboy ? '🛵 ' . $order->motoboy->name : 'Adicionar Motoboy' }}
                                                 </button>
                                             </td>
                                             <td>
@@ -76,6 +121,7 @@
                                                 </button>
 
                                             </td>
+
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -131,6 +177,12 @@
                             </tbody>
                         </table>
                     </div>
+                    <!-- Motivo do Cancelamento -->
+                    <div id="motivo-cancelamento-box" class="mt-3" style="display: none;">
+                        <h5 class="text-danger">❌ Motivo do Cancelamento</h5>
+                        <p id="motivo-cancelamento" class="text-muted"></p>
+                    </div>
+
                 </div>
 
                 <div class="modal-footer justify-content-between">
@@ -156,6 +208,52 @@
                     <ul id="lista-motoboys" class="list-group">
                         {{-- Carregado via AJAX --}}
                     </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Status -->
+    <div class="modal fade" id="modalStatus" tabindex="-1" aria-labelledby="modalStatusLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalStatusLabel">Alterar Status</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <select class="form-select" id="selectStatus">
+                        @foreach ($statuses as $status)
+                            <option value="{{ $status->id }}" data-name="{{ $status->name }}"
+                                data-color="{{ $status->color }}">
+                                {{ $status->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <input type="hidden" id="pedidoIdStatus">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="btnSalvarStatus">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal de Motivo de Cancelamento -->
+    <div class="modal fade" id="modalMotivoCancelamento" tabindex="-1" aria-labelledby="motivoCancelamentoLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Motivo do Cancelamento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <textarea class="form-control" id="inputMotivoCancelamento" rows="3"
+                        placeholder="Descreva o motivo do cancelamento..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-danger" id="btnConfirmarCancelamento">Confirmar Cancelamento</button>
                 </div>
             </div>
         </div>

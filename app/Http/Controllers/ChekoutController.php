@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Base62Helper;
+use App\Helpers\MessageHelper;
 use App\Models\Categories;
 use App\Models\Chat;
 use App\Models\Config;
@@ -11,6 +12,7 @@ use App\Models\Customer;
 use App\Models\Device;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\OrderPayment;
 use App\Models\Product;
 use App\Models\User;
 use App\Notifications\NewOrderNotification;
@@ -20,24 +22,33 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use GuzzleHttp\Client;
-
+use Illuminate\Support\Facades\DB;
 
 class ChekoutController extends Controller
 {
-    public function index(Request $request)
+    public function index($phone = null)
     {
-        $phone = $request->query('phone');
-
         $customer = null;
         $semCadastro = false;
         $taxaEntrega = 0;
 
         if ($phone) {
             $customer = Customer::where('jid', $phone)->first();
-
             if ($customer) {
                 session()->put('customer', $customer);
                 $taxaEntrega = $customer->delivery_fee ?? 0;
+
+                // Verifica se já existe um chat ativo
+                $chatAtivo = Chat::where('jid', $customer->jid)->where('active', 1)->first();
+                if (!$chatAtivo) {
+                    Chat::create([
+                        'jid' => $customer->jid,
+                        'session_id' => null, // ou o valor correto se houver
+                        'service_id' => null, // ou o valor correto se houver
+                        'active' => 1,
+                        'await_answer' => null, // pode ser "await_human" se desejar
+                    ]);
+                }
             } else {
                 session()->forget('customer');
                 $semCadastro = true;
@@ -59,6 +70,7 @@ class ChekoutController extends Controller
         return view('front.checkout.index', compact('categories', 'cart', 'customer', 'semCadastro'));
     }
 
+
     public function addProduto($id)
     {
         $product = Product::findOrFail($id);
@@ -66,19 +78,20 @@ class ChekoutController extends Controller
 
         return view('front.checkout.addProduct', compact('product', 'crusts'));
     }
-    public function add2Sabores()
+    public function add2Sabores(Request $request)
     {
-        $categories = Categories::where('name', 'LIKE', '%Pizzas%')->get(); // Busca as categorias que contêm a palavra "Pizzas" no nome
-        $crusts = Crust::all(); // Busca todas as bordas disponíveis
-        $products = collect(); // Cria uma coleção vazia para armazenar os produtos
+        $categories = Categories::where('name', 'LIKE', '%Pizzas%')->with('products')->get();
 
-        // Percorre todas as categorias encontradas
-        foreach ($categories as $category) {
-            // Adiciona os produtos da categoria atual à coleção de produtos
-            $products = $products->merge($category->products);
-        }
-        return view('front.checkout.add2Sabores', compact('products', 'crusts'));
+        $selectedCategoryId = $request->input('categoria');
+        $selectedCategory = $categories->firstWhere('id', $selectedCategoryId) ?? $categories->first();
+        $products = $selectedCategory ? $selectedCategory->products : collect();
+
+        $crusts = Crust::all();
+
+        return view('front.checkout.add2Sabores', compact('categories', 'products', 'crusts', 'selectedCategory'));
     }
+
+
     public function addToCart(Request $request)
     {
         $cart = session()->get('cart', []);
@@ -277,22 +290,17 @@ class ChekoutController extends Controller
         // Obter o carrinho da sessão
         $cart = session()->get('cart', []);
 
-
-        // dd($cart);
         // Recuperar o customer da sessão
         $customer = session()->get('customer');
-
-        // dd($customer);
-        $customer = Customer::find($customer->id);
+        $cliente = Customer::find($customer->id);
 
         // Obter o valor do frete da sessão
         $taxaEntrega = session('taxa_entrega', 0);
 
-        $totalPrice = array_sum(array_column($cart, 'total')) + $taxaEntrega;
-
         // Obter a forma de pagamento
         $paymentMethod = $request->input('payment');
-        $trocoAmount = $request->input('troco_amount', 0); // Adicione esta linha
+
+        $trocoAmount = $request->input('troco_amount', 0);
         $observation = '';
 
         if ($paymentMethod == 'Dinheiro' && $request->filled('troco_amount')) {
@@ -302,133 +310,189 @@ class ChekoutController extends Controller
             }
         }
 
-        // Criar o pedido
-        $order = Order::create([
-            'customer_id' => $customer->id,
-            'status_id' => 1,
-            'total_price' =>  $totalPrice,
-            'payment_method' => $paymentMethod,
-            'observation' => $observation,
-        ]);
+        // --- Aqui começa a lógica do storeFromAdmin adaptada ---
 
-        // Criar os itens do pedido
+        // Para o pedido vamos usar os produtos do carrinho do finish, mas formatar igual storeFromAdmin
+
+        // Preparar array de produtos para a lógica do storeFromAdmin
+        $todosProdutos = [];
+
         foreach ($cart as $item) {
-            // Dividir os product_ids em primário e secundário e terciário
-            $productIds = explode(',', $item['product_id']);
-            $primaryProductId = $productIds[0];
-            $secondaryProductId = isset($productIds[1]) ? $productIds[1] : null;
-            $tertiaryProductId = isset($productIds[2]) ? $productIds[2] : null;
+            $todosProdutos[] = [
+                'nome' => $item['name'],
+                'valor' => $item['price'],
+                'preco_borda' => $item['crust_price'] ?? 0,
+                'quantidade' => $item['quantity'],
+                'borda' => $item['crust'] ?? 'Tradicional',
+                'observacao' => $item['observation_primary'] ?? null,
+            ];
+        }
 
-            OrderItem::create([
-                'order_id' => $order->id,
-                'product_id_primary' => $primaryProductId,
-                'product_id_secondary' => $secondaryProductId,
-                'product_id_tertiary' => $tertiaryProductId,
-                'name' => $item['name'],
-                'description' => $item['description'],
-                'price' => $item['price'],
-                'quantity' => $item['quantity'],
-                'crust' => $item['crust'],
-                'crust_price' => $item['crust_price'],
-                'observation_primary' => isset($item['observation']) && $item['observation'] !== '' ? $item['observation'] : null,
-                'observation_secondary' => isset($item['observation_secondary']) && $item['observation_secondary'] !== '' ? $item['observation_secondary'] : null,
-                'observation_tertiary' => isset($item['observation_tertiary']) && $item['observation_tertiary'] !== '' ? $item['observation_tertiary'] : null,
+        DB::beginTransaction();
+        try {
+            // Soma total dos itens com bordas
+            $totalPedido = 0;
+            foreach ($todosProdutos as $item) {
+                $valor = floatval($item['valor']);
+                $precoBorda = floatval($item['preco_borda'] ?? 0);
+                $quantidade = intval($item['quantidade']);
+                $totalItem = $valor * $quantidade;
+                $totalPedido += $totalItem;
+            }
+
+            $totalPedidoComEntrega = $totalPedido + $taxaEntrega;
+            //    dd($totalPedidoComEntrega);
+            // Troco (passado pelo request)
+            $troco = $trocoAmount;
+
+            // Cria pedido (sem total_price)
+            $pedido = Order::create([
+                'customer_id' => $cliente->id,
+                'status_id' => 1,
+                'change_for' => $troco > 0 ? $troco : null,
+                'delivery_fee' => $taxaEntrega,
+                'observation' => $observation,
+            ]);
+
+            // Salvar os itens do pedido (igual storeFromAdmin)
+            foreach ($todosProdutos as $item) {
+                $valor = floatval($item['valor']);
+                $precoBorda = floatval($item['preco_borda'] ?? 0);
+                $quantidade = intval($item['quantidade']);
+                $totalItem = ($valor + $precoBorda) * $quantidade;
+
+                OrderItem::create([
+                    'order_id' => $pedido->id,
+                    'name' => $item['nome'],
+                    'price' => $valor,
+                    'quantity' => $quantidade,
+                    'crust' => $item['borda'] ?? 'Tradicional',
+                    'crust_price' => $precoBorda,
+                    'observation_primary' => $item['observacao'] ?? null,
+                    'total' => $totalItem,
+                ]);
+            }
+
+            // Salvar pagamento único (como no finish original)
+            $paymentMethodId = DB::table('payment_methods')
+                ->where('name', $paymentMethod)
+                ->value('id');
+            OrderPayment::create([
+                'order_id' => $pedido->id,
+                'payment_method_id' => $paymentMethodId,
+                'amount' => $totalPedidoComEntrega,
+            ]);
+
+            DB::commit();
+            session()->forget(['cart']);
+
+            // Retornar igual no finish original
+            return view('front.checkout.resumo', [
+                'cart' => $cart,
+                'taxaEntrega' => $taxaEntrega,
+                'totalPrice' => $totalPedidoComEntrega,
+                'customer' => $cliente,
+                'paymentMethod' => $paymentMethod,
+                'trocoAmount' => $trocoAmount,
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Erro ao salvar o pedido.',
+                'error' => $e->getMessage()
             ]);
         }
-
-        // Disparar a notificação para todos os administradores
-        $admins = User::where('role', 'admin')->get(); // Supondo que você tem uma coluna 'role' para identificar administradores
-        foreach ($admins as $admin) {
-            $admin->notify(new NewOrderNotification("Novo Pedido"));
-        }
-
-        // Limpar a sessão do carrinho
-        session()->forget(['cart']);
-
-        return view('front.checkout.resumo', compact('cart', 'taxaEntrega', 'totalPrice', 'customer', 'paymentMethod', 'trocoAmount'));
     }
+
 
 
     public function enviaImagen(Request $request)
     {
-        // Recuperar o customer da sessão
         $customer = session()->get('customer');
         $customer = Customer::find($customer->id);
+
+        if (!$customer) {
+            return response()->json(['success' => false, 'message' => 'Cliente não encontrado.']);
+        }
+
         $service = Chat::where('jid', $customer->jid)
             ->where('active', 1)
             ->first();
-        // Obtém a imagem enviada no corpo da requisição
-        $imagemBase64 = $request->input('imagem');
-        // Verifica se o diretório existe, se não, cria-o
-        if (!Storage::disk('public')->exists('imagens')) {
-            Storage::disk('public')->makeDirectory('imagens');
+
+        if (!$service) {
+            return response()->json(['success' => false, 'message' => 'Conversa ativa não encontrada.']);
         }
-        // Decodifica a imagem base64 e gera um nome único para o arquivo
+
+        // Decodifica e salva a imagem
+        $imagemBase64 = $request->input('imagem');
+        if (!$imagemBase64) {
+            return response()->json(['success' => false, 'message' => 'Imagem não enviada.']);
+        }
+
         $imagem = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $imagemBase64));
         $nomeArquivo = uniqid() . '.png';
-
-        // Salva a imagem na pasta de armazenamento (por exemplo, a pasta "public")
         $caminhoArquivo = 'imagens/' . $nomeArquivo;
+
         Storage::disk('public')->put($caminhoArquivo, $imagem);
-        $session = Device::first();
+        $imagemUrl = asset('storage/' . $caminhoArquivo);
 
-        $this->sendImage($session->session, $customer->jid, asset('storage/' . $caminhoArquivo), '');
+        // Enviar a imagem com helper
+        MessageHelper::enviarImagem($customer->jid, $imagemUrl);
 
-        date_default_timezone_set('America/Sao_Paulo');
-        $horaAtual = Carbon::now();
+        // Mensagens padrão
+        $horaAtual = Carbon::now('America/Sao_Paulo');
         $config = Config::firstOrFail();
-        $horaMais45Minutos = $horaAtual->addMinutes($config->minuts);
-        $text = " Pedido feito com Sucesso .";
-        $this->sendMessagem($session->session, $customer->jid, $text);
+        $horaPrevista = $horaAtual->copy()->addMinutes($config->minuts);
 
-        $text = "Previsão da entrega " . $horaMais45Minutos->format('H:i');
-        $this->sendMessagem($session->session, $customer->jid, $text);
+        MessageHelper::enviarMensagem($customer->jid, 'Pedido feito com Sucesso.');
+        MessageHelper::enviarMensagem($customer->jid, 'Previsão da entrega: ' . $horaPrevista->format('H:i'));
+        MessageHelper::enviarMensagem($customer->jid, 'Muito Obrigado!');
 
-        $text = "Muito Obrigado! ";
-        $this->sendMessagem($session->session, $customer->jid, $text);
-        $service->await_answer = 'finish';
-        $service->update();
+        $service->update(['await_answer' => 'finish']);
 
-        // Limpar a sessão do carrinho e do customer
-        session()->forget(['customer', 'taxa_entrega']);
+        // Limpar a sessão
+        session()->forget(['customer', 'taxa_entrega', 'cart']);
+
+        return response()->json(['success' => true, 'message' => 'Imagem enviada com sucesso.']);
     }
-    public function sendImage($session, $phone, $nomeImagen, $detalhes)
-    {
-        $curl = curl_init();
+    // public function sendImage($session, $phone, $nomeImagen, $detalhes)
+    // {
+    //     $curl = curl_init();
 
-        $send = array(
-            "number" => $phone,
-            "message" => array(
-                "image" => array(
-                    "url" => $nomeImagen // public_path('uploads/' . $nomeImagen)
-                ),
-                "caption" => $detalhes
-            ),
-            "delay" => 3
-        );
+    //     $send = array(
+    //         "number" => $phone,
+    //         "message" => array(
+    //             "image" => array(
+    //                 "url" => $nomeImagen // public_path('uploads/' . $nomeImagen)
+    //             ),
+    //             "caption" => $detalhes
+    //         ),
+    //         "delay" => 3
+    //     );
 
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => env('APP_URL_ZAP') . '/' . $session . '/messages/send',
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => 'POST',
-            CURLOPT_POSTFIELDS => json_encode($send),
-            CURLOPT_HTTPHEADER => array(
-                'secret: $2a$12$VruN7Mf0FsXW2mR8WV0gTO134CQ54AmeCR.ml3wgc9guPSyKtHMgC',
-                'Content-Type: application/json'
-            ),
-        ));
+    //     curl_setopt_array($curl, array(
+    //         CURLOPT_URL => env('APP_URL_ZAP') . '/' . $session . '/messages/send',
+    //         CURLOPT_RETURNTRANSFER => true,
+    //         CURLOPT_ENCODING => '',
+    //         CURLOPT_MAXREDIRS => 10,
+    //         CURLOPT_TIMEOUT => 0,
+    //         CURLOPT_FOLLOWLOCATION => true,
+    //         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+    //         CURLOPT_CUSTOMREQUEST => 'POST',
+    //         CURLOPT_POSTFIELDS => json_encode($send),
+    //         CURLOPT_HTTPHEADER => array(
+    //             'secret: $2a$12$VruN7Mf0FsXW2mR8WV0gTO134CQ54AmeCR.ml3wgc9guPSyKtHMgC',
+    //             'Content-Type: application/json'
+    //         ),
+    //     ));
 
-        $response = curl_exec($curl);
+    //     $response = curl_exec($curl);
 
-        //  file_put_contents(Utils::createCode() . ".txt", $response);
+    //     //  file_put_contents(Utils::createCode() . ".txt", $response);
 
-        curl_close($curl);
-    }
+    //     curl_close($curl);
+    // }
     public function sendMessagem($session, $phone, $texto)
     {
 
@@ -478,22 +542,32 @@ class ChekoutController extends Controller
     {
         $data = $request->all();
 
-        // Cria ou atualiza o cliente
-        if (!empty($data['id'])) {
-            $customer = Customer::find($data['id']);
+        // Se já tem cliente na sessão, usa ele
+        if (session()->has('customer')) {
+            $customerSession = session()->get('customer');
+            $customer = Customer::find($customerSession->id);
+            // Salva na sessão
+            session()->put('customer', $customer);
+            session()->put('taxa_entrega', $customer->delivery_fee ?? 0);
+        } else {
+            // Se veio ID, tenta buscar e atualizar o cliente
+            if (!empty($data['id'])) {
+                $customer = Customer::find($data['id']);
 
-            if (!$customer) {
-                return redirect()->back()->withErrors('Cliente não encontrado.');
+                if (!$customer) {
+                    return redirect()->back()->withErrors('Cliente não encontrado.');
+                }
+
+                $customer->update($data);
+            } else {
+                // Se não veio ID, cria novo cliente
+                $customer = Customer::create($data);
             }
 
-            $customer->update($data);
-        } else {
-            $customer = Customer::create($data);
+            // Salva na sessão
+            session()->put('customer', $customer);
+            session()->put('taxa_entrega', $customer->delivery_fee ?? 0);
         }
-
-        // Já existe: salva na sessão o cliente e a taxa de entrega dele
-        session()->put('customer', $customer);
-        session()->put('taxa_entrega', $customer->delivery_fee ?? 0);
 
         // Obter carrinho
         $cart = session()->get('cart', []);
@@ -508,6 +582,7 @@ class ChekoutController extends Controller
 
         return view('front.checkout.payments', compact('produtosBebidas', 'cart'));
     }
+
 
 
     public function gerarPix(Request $request)

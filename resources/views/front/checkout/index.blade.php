@@ -286,12 +286,11 @@
 
     <div class="container" id="product-container">
         <div class="category" id="category-home">
-            <h2>Monte Sua Pizza 2 ou 3 Sabores</h2>
             <div class="product" data-product-id="perso">
                 <img src="https://maissaborgranjalisboa.onezap.link/wp-content/uploads/2022/03/meio-a-meio-scaled.jpg"
                     alt="">
                 <div class="product-details">
-                    <div class="product-title">Escolha até 3 Sabores</div>
+                    <div class="product-title">Escolha 2 Sabores</div>
                     <div class="product-description">Prevalece o valor da Maior</div>
                 </div>
                 <div class="product-price"></div>
@@ -352,26 +351,33 @@
 @endphp
 @section('scripts')
     <script>
-       function redirectToCart() {
-        const customerZipcode = @json($zipcode);
-        console.log(customerZipcode);
-        if (customerZipcode) {
-            const customerName = @json($name);
-            const customerAddress = @json($public_place);
-            const customerCity = @json($city);
-            const customerState = @json($state);
-            const customerNumber = @json($number);
-            const customerNeighborhood = @json($neighborhood);
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                document.querySelector('.loading-overlay').style.display = 'none';
+            }, 1000); // Ajuste o tempo conforme necessário
+        });
+    </script>
+    <script>
+        function redirectToCart() {
+            const customerZipcode = @json($zipcode);
+            console.log(customerZipcode);
+            if (customerZipcode) {
+                const customerName = @json($name);
+                const customerAddress = @json($public_place);
+                const customerCity = @json($city);
+                const customerState = @json($state);
+                const customerNumber = @json($number);
+                const customerNeighborhood = @json($neighborhood);
 
-            document.getElementById('addressInfo').innerText = `
+                document.getElementById('addressInfo').innerText = `
                 ${customerAddress}, N° ${customerNumber}\nBairro: ${customerNeighborhood}\nCEP: ${customerZipcode}
             `;
 
-            document.getElementById('addressModal').style.display = 'block';
-        } else {
-            window.location.href = "{{ route('cart.show') }}";
+                document.getElementById('addressModal').style.display = 'block';
+            } else {
+                window.location.href = "{{ route('cart.show') }}";
+            }
         }
-    }
 
         // Fecha o modal ao clicar no botão de fechar
         document.querySelector('.close').addEventListener('click', function() {

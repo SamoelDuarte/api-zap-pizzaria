@@ -20,6 +20,7 @@ use App\Http\Controllers\RouteController;
 use App\Http\Controllers\WebhookController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Customer;
+use App\Models\Order;
 use Illuminate\Support\Facades\Http;
 use League\Csv\Reader;
 use Illuminate\Http\Request;
@@ -187,6 +188,8 @@ Route::middleware(['auth.user'])->group(function () {
             Route::post('/novo-pedido', 'storeFromAdmin')->name('admin.pedidos.finalizar');
             Route::get('/motoboys/lista','motoboyLista');
             Route::post('/atribuir-motoboy','atribuirMotoboy');  
+            Route::post('/alterar-status', [OrderController::class, 'alterarStatus']);
+
         });
 
         Route::prefix('/config')->controller(ConfigController::class)->group(function () {

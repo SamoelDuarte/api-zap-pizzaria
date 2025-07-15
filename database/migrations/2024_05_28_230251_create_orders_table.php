@@ -23,6 +23,7 @@ return new class extends Migration
             $table->decimal('delivery_fee', 10, 2)->default(0);
 
             $table->string('status_id')->default('1'); // Status do pedido
+            $table->text('cancel_reason')->nullable();
             $table->timestamps();
         });
     }

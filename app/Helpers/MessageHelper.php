@@ -49,4 +49,44 @@ class MessageHelper
             return false;
         }
     }
+    public static function enviarImagem($numero, $imagemUrl, $caption = '')
+    {
+        $numero = preg_replace('/[^0-9]/', '', $numero);
+
+        if (str_starts_with($numero, '55')) {
+            $numero = substr($numero, 2);
+        }
+
+        $device = Device::where('status', "open")->first();
+        if (!$device) {
+            Log::error('Imagem: Nenhum dispositivo ativo');
+            return false;
+        }
+
+        $client = new \GuzzleHttp\Client();
+        $url = "http://147.79.111.119:8080/message/sendImage/{$device->session}";
+
+        $headers = [
+            'Content-Type' => 'application/json',
+            'apikey' => env('TOKEN_EVOLUTION'),
+        ];
+
+        $body = json_encode([
+            'number' => '55' . $numero,
+            'url' => $imagemUrl,
+            'caption' => $caption,
+        ]);
+
+        try {
+            $request = new \GuzzleHttp\Psr7\Request('POST', $url, $headers, $body);
+            $response = $client->sendAsync($request)->wait();
+
+            Log::info("Imagem enviada para 55{$numero}");
+
+            return json_decode($response->getBody(), true);
+        } catch (\Exception $e) {
+            Log::error("Erro ao enviar imagem: " . $e->getMessage());
+            return false;
+        }
+    }
 }

@@ -10,11 +10,13 @@ use App\Models\Motoboy;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\OrderPayment;
+use App\Models\OrderStatus;
 use App\Models\PaymentMethod;
 use App\Models\User;
 use App\Models\Whatsapp;
 use App\Notifications\NewOrderNotification;
 use App\Services\DistanceService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -22,40 +24,26 @@ use Yajra\DataTables\Facades\DataTables;
 
 class OrderController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Busca os pedidos e marca os com notify = 0 como lidos
-        $orders = Order::with(['customer', 'items', 'payments.paymentMethod', 'status'])
-            ->latest()
-            ->get()
-            ->map(function ($order) {
-                $totalItens = $order->items->sum('total');
-                $deliveryFee = $order->customer->delivery_fee ?? 0;
+        $query = Order::with([
+            'customer',
+            'items',
+            'payments.paymentMethod',
+            'status',
+            'motoboy'
+        ]);
 
-                return (object) [
-                    'id' => $order->id,
-                    'customer_name' => $order->customer->name,
-                    'customer_phone' => $order->customer->phone,
-                    'status' => $order->status->name ?? 'Sem status',
-                    'delivery_fee' => $order->delivery_fee,
-                    'customer_address' => $order->customer->location, // ✅ Aqui
-                    'total_geral' => $order->total_geral,
-                    'items' => $order->items,
-                    'motoboy_name' => optional($order->motoboy)->name, // pode ser null
-                    'formas_pagamento' => $order->payments->map(function ($p) {
-                        return "{$p->paymentMethod->name} (R$ " . number_format($p->amount, 2, ',', '.') . ")";
-                    })->implode(', ') .
-                        ($order->change_for ? '<br><span class="text-danger">Troco: R$ ' . number_format($order->change_for, 2, ',', '.') . '</span>' : ''),
-                    'data' => $order->created_at->format('d/m/Y H:i'),
-                ];
-            });
-
-
-        // Atualiza notify para 1
+       
+        $query->whereDate('created_at', Carbon::today());
+        $orders = $query->latest()->get();
+        $motoboys = Motoboy::all();
         Order::where('notify', 0)->update(['notify' => 1]);
+        $statuses = \App\Models\OrderStatus::all();
 
-        return view('admin.order.index', compact('orders'));
+        return view('admin.order.index', compact('orders', 'statuses', 'motoboys'));
     }
+
 
     public function motoboyLista()
     {
@@ -137,9 +125,16 @@ class OrderController extends Controller
         MessageHelper::enviarMensagem($clienteTelefone, $msgCliente);
         MessageHelper::enviarMensagem($motoboyTelefone, $msgMotoboy);
 
-        return response()->json(['success' => true]);
+        $order->load('status'); // 🔁 Recarrega a relação após mudar o status
+
+        return response()->json([
+            'success' => true,
+            'status_name' => $order->status->name,
+            'status_color' => $order->status->color,
+            'motoboy_name' => $motoboy->name,
+        ]);
     }
-    
+
     public function create()
     {
         $crusts = \App\Models\Crust::all(); // busca todas as bordas do banco
@@ -224,7 +219,7 @@ class OrderController extends Controller
 
         DB::beginTransaction();
         try {
-            // Soma dos itens
+            // Soma dos itens (já com bordas)
             $totalPedido = 0;
             foreach ($todosProdutos as $item) {
                 $valor = floatval($item['valor']);
@@ -235,13 +230,19 @@ class OrderController extends Controller
                 $totalPedido += $totalItem;
             }
 
-            // Soma dos pagamentos
+            // Taxa de entrega
+            $deliveryFee = floatval($request->input('delivery_fee', 0));
+
+            // Total final do pedido
+            $totalPedidoComEntrega = $totalPedido + $deliveryFee;
+
+            // Total pago
             $totalPago = array_reduce($pagamentos, function ($carry, $pagamento) {
                 return $carry + floatval($pagamento['valor']);
             }, 0);
 
-            // Calcula troco (se houver)
-            $troco = $totalPago > $totalPedido ? $totalPago - $totalPedido : 0;
+            // Troco (se houver)
+            $troco = $totalPago > $totalPedidoComEntrega ? $totalPago - $totalPedidoComEntrega : 0;
             // dd($troco);
             // Cria pedido com troco
             $pedido = Order::create([
@@ -293,8 +294,6 @@ class OrderController extends Controller
         }
     }
 
-
-
     public function getOrder(Request $request)
     {
         $order = Order::with(['customer', 'items'])->where('id', $request->id)->first();
@@ -332,5 +331,20 @@ class OrderController extends Controller
         } else {
             return response()->json(['success' => false, 'message' => 'Pedido não encontrado.']);
         }
+    }
+
+    public function alterarStatus(Request $request)
+    {
+        $order = Order::findOrFail($request->order_id);
+        $order->status_id = $request->status_id;
+
+        // Se for cancelado, salva o motivo
+        if ($order->status && $order->status->name === 'Cancelado') {
+            $order->cancel_reason = $request->cancel_reason;
+        }
+
+        $order->save();
+
+        return response()->json(['success' => true]);
     }
 }

@@ -297,21 +297,78 @@
             display: none;
         }
     </style>
+    <style>
+        .categoria-selector {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            padding: 10px 0;
+            gap: 10px;
+        }
+
+        .categoria-option {
+            flex: 0 0 auto;
+            padding: 10px 16px;
+            border-radius: 20px;
+            border: 1px solid #ccc;
+            background-color: #f7f7f7;
+            font-size: 14px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .categoria-option:hover {
+            background-color: #e2e2e2;
+        }
+
+        .categoria-option.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+            font-weight: bold;
+        }
+
+        .categoria-option input {
+            display: none;
+        }
+    </style>
 @endsection
 
 @section('content')
-    <div class="loading-overlay">
-        <div class="loading-animation"></div>
+    <div id="global-loader"
+        style="
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        background-color: rgba(255,255,255,0.8);
+        top: 0; left: 0; right: 0; bottom: 0;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    ">
+        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
+        <div style="margin-top: 10px;">Carregando...</div>
     </div>
-
     <div class="header">
         <a href="{{ route('checkout.home') }}" class="header">
             <i class="fas fa-arrow-left"></i>
             <span>Voltar</span>
         </a>
+      
+
     </div>
     <div class="container">
-        <h2>Escolha 2 ou 3 Sabores</h2>
+          <div class="categoria-selector">
+            @foreach ($categories as $category)
+                <label class="categoria-option {{ $selectedCategory->id == $category->id ? 'active' : '' }}">
+                    <input type="radio" name="categoria" value="{{ $category->id }}"
+                        onchange="window.location.href='?categoria={{ $category->id }}'"
+                        {{ $selectedCategory->id == $category->id ? 'checked' : '' }}>
+                    {{ $category->name }}
+                </label>
+            @endforeach
+        </div>
         <div class="product-list">
             @foreach ($products as $product)
                 <div class="product-card" data-product-id="{{ $product->id }}">
@@ -371,20 +428,52 @@
         @endif
     </div>
     <div class="sobe" style="margin-top: 116px;"></div>
-        <div class="footer">
-            <div class="total-price">Total: R$ <span id="totalPrice">0.00</span></div>
-            <button id="addToCartButton" disabled>Adicionar ao Carrinho</button>
-        </div>
+    <div class="footer">
+        <div class="total-price">Total: R$ <span id="totalPrice">0.00</span></div>
+        <button id="addToCartButton" disabled>Adicionar ao Carrinho</button>
+    </div>
 @endsection
 
 @section('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(() => {
-                document.querySelector('.loading-overlay').style.display = 'none';
-            }, 1000); // Ajuste o tempo conforme necessário
+            const checkboxes = document.querySelectorAll('.product-checkbox');
+
+            function atualizarVisibilidadeProdutos() {
+                const selecionados = Array.from(checkboxes).filter(cb => cb.checked);
+
+                if (selecionados.length === 2) {
+                    checkboxes.forEach(cb => {
+                        const card = cb.closest('.product-card');
+                        if (!cb.checked) {
+                            card.style.display = 'none';
+                        }
+                    });
+                } else {
+                    // Mostra todos novamente
+                    checkboxes.forEach(cb => {
+                        const card = cb.closest('.product-card');
+                        card.style.display = '';
+                    });
+                }
+            }
+
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', atualizarVisibilidadeProdutos);
+            });
+        });
+    </script>
+    <script>
+        $(document).ajaxStart(function() {
+            $('#global-loader').css('display', 'flex'); // exibe com flex
         });
 
+        $(document).ajaxStop(function() {
+            $('#global-loader').css('display', 'none'); // esconde
+        });
+    </script>
+
+    <script>
         const productCards = document.querySelectorAll('.product-card');
         const swipperContainer = document.getElementById('swipper-container');
         const swipperClose = document.getElementById('swipper-close');
@@ -426,7 +515,7 @@
                     }
                     updateObservationText(productId, '');
                 } else {
-                    if (selectedProducts.length >= 3) {
+                    if (selectedProducts.length >= 2) {
                         alert('Você só pode selecionar até dois sabores.');
                         return;
                     }
@@ -477,11 +566,12 @@
             });
         });
         document.querySelectorAll('.crust-option input[type="radio"]').forEach(radio => {
-    radio.addEventListener('click', function() {
-        selectedCrust = this.value;
-        updateTotalPrice();
-    });
-});
+            radio.addEventListener('click', function() {
+                selectedCrust = this.value;
+                updateTotalPrice();
+            });
+        });
+
         function updateSwiper() {
             const swiperWrapper = document.querySelector('.swiper-wrapper');
             swiperWrapper.innerHTML = '';
@@ -504,25 +594,42 @@
                     slide.textContent = "Metade : " + productName;
                     swiperWrapper.appendChild(slide);
                 });
-            } else if (selectedProducts.length > 2) {
-                const remainder = selectedProducts.length - 2;
-                selectedProducts.slice(0, 2).forEach(productId => {
-                    const productName = document.querySelector(`.product-card[data-product-id="${productId}"] h3`)
-                        .textContent;
-                    const slide = document.createElement('div');
-                    slide.classList.add('swiper-slide');
-                    slide.textContent = "1/3 terço : " + productName;
-                    swiperWrapper.appendChild(slide);
+            }
+
+            // Oculta produtos não selecionados se dois estiverem marcados
+            const allCards = document.querySelectorAll('.product-card');
+            if (selectedProducts.length === 2) {
+                allCards.forEach(card => {
+                    const id = card.getAttribute('data-product-id');
+                    if (!selectedProducts.includes(id)) {
+                        card.style.display = 'none';
+                    }
                 });
-                selectedProducts.slice(2).forEach(productId => {
-                    const productName = document.querySelector(`.product-card[data-product-id="${productId}"] h3`)
-                        .textContent;
-                    const slide = document.createElement('div');
-                    slide.classList.add('swiper-slide');
-                    slide.textContent = "1/3 terço : " + productName;
-                    swiperWrapper.appendChild(slide);
+            } else {
+                allCards.forEach(card => {
+                    card.style.display = ''; // volta ao normal
                 });
             }
+
+            // else if (selectedProducts.length > 2) {
+            //     const remainder = selectedProducts.length - 2;
+            //     selectedProducts.slice(0, 2).forEach(productId => {
+            //         const productName = document.querySelector(`.product-card[data-product-id="${productId}"] h3`)
+            //             .textContent;
+            //         const slide = document.createElement('div');
+            //         slide.classList.add('swiper-slide');
+            //         slide.textContent = "1/3 terço : " + productName;
+            //         swiperWrapper.appendChild(slide);
+            //     });
+            //     selectedProducts.slice(2).forEach(productId => {
+            //         const productName = document.querySelector(`.product-card[data-product-id="${productId}"] h3`)
+            //             .textContent;
+            //         const slide = document.createElement('div');
+            //         slide.classList.add('swiper-slide');
+            //         slide.textContent = "1/3 terço : " + productName;
+            //         swiperWrapper.appendChild(slide);
+            //     });
+            // }
 
             if (selectedProducts.length > 0) {
                 swipperContainer.style.display = 'block';

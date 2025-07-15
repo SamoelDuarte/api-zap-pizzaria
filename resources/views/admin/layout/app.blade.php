@@ -41,6 +41,22 @@
 </head>
 
 <body id="page-top">
+    <div id="global-loader"
+        style="
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        background-color: rgba(255,255,255,0.8);
+        top: 0; left: 0; right: 0; bottom: 0;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    ">
+        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
+        <div style="margin-top: 10px;">Carregando...</div>
+    </div>
+
+
 
     <!-- Page Wrapper -->
     <div id="wrapper">
@@ -354,6 +370,15 @@
 
 
     <script>
+        $(document).ajaxStart(function() {
+            $('#global-loader').css('display', 'flex'); // exibe com flex
+        });
+
+        $(document).ajaxStop(function() {
+            $('#global-loader').css('display', 'none'); // esconde
+        });
+
+
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')

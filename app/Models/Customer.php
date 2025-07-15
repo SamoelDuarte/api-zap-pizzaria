@@ -41,6 +41,11 @@ class Customer extends Model
 
     public function setJidAttribute($value)
     {
+        if (empty($value)) {
+            $this->attributes['jid'] = null;
+            return;
+        }
+
         $value = preg_replace('/[^0-9]/', '', $value);
 
         if (!str_starts_with($value, '55')) {
@@ -49,6 +54,9 @@ class Customer extends Model
 
         $this->attributes['jid'] = $value;
     }
+
+
+
 
 
     // Modifique o método getPhoneAttribute
