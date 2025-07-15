@@ -64,7 +64,7 @@ class MessageHelper
         }
 
         $client = new \GuzzleHttp\Client();
-        $url = "http://147.79.111.119:8080/message/sendImage/{$device->session}";
+        $url = "http://147.79.111.119:8080/message/sendMedia/{$device->session}";
 
         $headers = [
             'Content-Type' => 'application/json',
@@ -73,8 +73,11 @@ class MessageHelper
 
         $body = json_encode([
             'number' => '55' . $numero,
-            'url' => $imagemUrl,
+            'mediatype' => 'image',
+            'mimetype' => 'image/png',
             'caption' => $caption,
+            'media' => $imagemUrl,
+            'fileName' => 'imagem.png',
         ]);
 
         try {
