@@ -30,11 +30,7 @@ class WebhookController extends Controller
             return response()->json(['erro' => 'Número não encontrado'], 422);
         }
 
-        $numero = preg_replace('/[^0-9]/', '', $numeroCompleto);
-        if (str_starts_with($numero, '55')) {
-            $numero = substr($numero, 2);
-        }
-
+      
         // Monta o link e mensagem
         $link = "https://fornadapronta.com.br/checkout/pedido/{$numero}";
         $mensagem = "🍕 Olá! Que tal fazer seu pedido pelo nosso app? 😄 Acesse agora: $link\n\nEstamos te esperando com muito carinho e sabor! ❤️";
