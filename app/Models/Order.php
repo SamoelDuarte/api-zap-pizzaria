@@ -70,7 +70,7 @@ class Order extends Model
     // =================== TOTAL COM TAXA DE ENTREGA ===================
     public function getTotalGeralAttribute()
     {
-        $somaItens = $this->items->sum('total');
+        $somaItens = $this->items->sum('price');
         return $somaItens + ($this->delivery_fee ?? 0);
     }
 

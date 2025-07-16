@@ -336,30 +336,17 @@
 @endsection
 
 @section('content')
-    <div id="global-loader"
-        style="
-        display: none;
-        position: fixed;
-        z-index: 9999;
-        background-color: rgba(255,255,255,0.8);
-        top: 0; left: 0; right: 0; bottom: 0;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-    ">
-        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
-        <div style="margin-top: 10px;">Carregando...</div>
-    </div>
+
     <div class="header">
         <a href="{{ route('checkout.home') }}" class="header">
             <i class="fas fa-arrow-left"></i>
             <span>Voltar</span>
         </a>
-      
+
 
     </div>
     <div class="container">
-          <div class="categoria-selector">
+        <div class="categoria-selector">
             @foreach ($categories as $category)
                 <label class="categoria-option {{ $selectedCategory->id == $category->id ? 'active' : '' }}">
                     <input type="radio" name="categoria" value="{{ $category->id }}"
@@ -461,15 +448,6 @@
             checkboxes.forEach(cb => {
                 cb.addEventListener('change', atualizarVisibilidadeProdutos);
             });
-        });
-    </script>
-    <script>
-        $(document).ajaxStart(function() {
-            $('#global-loader').css('display', 'flex'); // exibe com flex
-        });
-
-        $(document).ajaxStop(function() {
-            $('#global-loader').css('display', 'none'); // esconde
         });
     </script>
 
@@ -685,6 +663,8 @@
         });
 
         document.getElementById('addToCartButton').addEventListener('click', function() {
+            // Mostrar o loader
+            document.getElementById('global-loader').style.display = 'flex';
             const productIds = selectedProducts;
             let crustId = selectedCrust;
             if (crustId === null) {

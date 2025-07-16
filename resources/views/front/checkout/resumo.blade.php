@@ -145,110 +145,197 @@
 
         }
     </style>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #fff;
+            color: #333;
+            margin: 0;
+            padding: 10px;
+        }
+
+        .receipt-container {
+            max-width: 500px;
+            margin: auto;
+            padding: 15px;
+            border: 1px solid #eee;
+            background: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .title {
+            text-align: center;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        section {
+            margin-bottom: 15px;
+        }
+
+        .item-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .item-line {
+            font-size: 14px;
+            margin: 2px 0;
+        }
+
+        .totals {
+            font-size: 15px;
+        }
+
+        .total-final {
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .observations {
+            background: #fff9e6;
+            padding: 8px;
+            border-left: 3px solid #f0b400;
+            margin-top: 5px;
+            border-radius: 5px;
+        }
+
+        .observations ul {
+            margin: 5px 0 0 15px;
+            padding: 0;
+            font-size: 13px;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px dashed #ccc;
+            margin: 10px 0;
+        }
+
+        .whatsapp-btn {
+            display: block;
+            text-align: center;
+            background-color: #25d366;
+            color: white;
+            padding: 12px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .whatsapp-btn i {
+            margin-right: 5px;
+        }
+
+        @media (max-width: 480px) {
+            .receipt-container {
+                padding: 10px;
+            }
+
+            .item-line,
+            .totals,
+            .payment-info p {
+                font-size: 13px;
+            }
+
+            .title {
+                font-size: 18px;
+            }
+        }
+    </style>
+
 </head>
 
 <body>
     <div class="loading-overlay">
         <div class="loading-text">Por favor, aguarde...</div>
     </div>
-    <h1>Resumo do Carrinho</h1>
 
-    <!-- Dados do Cliente -->
-    <div class="customer-details">
-        <h2>Dados do Cliente</h2>
-        <p><strong>Nome:</strong> {{ $customer->name }}</p>
-        <p><strong>Telefone:</strong> {{ $customer->phone }}</p>
-        <p><strong>Endereço:</strong> {{ $customer->public_place .' N° '.$customer->number }}</p>
-        <p><strong>Bairro:</strong> {{ $customer->neighborhood }}</p>
-    </div>
+    <div class="receipt-container">
+        <h1 class="title">Resumo do Pedido</h1>
 
-    @foreach ($cart as $item)
-        <div class="item">
-            <div class="item-details">
-                @php
-                    // Dividir o nome da pizza e as observações
-                    $itemDetails = explode('/', $item['name']);
-                    $pizzaName = trim($itemDetails[0]); // Primeiro item é o nome da pizza
-                    $flavorsCount = count($itemDetails) - 1; // Calcula a quantidade de sabores
-                    $flavors = '';
-                    for ($i = 1; $i <= $flavorsCount; $i++) {
-                        $flavors .= $itemDetails[$i];
-                        if ($i < $flavorsCount) {
-                            $flavors .= ', ';
-                        }
-                    }
-                    $observations = explode(' / ', $item['observation']); // Divide as observações
-                @endphp
-                <h2>{{ $item['name'] }}</h2>
-                <div class="row">
+        <section class="customer-info">
+            <h2>Cliente</h2>
+            <p><strong>Nome:</strong> {{ $customer->name }}</p>
+            <p><strong>Telefone:</strong> {{ $customer->phone }}</p>
+            <p><strong>Endereço:</strong> {{ $customer->public_place }} Nº {{ $customer->number }}</p>
+            <p><strong>Bairro:</strong> {{ $customer->neighborhood }}</p>
+        </section>
 
-                    <div class="col-md-6">
-                        @if ($flavorsCount > 0)
-                            <p>Tipo: {{ $flavorsCount + 1 }} Sabores</p>
-                        @endif
+        <hr>
 
-                        <p>Borda: {{ $item['crust'] }} ({{ $item['crust_price'] }})</p>
-                        <p>Quantidade: {{ $item['quantity'] }}</p>
-                        <p>Preço Unitário: R$ {{ $item['price'] }}</p>
-                        <p>Total: R$ {{ number_format($item['total'], 2, ',', '.') }}</p>
+        @foreach ($cart as $item)
+            @php
+                $itemDetails = explode('/', $item['name']);
+                $pizzaName = trim($itemDetails[0]);
+                $flavorsCount = count($itemDetails) - 1;
+                $flavors = array_slice($itemDetails, 1);
+                $observations = explode(' / ', $item['observation']);
+            @endphp
+
+            <section class="item">
+                <h3 class="item-title">{{ $pizzaName }}</h3>
+                @if ($flavorsCount > 0)
+                    <p class="item-line"><strong>Tipo:</strong> {{ $flavorsCount + 1 }} Sabores</p>
+                    <p class="item-line"><strong>Sabores:</strong> {{ implode(', ', $flavors) }}</p>
+                @endif
+                <p class="item-line"><strong>Borda:</strong> {{ $item['crust'] }} (R$
+                    {{ number_format($item['crust_price'], 2, ',', '.') }})</p>
+                <p class="item-line"><strong>Quantidade:</strong> {{ $item['quantity'] }}</p>
+                <p class="item-line"><strong>Preço Unitário:</strong> R$
+                    {{ number_format($item['price'], 2, ',', '.') }}</p>
+                <p class="item-line"><strong>Total:</strong> R$ {{ number_format($item['total'], 2, ',', '.') }}</p>
+
+                @if (!empty($observations))
+                    <div class="observations">
+                        <strong>Observações:</strong>
+                        <ul>
+                            @foreach ($observations as $index => $obs)
+                                @if (!empty(trim($obs)))
+                                    <li><em>{{ $itemDetails[$index] ?? 'Pizza' }}:</em> {{ $obs }}</li>
+                                @endif
+                            @endforeach
+                        </ul>
                     </div>
-                    <div class="col-md-6">
-                        @if (!empty($observations))
-                            <div>
-                                <h3>Observações:</h3>
-                                @foreach ($observations as $index => $observation)
-                                    @php
-                                        $obsPizzaName = trim($itemDetails[$index] ?? ''); // Nome da pizza
-                                        $obsText = trim($observation); // Observação
-                                    @endphp
-                                    @if (!empty($obsText))
-                                        <p class="observation">{{ $obsPizzaName }}: {{ $obsText }}</p>
-                                    @endif
-                                @endforeach
-                            </div>
-                        @endif
-                    </div>
-                </div>
+                @endif
+            </section>
+            <hr>
+        @endforeach
 
-            </div>
-            <div style="clear:both;"></div>
-        </div>
-    @endforeach
+        <section class="totals">
+            <p><strong>Subtotal:</strong> R$ {{ number_format(array_sum(array_column($cart, 'total')), 2, ',', '.') }}
+            </p>
+            <p><strong>Taxa de Entrega:</strong> R$ {{ number_format($taxaEntrega, 2, ',', '.') }}</p>
+            <p class="total-final"><strong>Total:</strong> R$ {{ number_format($totalPrice, 2, ',', '.') }}</p>
+        </section>
 
-    <div class="total-price">
-        <div>
-            Itens: R$ {{ number_format(array_sum(array_column($cart, 'total')), 2, ',', '.') }}
-        </div>
-        <div>
-            Taxa de entrega: R$ {{ number_format($taxaEntrega, 2, ',', '.') }}
-        </div>
-        <div>
-            Total: R$ {{ number_format($totalPrice, 2, ',', '.') }}
-        </div>
-    </div>
+        <hr>
 
-    <!-- Forma de Pagamento -->
-    <div class="payment-method">
-        <h2>Forma de Pagamento</h2>
-        <p>{{ $paymentMethod }}</p>
-        @if ($paymentMethod == 'Dinheiro' && !empty($trocoAmount))
-            <p>Troco para: R$ {{ number_format($trocoAmount, 2, ',', '.') }}</p>
-        @endif
-    </div>
+        <section class="payment-info">
+            <h2>Pagamento</h2>
+            <p><strong>Método:</strong> {{ $paymentMethod }}</p>
+            @if ($paymentMethod == 'Dinheiro' && !empty($trocoAmount))
+                <p><strong>Troco para:</strong> R$ {{ number_format($trocoAmount, 2, ',', '.') }}</p>
+            @endif
+        </section>
 
-    <!-- Modal de Agradecimento -->
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <h2>Obrigado pelo seu pedido!</h2>
-            <p>Seu pedido foi recebido com sucesso. retorna para o WhatsApp.</p>
-            <div class="icons">
-                <a href="https://api.whatsapp.com/send?phone=5511933361625"><i class="fa-brands fa-whatsapp"></i> clique
-                    aqui!</a>
+        <div id="myModal" class="modal">
+            <div class="modal-content">
+                <h2>Obrigado pelo seu pedido!</h2>
+                <p>Seu pedido foi recebido com sucesso. Retorne para o WhatsApp.</p>
+                <a class="whatsapp-btn" href="https://api.whatsapp.com/send?phone=5511972920248">
+                    <i class="fa-brands fa-whatsapp"></i> Clique aqui!
+                </a>
             </div>
         </div>
     </div>
-
 </body>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.5.0-beta4/html2canvas.min.js"></script>
 

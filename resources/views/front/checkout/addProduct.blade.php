@@ -187,6 +187,7 @@
     <script>
         function disableButton() {
             document.getElementById("add-to-cart-btn").disabled = true;
+              document.getElementById('global-loader').style.display = 'flex';
         }
         var globalCrustPrice = parseFloat('{{ $crusts->first()->price }}');
 

@@ -287,7 +287,7 @@
     <div class="container" id="product-container">
         <div class="category" id="category-home">
             <div class="product" data-product-id="perso">
-                <img src="https://maissaborgranjalisboa.onezap.link/wp-content/uploads/2022/03/meio-a-meio-scaled.jpg"
+                <img src="{{ asset('assets/imagens/pizza_2_sabores.png')}}"
                     alt="">
                 <div class="product-details">
                     <div class="product-title">Escolha 2 Sabores</div>
