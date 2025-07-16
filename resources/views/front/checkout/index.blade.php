@@ -139,18 +139,21 @@
         }
 
         .cart-footer {
-            position: fixed;
+            position: fixed !important;
             bottom: 0;
-            width: 100%;
+            left: 0;
+            right: 0;
+            height: 65px;
             background-color: #000;
             color: #fff;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 20px;
-            z-index: 1000;
-            box-sizing: border-box;
+            padding: 0 16px;
+            z-index: 99999;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.2);
         }
+
 
         .cart-icon {
             display: flex;
@@ -287,8 +290,7 @@
     <div class="container" id="product-container">
         <div class="category" id="category-home">
             <div class="product" data-product-id="perso">
-                <img src="{{ asset('assets/imagens/pizza_2_sabores.png')}}"
-                    alt="">
+                <img src="{{ asset('assets/imagens/pizza_2_sabores.png') }}" alt="">
                 <div class="product-details">
                     <div class="product-title">Escolha 2 Sabores</div>
                     <div class="product-description">Prevalece o valor da Maior</div>
@@ -339,6 +341,8 @@
             </div>
         </footer>
     @endif
+   
+
 @endsection
 @php
     $zipcode = $customer->zipcode ?? null;
