@@ -38,29 +38,40 @@ class ChekoutController extends Controller
                 session()->put('customer', $customer);
                 $taxaEntrega = $customer->delivery_fee ?? 0;
 
-                // Verifica se já existe um chat ativo
                 $chatAtivo = Chat::where('jid', $customer->jid)->where('active', 1)->first();
                 if (!$chatAtivo) {
                     Chat::create([
                         'jid' => $customer->jid,
-                        'session_id' => null, // ou o valor correto se houver
-                        'service_id' => null, // ou o valor correto se houver
+                        'session_id' => null,
+                        'service_id' => null,
                         'active' => 1,
-                        'await_answer' => null, // pode ser "await_human" se desejar
+                        'await_answer' => null,
+                        'flow_stage' => 'fazendo_pedido',
                     ]);
+                } else {
+                    $chatAtivo->update(['flow_stage' => 'fazendo_pedido']);
                 }
             } else {
                 session()->forget('customer');
                 $semCadastro = true;
-            }
-        } else {
-            $customer = session()->get('customer');
-            if ($customer) {
-                $taxaEntrega = $customer->delivery_fee ?? 0;
-            } else {
-                $semCadastro = true;
+
+                // Cria chat mesmo sem cliente
+                $chatExistente = Chat::where('jid', $phone)->where('active', 1)->first();
+                if (!$chatExistente) {
+                    Chat::create([
+                        'jid' => $phone,
+                        'session_id' => null,
+                        'service_id' => null,
+                        'active' => 1,
+                        'await_answer' => null,
+                        'flow_stage' => 'fazendo_pedido',
+                    ]);
+                } else {
+                    $chatExistente->update(['flow_stage' => 'fazendo_pedido']);
+                }
             }
         }
+
 
         session()->put('taxa_entrega', $taxaEntrega);
 
@@ -383,6 +394,12 @@ class ChekoutController extends Controller
                 'amount' => $totalPedidoComEntrega,
             ]);
 
+            // Atualizar estágio do Chat
+            $chat = \App\Models\Chat::where('jid', $cliente->jid)->where('active', 1)->first();
+            if ($chat) {
+                $chat->update(['flow_stage' => 'finalizado']);
+            }
+
             DB::commit();
             session()->forget(['cart']);
 
@@ -404,8 +421,6 @@ class ChekoutController extends Controller
             ]);
         }
     }
-
-
 
     public function enviaImagen(Request $request)
     {
@@ -542,15 +557,24 @@ class ChekoutController extends Controller
     {
         $data = $request->all();
 
-        // Se já tem cliente na sessão, usa ele
+        // Tratar telefone
+        if (isset($data['phone'])) {
+            $data['phone'] = preg_replace('/\D+/', '', $data['phone']);
+            if (!str_starts_with($data['phone'], '55')) {
+                $data['phone'] = '55' . $data['phone'];
+            }
+
+            $data['jid'] = $data['phone'];
+            unset($data['phone']);
+        }
+
+        // Verifica se já tem cliente na sessão
         if (session()->has('customer')) {
             $customerSession = session()->get('customer');
             $customer = Customer::find($customerSession->id);
-            // Salva na sessão
             session()->put('customer', $customer);
             session()->put('taxa_entrega', $customer->delivery_fee ?? 0);
         } else {
-            // Se veio ID, tenta buscar e atualizar o cliente
             if (!empty($data['id'])) {
                 $customer = Customer::find($data['id']);
 
@@ -560,18 +584,30 @@ class ChekoutController extends Controller
 
                 $customer->update($data);
             } else {
-                // Se não veio ID, cria novo cliente
                 $customer = Customer::create($data);
             }
 
-            // Salva na sessão
             session()->put('customer', $customer);
             session()->put('taxa_entrega', $customer->delivery_fee ?? 0);
         }
 
+        // ✅ Atualiza ou cria Chat com flow_stage = 'fazendo_cadastro'
+        if (!empty($customer->jid)) {
+            $chat = \App\Models\Chat::where('jid', $customer->jid)->where('active', 1)->first();
+
+            if ($chat) {
+                $chat->update(['flow_stage' => 'fazendo_cadastro']);
+            } else {
+                \App\Models\Chat::create([
+                    'jid' => $customer->jid,
+                    'active' => 1,
+                    'flow_stage' => 'fazendo_cadastro',
+                ]);
+            }
+        }
+
         // Obter carrinho
         $cart = session()->get('cart', []);
-
         if (empty($cart)) {
             return view('front.checkout.va_pro_zap');
         }
@@ -582,6 +618,7 @@ class ChekoutController extends Controller
 
         return view('front.checkout.payments', compact('produtosBebidas', 'cart'));
     }
+
 
 
 

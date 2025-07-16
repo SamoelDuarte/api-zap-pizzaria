@@ -40,7 +40,7 @@
             margin-bottom: 20px;
         }
 
-        .pizza-price {
+        .borda-title {
             font-size: 20px;
             color: #ff4500;
         }
@@ -139,7 +139,7 @@
     <div class="container">
         <div class="pizza-name">{{ $product->name }}</div>
         <div class="pizza-details">{{ $product->description }}</div>
-        <div class="pizza-price">R$ {{ number_format($product->price, 2, ',', '.') }}</div>
+        <div class="borda-title">Escolha a Borda</div>
 
         @if (str_contains(strtolower($product->category->name), 'pizza'))
 
@@ -149,7 +149,7 @@
                         <div class="crust-option">
                             <input type="radio" name="crust" value="{{ json_encode($crust) }}"
                                 {{ $loop->first ? 'checked' : '' }}>
-                            {{ $crust->name }} <span class="pizza-price">+ R$
+                            {{ $crust->name }} <span class="borda-title">+ R$
                                 {{ number_format($crust->price, 2, ',', '.') }}</span>
                         </div>
                     @endforeach
@@ -178,7 +178,7 @@
 
                 <button type="submit" id="add-to-cart-btn" class="btn-add">Adicionar ao Carrinho</button>
             </div>
-            <span class="pizza-price" id="total-price">R$ {{ number_format($product->price, 2, ',', '.') }}</span>
+            <span class="borda-title" id="total-price">R$ {{ number_format($product->price, 2, ',', '.') }}</span>
         </form>
     </div>
 @endsection

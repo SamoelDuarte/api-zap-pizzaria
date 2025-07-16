@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Chat;
 use App\Models\Cliente;
 use App\Models\Device;
 use App\Models\Messagen;
@@ -14,70 +15,82 @@ use GuzzleHttp\Psr7\Request as GuzzleRequest;
 
 class WebhookController extends Controller
 {
-    // public function evento(Request $request)
-    // {
-    //     // Captura o JSON bruto e decodifica
-    //     $raw = $request->getContent();
-    //     $data = json_decode($raw, true);
+    public function evento(Request $request)
+    {
+        $raw = $request->getContent();
+        $data = json_decode($raw, true);
 
-    //     if (json_last_error() !== JSON_ERROR_NONE) {
-    //         return response()->json(['erro' => 'JSON inválido'], 400);
-    //     }
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return response()->json(['erro' => 'JSON inválido'], 400);
+        }
 
-    //     // Extrai número do cliente
-    //     $numeroCompleto = $data['data']['key']['remoteJid'] ?? null;
-    //     if (!$numeroCompleto) {
-    //         return response()->json(['erro' => 'Número não encontrado'], 422);
-    //     }
+        $numeroCompleto = $data['data']['key']['remoteJid'] ?? null;
+        if (!$numeroCompleto) {
+            return response()->json(['erro' => 'Número não encontrado'], 422);
+        }
 
-    //     $numero = preg_replace('/[^0-9]/', '', $numeroCompleto);
-    //     if (str_starts_with($numero, '55')) {
-    //         $numero = substr($numero, 2);
-    //     }
+        // Limpa o número
+        $numero = preg_replace('/[^0-9]/', '', $numeroCompleto);
+        if (str_starts_with($numero, '55')) {
+            $numero = substr($numero, 2);
+        }
 
-    //     // Monta o link e mensagem
-    //     $link = "https://fornadapronta.com.br/checkout/pedido/55{$numero}";
-    //     $mensagem = "🍕 Olá! Que tal fazer seu pedido pelo nosso app? 😄 Acesse agora: $link\n\nEstamos te esperando com muito carinho e sabor! ❤️";
+        // Cria ou atualiza o Chat
+        $chat = Chat::updateOrCreate(
+            ['jid' => "55{$numero}"],
+            [
+                'active' => true,
+                'erro' => 0,
+                'flow_stage' => 'aguardando',
+                'await_answer' => null,
+                'session_id' => Device::where('status', 'open')->first()?->id,
+                'service_id' => null,
+            ]
+        );
 
-    //     // Pega sessão ativa do device
-    //     $device = Device::where('status', "open")->first();
-    //     if (!$device) {
-    //         return response()->json(['erro' => 'Nenhum dispositivo ativo encontrado'], 500);
-    //     }
+        Log::info("Chat criado ou atualizado para o número 55{$numero}");
 
-    //     // Prepara envio
-    //     $url = "http://147.79.111.119:8080/message/sendText/{$device->session}";
-    //     $headers = [
-    //         'Content-Type' => 'application/json',
-    //         'apikey' => env('TOKEN_EVOLUTION'),
-    //     ];
+        // Envia mensagem com link
+        $link = "https://fornadapronta.com.br/checkout/pedido/55{$numero}";
+        $mensagem = "🍕 Olá! Que tal fazer seu pedido pelo nosso app? 😄 Acesse agora: $link\n\nEstamos te esperando com muito carinho e sabor! ❤️";
 
-    //     $body = json_encode([
-    //         'number' => "55{$numero}",
-    //         'text' => $mensagem,
-    //     ]);
+        $device = Device::where('status', "open")->first();
+        if (!$device) {
+            return response()->json(['erro' => 'Nenhum dispositivo ativo encontrado'], 500);
+        }
 
-    //     try {
-    //         $client = new Client();
-    //         $requestGuzzle = new GuzzleRequest('POST', $url, $headers, $body);
-    //         $response = $client->sendAsync($requestGuzzle)->wait();
+        $url = "http://147.79.111.119:8080/message/sendText/{$device->session}";
+        $headers = [
+            'Content-Type' => 'application/json',
+            'apikey' => env('TOKEN_EVOLUTION'),
+        ];
 
-    //         $status = $response->getStatusCode();
-    //         $resposta = $response->getBody()->getContents();
+        $body = json_encode([
+            'number' => "55{$numero}",
+            'text' => $mensagem,
+        ]);
 
-    //         Log::info("Webhook: Mensagem enviada para {$numero} com status {$status}");
+        try {
+            $client = new Client();
+            $requestGuzzle = new GuzzleRequest('POST', $url, $headers, $body);
+            $response = $client->sendAsync($requestGuzzle)->wait();
 
-    //         return response()->json([
-    //             'status' => 'Mensagem enviada com sucesso',
-    //             'resposta_api' => json_decode($resposta, true),
-    //         ]);
-    //     } catch (\Exception $e) {
-    //         Log::error("Webhook: Erro ao enviar mensagem: " . $e->getMessage());
+            $status = $response->getStatusCode();
+            $resposta = $response->getBody()->getContents();
 
-    //         return response()->json([
-    //             'erro' => 'Falha ao enviar mensagem',
-    //             'mensagem' => $e->getMessage(),
-    //         ]);
-    //     }
-    // }
+            Log::info("Webhook: Mensagem enviada para {$numero} com status {$status}");
+
+            return response()->json([
+                'status' => 'Mensagem enviada com sucesso',
+                'resposta_api' => json_decode($resposta, true),
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Webhook: Erro ao enviar mensagem: " . $e->getMessage());
+
+            return response()->json([
+                'erro' => 'Falha ao enviar mensagem',
+                'mensagem' => $e->getMessage(),
+            ]);
+        }
+    }
 }

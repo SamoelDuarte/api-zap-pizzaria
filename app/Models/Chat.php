@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use PhpParser\Node\Stmt\Switch_;
 
 class Chat extends Model
 {
@@ -16,10 +15,13 @@ class Chat extends Model
         'jid',
         'active',
         'erro',
+        'await_answer',
+        'flow_stage', // novo campo
     ];
 
     protected $appends = [
-        'display_status'
+        'display_status',
+        'flow_stage_label', // novo atributo virtual
     ];
 
     public function customer()
@@ -27,27 +29,29 @@ class Chat extends Model
         return $this->hasOne(Customer::class, 'jid', 'jid');
     }
 
-    public function getDisplayStatusAttribute(){
-        
-        if($this->await_answer == "await_human"){
-          
-        }
+    public function getDisplayStatusAttribute()
+    {
         switch ($this->await_answer) {
             case 'await_human':
                 return "Aguardando Atendimento";
-                break;
-
-                case 'in_service':
-                    return "Em Atendimento";
-                    break;
-
-                    case 'finish':
-                        return "Finalizado";
-                        break;
-            
+            case 'in_service':
+                return "Em Atendimento";
+            case 'finish':
+                return "Finalizado";
             default:
-            return "Sem Status";
-                break;
+                return "Sem Status";
         }
+    }
+
+    public function getFlowStageLabelAttribute()
+    {
+        return match ($this->flow_stage) {
+            'aguardando' => '🕐 Aguardando resposta',
+            'fazendo_pedido' => '🍕 Escolhendo produtos',
+            'fazendo_cadastro' => '📝 Preenchendo cadastro',
+            'confirmando' => '💳 Confirmando pagamento',
+            'finalizado' => '✅ Pedido finalizado',
+            default => '🔍 Etapa desconhecida',
+        };
     }
 }

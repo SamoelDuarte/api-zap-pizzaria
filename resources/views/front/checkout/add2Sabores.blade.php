@@ -83,8 +83,8 @@
         }
 
         .product-image {
-            width: 60px;
-            height: 60px;
+            max-width: 50px;
+            max-height: 50px;
             object-fit: cover;
             margin-right: 10px;
         }
@@ -332,6 +332,11 @@
         .categoria-option input {
             display: none;
         }
+
+        .pizza-name {
+            font-size: 18px;
+            font-weight: bold;
+        }
     </style>
 @endsection
 
@@ -364,7 +369,7 @@
                             alt="{{ $product->name }}">
                     </div>
                     <div class="product-details">
-                        <div class="product-title">{{ $product->name }}</div>
+                        <div class="product-title pizza-name">{{ $product->name }}</div>
                         <div class="product-description">{{ $product->description }}</div>
                     </div>
                     <h3 style="display: none">{{ $product->name }}</h3>

@@ -15,12 +15,19 @@ return new class extends Migration
             $table->id();
             $table->string('jid', 255)->nullable();
             $table->integer('erro')->default(0);
-            // Remove a declaração da chave estrangeira abaixo
-            // $table->foreignId('session_id')->constrained('devices', 'id');
-            $table->unsignedBigInteger('session_id')->nullable(); // Adiciona uma coluna de chave estrangeira não restrita
-            $table->foreign('session_id')->references('id')->on('devices')->onDelete('set null'); // Define a ação de exclusão como definir nulo
+
+            // Dispositivo usado para atendimento (bot ou atendente)
+            $table->unsignedBigInteger('session_id')->nullable();
+            $table->foreign('session_id')->references('id')->on('devices')->onDelete('set null');
+
             $table->string('service_id', 255)->nullable();
+
+            // Status geral do atendimento humano
             $table->string('await_answer', 255)->nullable();
+
+            // Status do fluxo do pedido (funil do bot)
+            $table->string('flow_stage', 100)->default('aguardando'); // NOVO CAMPO
+
             $table->boolean('active')->default(true);
             $table->timestamps();
         });
