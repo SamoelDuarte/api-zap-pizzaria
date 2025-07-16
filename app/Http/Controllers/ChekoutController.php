@@ -397,7 +397,7 @@ class ChekoutController extends Controller
             // Atualizar estágio do Chat
             $chat = \App\Models\Chat::where('jid', $cliente->jid)->where('active', 1)->first();
             if ($chat) {
-                $chat->update(['flow_stage' => 'finalizado']);
+                $chat->update(['flow_stage' => 'finalizado','active' => 0]);
             }
 
             DB::commit();
