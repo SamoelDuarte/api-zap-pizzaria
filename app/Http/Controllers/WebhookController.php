@@ -35,18 +35,29 @@ class WebhookController extends Controller
             $numero = substr($numero, 2);
         }
 
-        // Cria ou atualiza o Chat
-        $chat = Chat::updateOrCreate(
-            ['jid' => "55{$numero}"],
-            [
-                'active' => true,
-                'erro' => 0,
-                'flow_stage' => 'aguardando',
-                'await_answer' => null,
-                'session_id' => Device::where('status', 'open')->first()?->id,
-                'service_id' => null,
-            ]
-        );
+        $jid = "55{$numero}";
+
+        // Verifica se já existe um chat ativo
+        $chat = Chat::where('jid', $jid)->where('active', true)->first();
+
+        if ($chat) {
+            Log::info("Chat já ativo para {$jid}, não enviando nova mensagem.");
+            return response()->json(['status' => 'Chat já ativo, mensagem não reenviada']);
+        }
+
+        // Não existe chat ativo, cria um novo
+        $chat = Chat::create([
+            'jid' => $jid,
+            'active' => true,
+            'erro' => 0,
+            'flow_stage' => 'aguardando',
+            'await_answer' => null,
+            'session_id' => Device::where('status', 'open')->first()?->id,
+            'service_id' => null,
+        ]);
+
+        Log::info("Chat criado para o número {$jid}");
+
 
         Log::info("Chat criado ou atualizado para o número 55{$numero}");
 
