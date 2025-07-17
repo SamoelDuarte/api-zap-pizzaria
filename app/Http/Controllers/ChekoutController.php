@@ -89,17 +89,18 @@ class ChekoutController extends Controller
 
         return view('front.checkout.addProduct', compact('product', 'crusts'));
     }
-    public function add2Sabores(Request $request)
+    public function add2Sabores()
     {
-        $categories = Categories::where('name', 'LIKE', '%Pizzas%')->with('products')->get();
+        $categories = Categories::where('name', 'LIKE', '%Pizzas%')->get(); // Busca as categorias que contêm a palavra "Pizzas" no nome
+        $crusts = Crust::all(); // Busca todas as bordas disponíveis
+        $products = collect(); // Cria uma coleção vazia para armazenar os produtos
 
-        $selectedCategoryId = $request->input('categoria');
-        $selectedCategory = $categories->firstWhere('id', $selectedCategoryId) ?? $categories->first();
-        $products = $selectedCategory ? $selectedCategory->products : collect();
-
-        $crusts = Crust::all();
-
-        return view('front.checkout.add2Sabores', compact('categories', 'products', 'crusts', 'selectedCategory'));
+        // Percorre todas as categorias encontradas
+        foreach ($categories as $category) {
+            // Adiciona os produtos da categoria atual à coleção de produtos
+            $products = $products->merge($category->products);
+        }
+        return view('front.checkout.add2Sabores', compact('products', 'crusts'));
     }
 
 
@@ -141,7 +142,7 @@ class ChekoutController extends Controller
         // Obter o carrinho da sessão
         $cart = session()->get('cart', []);
 
-
+        $isBroto = $request->has('is_broto') && $request->input('is_broto') == '1';
 
         // Obter os dados do formulário
         $productIds = json_decode($request->input('product_ids'), true); // Convertendo de string para array
@@ -189,7 +190,7 @@ class ChekoutController extends Controller
 
         $cartItem = [
             'product_id' => implode(',', $productIds), // Combine os IDs dos produtos
-            'name' => implode(' / ', $productNames), // Combine os nomes dos produtos
+            'name' => implode(' / ', $productNames) . ($isBroto ? ' (Broto)' : ''),
             'description' => implode(' / ', $productDescriptions), // Combine as descrições dos produtos
             'price' => $totalPrice, // Preço total dos produtos
             'quantity' => 1, // Definindo como 1 por enquanto, pode ser ajustado conforme necessário
@@ -397,7 +398,7 @@ class ChekoutController extends Controller
             // Atualizar estágio do Chat
             $chat = \App\Models\Chat::where('jid', $cliente->jid)->where('active', 1)->first();
             if ($chat) {
-                $chat->update(['flow_stage' => 'finalizado','active' => 0]);
+                $chat->update(['flow_stage' => 'finalizado', 'active' => 0]);
             }
 
             DB::commit();

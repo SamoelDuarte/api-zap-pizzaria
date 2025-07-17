@@ -24,9 +24,7 @@ return new class extends Migration
         // Inserir dados iniciais para uma pizzaria
         DB::table('categories')->insert([
             ['name' => 'Pizzas Clássica'],
-            ['name' => 'Pizzas Broto'],
             ['name' => 'Pizzas Doces'],
-            ['name' => 'Pizzas Doces Broto'],
             ['name' => 'Bebidas']
         ]);
     }

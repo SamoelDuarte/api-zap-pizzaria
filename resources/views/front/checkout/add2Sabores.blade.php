@@ -214,6 +214,7 @@
             padding: 10px;
             display: flex;
             align-items: center;
+            justify-content: space-between;
         }
 
         .header i {
@@ -296,71 +297,58 @@
         .observation {
             display: none;
         }
-    </style>
-    <style>
-        .categoria-selector {
+
+        .broto-option {
             display: flex;
-            flex-wrap: nowrap;
-            overflow-x: auto;
-            padding: 10px 0;
+            align-items: center;
+            font-size: 18px;
             gap: 10px;
         }
 
-        .categoria-option {
-            flex: 0 0 auto;
-            padding: 10px 16px;
-            border-radius: 20px;
-            border: 1px solid #ccc;
-            background-color: #f7f7f7;
-            font-size: 14px;
-            white-space: nowrap;
+        .broto-option input[type="checkbox"] {
+            transform: scale(1.5);
+            accent-color: #28a745;
+            /* verde */
+        }
+
+        .broto-label {
             cursor: pointer;
-            transition: all 0.2s ease-in-out;
-        }
-
-        .categoria-option:hover {
-            background-color: #e2e2e2;
-        }
-
-        .categoria-option.active {
-            background-color: #007bff;
-            color: white;
-            border-color: #007bff;
-            font-weight: bold;
-        }
-
-        .categoria-option input {
-            display: none;
-        }
-
-        .pizza-name {
-            font-size: 18px;
-            font-weight: bold;
+            user-select: none;
         }
     </style>
 @endsection
 
 @section('content')
-
+    <div id="global-loader"
+        style="
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        background-color: rgba(255,255,255,0.8);
+        top: 0; left: 0; right: 0; bottom: 0;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    ">
+        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"></div>
+        <div style="margin-top: 10px;">Carregando...</div>
+    </div>
     <div class="header">
         <a href="{{ route('checkout.home') }}" class="header">
             <i class="fas fa-arrow-left"></i>
             <span>Voltar</span>
         </a>
-
-
     </div>
+
+
     <div class="container">
-        <div class="categoria-selector">
-            @foreach ($categories as $category)
-                <label class="categoria-option {{ $selectedCategory->id == $category->id ? 'active' : '' }}">
-                    <input type="radio" name="categoria" value="{{ $category->id }}"
-                        onchange="window.location.href='?categoria={{ $category->id }}'"
-                        {{ $selectedCategory->id == $category->id ? 'checked' : '' }}>
-                    {{ $category->name }}
-                </label>
-            @endforeach
+        <div class="broto-option" style="margin: 20px 0; display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="brotoCheckbox" name="broto" value="1">
+            <label for="brotoCheckbox" style="font-size: 16px; cursor: pointer;">
+                Broto
+            </label>
         </div>
+        <h2>Escolha 2 Sabores</h2>
         <div class="product-list">
             @foreach ($products as $product)
                 <div class="product-card" data-product-id="{{ $product->id }}">
@@ -369,17 +357,20 @@
                             alt="{{ $product->name }}">
                     </div>
                     <div class="product-details">
-                        <div class="product-title pizza-name">{{ $product->name }}</div>
+                        <div class="product-title">{{ $product->name }}</div>
                         <div class="product-description">{{ $product->description }}</div>
                     </div>
                     <h3 style="display: none">{{ $product->name }}</h3>
                     <p style="display: none">{{ $product->description }}</p>
-                    <div class="product-price">R$ {{ number_format($product->price, 2, ',', '.') }}</div>
+                    <div class="product-price" data-original-price="{{ $product->price }}">
+                        R$ {{ number_format($product->price, 2, ',', '.') }}
+                    </div>
                     <input type="checkbox" class="product-checkbox">
                 </div>
             @endforeach
         </div>
         <h2>Bordas e Observações</h2>
+        <input type="hidden" name="is_broto" id="isBrotoInput" value="0">
         @if (count($crusts) > 0)
             <div class="crust-options">
                 @foreach ($crusts as $crust)
@@ -428,6 +419,31 @@
 
 @section('scripts')
     <script>
+        const brotoCheckbox = document.getElementById('brotoCheckbox');
+        const isBrotoInput = document.getElementById('isBrotoInput');
+
+        brotoCheckbox.addEventListener('change', function() {
+            const isBroto = brotoCheckbox.checked;
+            const priceElements = document.querySelectorAll('.product-price');
+
+            priceElements.forEach(el => {
+                const originalPrice = parseFloat(el.dataset.originalPrice);
+                let newPrice = originalPrice;
+
+                if (isBroto) {
+                    newPrice = Math.max(originalPrice - 10, 0); // evita preço negativo
+                }
+
+                el.textContent = `R$ ${newPrice.toFixed(2).replace('.', ',')}`;
+            });
+            isBrotoInput.value = brotoCheckbox.checked ? 1 : 0;
+            updateTotalPrice();
+            updateAddToCartButton();
+        });
+    </script>
+
+
+    <script>
         document.addEventListener('DOMContentLoaded', function() {
             const checkboxes = document.querySelectorAll('.product-checkbox');
 
@@ -453,6 +469,15 @@
             checkboxes.forEach(cb => {
                 cb.addEventListener('change', atualizarVisibilidadeProdutos);
             });
+        });
+    </script>
+    <script>
+        $(document).ajaxStart(function() {
+            $('#global-loader').css('display', 'flex'); // exibe com flex
+        });
+
+        $(document).ajaxStop(function() {
+            $('#global-loader').css('display', 'none'); // esconde
         });
     </script>
 
@@ -628,24 +653,32 @@
         }
 
         function updateTotalPrice() {
-            let maxPrice = 0;
-            selectedProducts.forEach(productId => {
-                const productPrice = parseFloat(document.querySelector(
-                    `.product-card[data-product-id="${productId}"] .product-price`).textContent.replace(
-                    'R$ ', '').replace(',', '.'));
-                if (productPrice > maxPrice) {
-                    maxPrice = productPrice;
+            const checkboxes = document.querySelectorAll('.product-checkbox:checked');
+            const brotoAtivo = document.getElementById('brotoCheckbox').checked;
+            let maiorPreco = 0;
+
+            checkboxes.forEach(cb => {
+                const card = cb.closest('.product-card');
+                const priceText = card.querySelector('.product-price').textContent;
+                let preco = parseFloat(priceText.replace('R$ ', '').replace(',', '.'));
+
+                // if (brotoAtivo) {
+                //     preco = Math.max(0, preco - 10); // Aplica desconto de R$10, nunca deixa negativo
+                // }
+
+                if (preco > maiorPreco) {
+                    maiorPreco = preco;
                 }
             });
 
-            // Adicionar o preço da borda ao preço total apenas se houver uma borda selecionada
-            if (selectedCrust !== null) {
-                const crustPrice = parseFloat(document.querySelector(`input[name="crust"][value="${selectedCrust}"]`)
-                    .dataset.price);
-                maxPrice += crustPrice;
+            // Soma preço da borda, se houver
+            const crustSelected = document.querySelector('input[name="crust"]:checked');
+            if (crustSelected) {
+                const precoBorda = parseFloat(crustSelected.dataset.price);
+                maiorPreco += precoBorda;
             }
 
-            totalPriceElement.textContent = maxPrice.toFixed(2);
+            document.getElementById('totalPrice').textContent = maiorPreco.toFixed(2).replace('.', ',');
         }
 
         function updateAddToCartButton() {
@@ -668,8 +701,6 @@
         });
 
         document.getElementById('addToCartButton').addEventListener('click', function() {
-            // Mostrar o loader
-            document.getElementById('global-loader').style.display = 'flex';
             const productIds = selectedProducts;
             let crustId = selectedCrust;
             if (crustId === null) {
@@ -686,6 +717,9 @@
             formData.append('observation2', observation2);
             formData.append('observation3', observation3);
             formData.append('_token', '{{ csrf_token() }}');
+            if (brotoCheckbox && brotoCheckbox.checked) {
+                formData.append('is_broto', '1');
+            }
 
             fetch('{{ route('cart.add2') }}', {
                     method: 'POST',
