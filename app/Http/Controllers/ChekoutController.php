@@ -434,7 +434,6 @@ class ChekoutController extends Controller
         }
 
         $service = Chat::where('jid', $customer->jid)
-            ->where('active', 1)
             ->first();
 
         if (!$service) {
