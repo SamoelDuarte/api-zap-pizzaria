@@ -34,7 +34,7 @@ class OrderController extends Controller
             'motoboy'
         ]);
 
-       
+
         $query->whereDate('created_at', Carbon::today());
         $orders = $query->latest()->get();
         $motoboys = Motoboy::all();
@@ -258,19 +258,21 @@ class OrderController extends Controller
                 $precoBorda = floatval($item['preco_borda'] ?? 0);
                 $quantidade = intval($item['quantidade']);
 
+                // ⚠️ Total do item inclui valor + borda
                 $totalItem = ($valor + $precoBorda) * $quantidade;
 
                 OrderItem::create([
                     'order_id' => $pedido->id,
                     'name' => $item['nome'],
-                    'price' => $valor,
+                    'price' => $valor, // <- preço base, sem borda
                     'quantity' => $quantidade,
                     'crust' => $item['borda'] ?? 'Tradicional',
-                    'crust_price' => $precoBorda,
+                    'crust_price' => $precoBorda, // <- borda separada
                     'observation_primary' => $item['observacao'] ?? null,
-                    'total' => $totalItem,
+                    'total' => $totalItem, // <- valor com borda
                 ]);
             }
+
 
             // Salva os pagamentos
             foreach ($pagamentos as $pagamento) {

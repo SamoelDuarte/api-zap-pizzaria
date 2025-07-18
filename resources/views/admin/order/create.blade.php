@@ -86,6 +86,13 @@
                                 <div class="col-md-12">
                                     <!-- Produto Unidade (sem código) -->
                                     <div class="row align-items-end mt-3">
+                                        <div class="col-md-1 d-flex align-items-center">
+                                            <div class="form-check mt-4">
+                                                <label class="form-label" for="produto_unidade_broto">Broto</label>
+                                                <input class="form-input form-control" type="checkbox"
+                                                    id="produto_unidade_broto">
+                                            </div>
+                                        </div>
                                         <div class="col-md-2 position-relative">
                                             <label class="form-label">Produto Unidade</label>
                                             <input type="text" class="form-control" id="produto_unidade_nome"
@@ -128,6 +135,12 @@
                                 <h5 class="mt-4">🍕 Pizza Meia a Meia</h5>
                                 <div class="col-md-12">
                                     <div class="row align-items-end mt-3">
+                                        <div class="col-md-1 d-flex align-items-center">
+                                            <div class="form-check mt-4">
+                                                <label class="form-label" for="meia_broto">Broto</label>
+                                                <input class="form-input form-control" type="checkbox" id="meia_broto">
+                                            </div>
+                                        </div>
                                         <div class="col-md-2 position-relative">
                                             <label class="form-label">Sabor 1</label>
                                             <input type="text" class="form-control" id="meia1_nome"
@@ -152,7 +165,7 @@
                                             <input type="text" class="form-control" id="meia_valor"
                                                 placeholder="Ex: 49.90">
                                         </div>
-                                        <div class="col-md-3">
+                                        <div class="col-md-2">
                                             <label class="form-label">Borda</label>
                                             <select class="form-select form-control" id="meia_borda">
                                                 @foreach ($crusts as $crust)
@@ -280,6 +293,7 @@
                         <div id="inputs_ocultos_meia"></div>
                         <div id="inputs_ocultos_simples"></div>
                         <div id="inputs_pagamentos"></div>
+                        <input type="hidden" name="is_broto" id="is_broto_input" value="0">
                         <button type="submit">Salvar</button>
                     </form>
                 </div>
@@ -309,6 +323,11 @@
 @section('scripts')
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBjtRzX47y95pI2XlmJrsXgka8SHSMLtQw&libraries=places">
     </script>
+    <script>
+        const inputBroto = document.getElementById('produto_unidade_broto');
+        const checkboxBroto = document.getElementById('meia_broto');
+    </script>
+
     {{-- susgestaode cliente --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -579,8 +598,6 @@
                 const nomeBorda = bordaSelect.value;
                 const precoBorda = parseFloat(bordaSelect.selectedOptions[0]?.dataset.preco || 0);
                 const inputObs = document.getElementById('produto_unidade_obs');
-                // Dentro da função adicionarProdutoNaTabela:
-                console.log("preco borda" + precoBorda);
 
                 const observacao = inputObs.value.trim();
                 if (!nome || valorUnitario <= 0) {
@@ -620,14 +637,22 @@
 
             // Preenche campos ao selecionar produto
             function preencherCampos(produto) {
-                inputNome.value = produto.name;
-                inputValor.value = parseFloat(produto.price).toFixed(2).replace('.', ',');
+                let preco = parseFloat(produto.price);
+                let nome = produto.name;
+
+                if (inputBroto.checked) {
+                    preco = Math.max(0, preco - 10);
+                    nome += ' (Broto)';
+                }
+                inputNome.value = nome;
+                inputValor.value = preco.toFixed(2).replace('.', ',');
                 inputQtd.value = '1';
                 sugestoesBox.classList.add('d-none');
 
                 inputQtd.focus();
                 inputQtd.select();
             }
+
 
             function buscarProduto(valor) {
                 if (valor.length < 2 || valor === ultimoValorBuscado) return;
@@ -645,8 +670,17 @@
                                 const item = document.createElement('a');
                                 item.href = '#';
                                 item.classList.add('list-group-item', 'list-group-item-action');
-                                item.textContent =
-                                    `${produto.name} - R$ ${parseFloat(produto.price).toFixed(2)}`;
+
+                                // Aplica desconto se a checkbox broto estiver marcada
+                                let preco = parseFloat(produto.price);
+                                let nome = produto.name;
+
+                                if (inputBroto.checked) {
+                                    preco = Math.max(0, preco - 10);
+                                    nome += ' (Broto)';
+                                }
+
+                                item.textContent = `${nome} - R$ ${preco.toFixed(2)}`;
                                 item.dataset.index = index;
 
                                 item.addEventListener('click', function(e) {
@@ -656,12 +690,14 @@
 
                                 sugestoesBox.appendChild(item);
                             });
+
                             sugestoesBox.classList.remove('d-none');
                         } else {
                             sugestoesBox.classList.add('d-none');
                         }
                     });
             }
+
 
             inputNome.addEventListener('input', function() {
                 buscarProduto(this.value.trim());
@@ -885,12 +921,15 @@
 
             function buscarPizza(nome, callback, box) {
                 if (nome.length < 2) return;
+
+                const checkboxBroto = document.getElementById('meia_broto');
+
                 fetch(`/produtos/buscar-pizza-por-nome?nome=${encodeURIComponent(nome)}`)
                     .then(res => res.json())
                     .then(data => {
                         box.innerHTML = '';
 
-                        // 🔽 Adiciona isso aqui para alimentar a navegação com teclado
+                        // Navegação por teclado
                         if (box === sugestaoMeia1) {
                             sugestoesMeia1 = data;
                             indexSelecionadoMeia1 = -1;
@@ -900,26 +939,45 @@
                         }
 
                         if (data.length) {
-                            data.forEach(produto => {
+                            data.forEach((produto, index) => {
                                 const item = document.createElement('a');
                                 item.href = '#';
                                 item.classList.add('list-group-item', 'list-group-item-action');
-                                item.textContent =
-                                    `${produto.name} - R$ ${parseFloat(produto.price).toFixed(2)}`;
+
+                                // Aplica desconto e renomeia se checkbox estiver marcada
+                                let preco = parseFloat(produto.price);
+                                let nomeProduto = produto.name;
+
+                                if (checkboxBroto?.checked) {
+                                    preco = Math.max(0, preco - 10);
+                                    nomeProduto += ' (Broto)';
+                                }
+
+                                item.textContent = `${nomeProduto} - R$ ${preco.toFixed(2)}`;
+                                item.dataset.index = index;
+
                                 item.addEventListener('click', function(e) {
                                     e.preventDefault();
-                                    callback(produto);
+
+                                    const produtoModificado = {
+                                        ...produto,
+                                        name: nomeProduto,
+                                        price: preco
+                                    };
+
+                                    callback(produtoModificado);
                                     box.classList.add('d-none');
                                 });
+
                                 box.appendChild(item);
                             });
+
                             box.classList.remove('d-none');
                         } else {
                             box.classList.add('d-none');
                         }
                     });
             }
-
 
 
             inputMeia1.addEventListener('keydown', function(e) {
@@ -990,21 +1048,39 @@
 
 
             function preencherMeia1(produto) {
-                inputMeia1.value = produto.name;
-                valores.meia1 = parseFloat(produto.price);
-                nomes.meia1 = produto.name;
+                let preco = parseFloat(produto.price);
+                let nome = produto.name;
+
+                if (checkboxBroto.checked) {
+                    preco = Math.max(0, preco - 10);
+                    nome += ' (Broto)';
+                }
+
+                inputMeia1.value = nome;
+                valores.meia1 = preco;
+                nomes.meia1 = nome;
                 atualizarValorSeMaior();
                 inputMeia2.focus();
             }
 
+
             function preencherMeia2(produto) {
-                inputMeia2.value = produto.name;
-                valores.meia2 = parseFloat(produto.price);
-                nomes.meia2 = produto.name;
+                let preco = parseFloat(produto.price);
+                let nome = produto.name;
+
+                if (checkboxBroto.checked) {
+                    preco = Math.max(0, preco - 10);
+                    nome += ' (Broto)';
+                }
+
+                inputMeia2.value = nome;
+                valores.meia2 = preco;
+                nomes.meia2 = nome;
                 atualizarValorSeMaior();
                 inputQtd.focus();
                 inputQtd.select();
             }
+
 
             // Navegação com Enter
             inputQtd.addEventListener('keydown', e => {
@@ -1158,14 +1234,21 @@
             }
 
             function preencherCampos(produto) {
-                inputNome.value = produto.name;
-                inputValor.value = parseFloat(produto.price).toFixed(2).replace('.', ',');
+                let preco = parseFloat(produto.price);
+
+                if (produto.is_broto) {
+                    preco = Math.max(0, preco - 10); // Aplica desconto de R$10 se for broto
+                }
+
+                inputNome.value = produto.name + (produto.is_broto ? ' (Broto)' : '');
+                inputValor.value = preco.toFixed(2).replace('.', ',');
                 inputQtd.value = '1';
                 sugestoesBox.classList.add('d-none');
 
                 inputQtd.focus();
                 inputQtd.select();
             }
+
 
             function buscarProduto(valor) {
                 if (valor.length < 2 || valor === ultimoValorBuscado) return;

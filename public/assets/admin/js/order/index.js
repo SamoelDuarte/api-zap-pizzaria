@@ -22,7 +22,7 @@ $(document).on('click', '.btn-ver-pedido', function () {
     // Itens do pedido
     pedido.items.forEach(function (item) {
         let crustHtml = '';
-        let itemTotal = parseFloat(item.price) || 0;
+        let itemTotal = parseFloat(item.total) || 0;
         let crustPrice = parseFloat(item.crust_price) || 0;
 
         if (item.crust) {

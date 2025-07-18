@@ -145,97 +145,78 @@ class ChekoutController extends Controller
 
         return redirect()->route('checkout.home')->with('success', 'Produto adicionado ao carrinho com sucesso.');
     }
-
-
+    
     public function addToCart2(Request $request)
     {
-        // Obter o carrinho da sessão
         $cart = session()->get('cart', []);
 
         $isBroto = $request->has('is_broto') && $request->input('is_broto') == '1';
 
-        // Obter os dados do formulário
-        $productIds = json_decode($request->input('product_ids'), true); // Convertendo de string para array
+        $productIds = json_decode($request->input('product_ids'), true);
         $crustId = $request->input('crust_id');
         $observation1 = $request->input('observation1');
         $observation2 = $request->input('observation2');
         $observation3 = $request->input('observation3');
 
-        // Verificar se foram selecionados 2 ou 3 produtos
         $selectedProductCount = count($productIds);
         if ($selectedProductCount < 2 || $selectedProductCount > 3) {
             return redirect()->back()->with('error', 'Por favor, selecione entre 2 e 3 produtos.');
         }
 
-        // Inicializar variáveis para armazenar informações dos produtos selecionados
         $productNames = [];
         $productDescriptions = [];
-        $totalPrice = 0;
+        $productPrices = [];
 
-        // Obter informações dos produtos e calcular o preço total
         foreach ($productIds as $productId) {
             $product = Product::findOrFail($productId);
             $productNames[] = $product->name;
             $productDescriptions[] = $product->description;
+            $productPrices[] = floatval($product->price);
         }
 
+        // Define o preço base (maior preço entre os sabores)
+        $basePrice = max($productPrices);
 
-
-        // Se houver borda selecionada, adicionar o preço da borda ao total do produto
-        if ($crustId !== null) {
-            $crustPrice = Crust::findOrFail($crustId)->price;
-            $totalPrice += $crustPrice; // Multiplicar pelo número de produtos selecionados
-        }
-
-
-        // Verificar se há 3 produtos e calcular o preço total usando o maior preço
-        if ($selectedProductCount >= 2) {
-            $productPrices = collect();
-            foreach ($productIds as $productId) {
-                $product = Product::findOrFail($productId);
-                $productPrices->push($product->price);
-            }
-            $totalPrice += $productPrices->max();
-        }
-
-        // Aplicar desconto de R$ 10,00 se for broto
+        // Aplica desconto se for broto
         if ($isBroto) {
-            $totalPrice -= 10;
-            // Evitar valor negativo
-            if ($totalPrice < 0) {
-                $totalPrice = 0;
-            }
+            $basePrice = max(0, $basePrice - 10);
         }
 
+        // Define borda
+        $crustPrice = 0;
+        $crustName = 'Tradicional';
+        if ($crustId !== null) {
+            $crust = Crust::findOrFail($crustId);
+            $crustPrice = floatval($crust->price);
+            $crustName = $crust->name;
+        }
 
         $cartItem = [
-            'product_id' => implode(',', $productIds), // Combine os IDs dos produtos
+            'product_id' => implode(',', $productIds),
             'name' => implode(' / ', $productNames) . ($isBroto ? ' (Broto)' : ''),
-            'description' => implode(' / ', $productDescriptions), // Combine as descrições dos produtos
-            'price' => $totalPrice, // Preço total dos produtos
-            'quantity' => 1, // Definindo como 1 por enquanto, pode ser ajustado conforme necessário
-            'crust' => $crustId !== null ? Crust::findOrFail($crustId)->name : 'Tradicional', // Se não houver borda selecionada, usar 'Tradicional'
-            'crust_price' => $crustId !== null ? $crustPrice : 0, // Se não houver borda selecionada, preço da borda será 0
-            'observation' => $observation1 . ' / ' . $observation2 . ' / ' . $observation3, // Combine as observações dos produtos
-            'total' => $totalPrice, // Preço total do produto
+            'description' => implode(' / ', $productDescriptions),
+            'price' => $basePrice,
+            'quantity' => 1,
+            'crust' => $crustName,
+            'crust_price' => $crustPrice,
+            'observation' => $observation1 . ' / ' . $observation2 . ' / ' . $observation3,
+            'total' => $basePrice + $crustPrice, // valor separado
+            'is_broto' => $isBroto,
         ];
 
-        // Adicionar a lógica para determinar a imagem com base no número de sabores selecionados
+        // Define imagem com base na quantidade de sabores
         if ($selectedProductCount == 2) {
             $cartItem['image'] = 'assets/imagens/pizza_2_sabores.png';
         } elseif ($selectedProductCount == 3) {
             $cartItem['image'] = 'assets/imagens/pizza_3_sabores.jpg';
         }
 
-        // Adicionar o item ao carrinho
         $cart[] = $cartItem;
-
-        // Atualizar o carrinho na sessão
         session()->put('cart', $cart);
 
-        // Redirecionar para a página de checkout com uma mensagem de sucesso
         return redirect()->route('checkout.home')->with('success', 'Produto(s) adicionado(s) ao carrinho com sucesso.');
     }
+
 
     public function showCart()
     {
@@ -368,7 +349,7 @@ class ChekoutController extends Controller
                 $valor = floatval($item['valor']);
                 $precoBorda = floatval($item['preco_borda'] ?? 0);
                 $quantidade = intval($item['quantidade']);
-                $totalItem = $valor * $quantidade;
+                $totalItem = ($valor + $precoBorda)* $quantidade;
                 $totalPedido += $totalItem;
             }
 
