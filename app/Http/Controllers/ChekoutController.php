@@ -111,31 +111,41 @@ class ChekoutController extends Controller
         $productId = $request->input('product_id');
         $quantity = $request->input('quantity');
         $crust = $request->input('crust', 'Tradicional');
-        $crustPrice = $request->input('crustPrice');
+        $crustPrice = floatval($request->input('crustPrice', 0));
         $observation = $request->input('observation', '');
+        $isBroto = $request->boolean('is_broto');
 
         $product = Product::findOrFail($productId);
+        $productPrice = floatval($product->price);
+
+        // Aplica desconto de R$ 10,00 se for broto
+        if ($isBroto) {
+            $productPrice -= 10;
+            if ($productPrice < 0) {
+                $productPrice = 0; // Evita total negativo
+            }
+        }
 
         $cartItem = [
             'product_id' => $product->id,
-            'name' => $product->name,
+            'name' => $product->name . ($isBroto ? ' (Broto)' : ''),
             'image' => $product->image,
             'description' => $product->description,
-            'price' => $product->price,
+            'price' => $productPrice,
             'quantity' => $quantity,
             'crust' => $crust,
             'crust_price' => $crustPrice,
             'observation' => $observation,
-            'total' => ($product->price + $crustPrice) * $quantity, // Inclui o preço da borda, se aplicável
+            'is_broto' => $isBroto,
+            'total' => ($productPrice + $crustPrice) * $quantity,
         ];
 
         $cart[] = $cartItem;
-
         session()->put('cart', $cart);
 
-        $cart = session()->get('cart', []);
         return redirect()->route('checkout.home')->with('success', 'Produto adicionado ao carrinho com sucesso.');
     }
+
 
     public function addToCart2(Request $request)
     {
@@ -187,6 +197,16 @@ class ChekoutController extends Controller
             }
             $totalPrice += $productPrices->max();
         }
+
+        // Aplicar desconto de R$ 10,00 se for broto
+        if ($isBroto) {
+            $totalPrice -= 10;
+            // Evitar valor negativo
+            if ($totalPrice < 0) {
+                $totalPrice = 0;
+            }
+        }
+
 
         $cartItem = [
             'product_id' => implode(',', $productIds), // Combine os IDs dos produtos

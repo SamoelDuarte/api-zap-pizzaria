@@ -299,21 +299,30 @@
         }
 
         .broto-option {
+            margin: 20px 0;
             display: flex;
             align-items: center;
-            font-size: 18px;
-            gap: 10px;
-        }
-
-        .broto-option input[type="checkbox"] {
-            transform: scale(1.5);
-            accent-color: #28a745;
-            /* verde */
+            justify-content: center;
         }
 
         .broto-label {
+            display: inline-block;
+            padding: 12px 24px;
+            font-size: 16px;
+            border: 2px solid #000000;
+            border-radius: 8px;
+            background-color: white;
+            color: #000000;
             cursor: pointer;
             user-select: none;
+            transition: all 0.2s ease;
+        }
+
+        #brotoCheckbox:checked+.broto-label {
+            background-color: #28a745;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.4);
         }
     </style>
 @endsection
@@ -342,12 +351,13 @@
 
 
     <div class="container">
-        <div class="broto-option" style="margin: 20px 0; display: flex; align-items: center; gap: 8px;">
-            <input type="checkbox" id="brotoCheckbox" name="broto" value="1">
-            <label for="brotoCheckbox" style="font-size: 16px; cursor: pointer;">
-                Broto
+        <div class="broto-option">
+            <input type="checkbox" id="brotoCheckbox" name="broto" hidden>
+            <label for="brotoCheckbox" class="broto-label">
+                🍕 Pizza Broto (Pequena)
             </label>
         </div>
+
         <h2>Escolha 2 Sabores</h2>
         <div class="product-list">
             @foreach ($products as $product)

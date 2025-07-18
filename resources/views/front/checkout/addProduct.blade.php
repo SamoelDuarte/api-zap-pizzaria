@@ -128,6 +128,28 @@
             height: 50%;
         }
     </style>
+    <style>
+        .broto-toggle-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .broto-toggle-btn {
+            background-color: #f8f9fa;
+            border: 2px solid #28a745;
+            color: #28a745;
+            padding: 10px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .broto-toggle-btn.active {
+            background-color: #28a745;
+            color: #fff;
+        }
+    </style>
 @endsection
 
 @section('content')
@@ -135,14 +157,16 @@
         <i class="fas fa-arrow-left" onclick="history.back()"></i>
         <span>Voltar</span>
     </div>
-
+    <div class="broto-toggle-container">
+        <button type="button" id="brotoToggleBtn" class="broto-toggle-btn">🍕 PIZZA BROTO</button>
+    </div>
     <div class="container">
         <div class="pizza-name">{{ $product->name }}</div>
         <div class="pizza-details">{{ $product->description }}</div>
-        <div class="borda-title">Escolha a Borda</div>
+
 
         @if (str_contains(strtolower($product->category->name), 'pizza'))
-
+            <div class="borda-title">Escolha a Borda</div>
             @if (count($crusts) > 0)
                 <div class="crust-options">
                     @foreach ($crusts as $crust)
@@ -171,6 +195,7 @@
             <input type="hidden" name="crust" id="selected-crust" value="Tradicional">
             <input type="hidden" name="crustPrice" id="selected-crust-price" value="0.00">
             <input type="hidden" name="observation" id="observation-input">
+            <input type="hidden" name="is_broto" id="is_broto_input" value="0">
             <div class="quantity">
                 <button type="button" class="decrement" onclick="changeQuantity(-1)">-</button>
                 <input type="number" id="quantity" name="quantity" value="1" min="1">
@@ -185,9 +210,36 @@
 
 @section('scripts')
     <script>
+        let isBroto = false;
+
+        document.getElementById('brotoToggleBtn').addEventListener('click', function() {
+            isBroto = !isBroto;
+            document.getElementById('is_broto_input').value = isBroto ? 1 : 0;
+
+            this.classList.toggle('active');
+            updateTotalPrice(globalCrustPrice);
+        });
+
+        // Atualização da função de preço
+        function updateTotalPrice(crustPrice) {
+            const quantity = parseInt(document.getElementById('quantity').value);
+            let total = (productPrice + crustPrice) * quantity;
+
+            if (isBroto) {
+                total -= 10;
+            }
+
+            document.getElementById('total-price').innerText = 'R$ ' + total.toFixed(2).replace('.', ',');
+        }
+
+        // Chamar já no início pra refletir valor se necessário
+        updateTotalPrice(globalCrustPrice);
+    </script>
+
+    <script>
         function disableButton() {
             document.getElementById("add-to-cart-btn").disabled = true;
-              document.getElementById('global-loader').style.display = 'flex';
+            document.getElementById('global-loader').style.display = 'flex';
         }
         var globalCrustPrice = parseFloat('{{ $crusts->first()->price }}');
 
@@ -222,12 +274,12 @@
             });
         });
 
-        // Função para atualizar o preço total com base na quantidade e na borda selecionada
-        function updateTotalPrice(crustPrice) {
-            const quantity = parseInt(document.getElementById('quantity').value);
-            const totalPrice = (productPrice + crustPrice) * quantity;
-            document.getElementById('total-price').innerText = 'R$ ' + totalPrice.toFixed(2).replace('.', ',');
-        }
+        // // Função para atualizar o preço total com base na quantidade e na borda selecionada
+        // function updateTotalPrice(crustPrice) {
+        //     const quantity = parseInt(document.getElementById('quantity').value);
+        //     const totalPrice = (productPrice + crustPrice) * quantity;
+        //     document.getElementById('total-price').innerText = 'R$ ' + totalPrice.toFixed(2).replace('.', ',');
+        // }
 
         document.getElementById('quantity').addEventListener('input', function() {
             // Atualiza o preço total com base na quantidade e na borda selecionada
