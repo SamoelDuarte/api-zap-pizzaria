@@ -59,7 +59,7 @@ class ChekoutController extends Controller
         $product = Product::findOrFail($id);
         $crusts = Crust::all();
 
-        $this->criarOuAtualizarChat('fazendo_pedido5'); // Atualiza o estágio do fluxo
+        $this->criarOuAtualizarChat('fazendo_pedido'); // Atualiza o estágio do fluxo
 
         return view('front.checkout.addProduct', compact('product', 'crusts'));
     }
@@ -74,7 +74,7 @@ class ChekoutController extends Controller
             $products = $products->merge($category->products);
         }
 
-        $this->criarOuAtualizarChat('fazendo_pedido5'); // Atualiza o estágio do fluxo
+        $this->criarOuAtualizarChat('fazendo_pedido'); // Atualiza o estágio do fluxo
 
         return view('front.checkout.add2Sabores', compact('products', 'crusts'));
     }
