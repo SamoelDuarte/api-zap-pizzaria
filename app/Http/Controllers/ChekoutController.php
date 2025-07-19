@@ -33,45 +33,17 @@ class ChekoutController extends Controller
         $taxaEntrega = 0;
 
         if ($phone) {
+            session()->put('jid', $phone); // ← Salva o JID na sessão
+
             $customer = Customer::where('jid', $phone)->first();
             if ($customer) {
                 session()->put('customer', $customer);
                 $taxaEntrega = $customer->delivery_fee ?? 0;
-
-                $chatAtivo = Chat::where('jid', $customer->jid)->where('active', 1)->first();
-                if (!$chatAtivo) {
-                    Chat::create([
-                        'jid' => $customer->jid,
-                        'session_id' => null,
-                        'service_id' => null,
-                        'active' => 1,
-                        'await_answer' => null,
-                        'flow_stage' => 'fazendo_pedido1',
-                    ]);
-                } else {
-                    $chatAtivo->update(['flow_stage' => 'fazendo_pedido4']);
-                }
             } else {
                 session()->forget('customer');
                 $semCadastro = true;
-
-                // Cria chat mesmo sem cliente
-                $chatExistente = Chat::where('jid', $phone)->where('active', 1)->first();
-                if (!$chatExistente) {
-                    Chat::create([
-                        'jid' => $phone,
-                        'session_id' => null,
-                        'service_id' => null,
-                        'active' => 1,
-                        'await_answer' => null,
-                        'flow_stage' => 'fazendo_pedido2',
-                    ]);
-                } else {
-                    $chatExistente->update(['flow_stage' => 'fazendo_pedido3']);
-                }
             }
         }
-
 
         session()->put('taxa_entrega', $taxaEntrega);
 
@@ -85,23 +57,49 @@ class ChekoutController extends Controller
     public function addProduto($id)
     {
         $product = Product::findOrFail($id);
-        $crusts = Crust::all(); // Busca todas as bordas disponíveis
+        $crusts = Crust::all();
+
+        $this->criarOuAtualizarChat('fazendo_pedido5'); // Atualiza o estágio do fluxo
 
         return view('front.checkout.addProduct', compact('product', 'crusts'));
     }
+
     public function add2Sabores()
     {
-        $categories = Categories::where('name', 'LIKE', '%Pizzas%')->get(); // Busca as categorias que contêm a palavra "Pizzas" no nome
-        $crusts = Crust::all(); // Busca todas as bordas disponíveis
-        $products = collect(); // Cria uma coleção vazia para armazenar os produtos
+        $categories = Categories::where('name', 'LIKE', '%Pizzas%')->get();
+        $crusts = Crust::all();
+        $products = collect();
 
-        // Percorre todas as categorias encontradas
         foreach ($categories as $category) {
-            // Adiciona os produtos da categoria atual à coleção de produtos
             $products = $products->merge($category->products);
         }
+
+        $this->criarOuAtualizarChat('fazendo_pedido5'); // Atualiza o estágio do fluxo
+
         return view('front.checkout.add2Sabores', compact('products', 'crusts'));
     }
+
+    protected function criarOuAtualizarChat($flowStage)
+    {
+        $jid = session('jid');
+        if (!$jid) return;
+
+        $chat = Chat::where('jid', $jid)->where('active', 1)->first();
+
+        if ($chat) {
+            $chat->update(['flow_stage' => $flowStage]);
+        } else {
+            Chat::create([
+                'jid' => $jid,
+                'session_id' => null,
+                'service_id' => null,
+                'active' => 1,
+                'await_answer' => null,
+                'flow_stage' => $flowStage,
+            ]);
+        }
+    }
+
 
 
     public function addToCart(Request $request)
@@ -145,7 +143,7 @@ class ChekoutController extends Controller
 
         return redirect()->route('checkout.home')->with('success', 'Produto adicionado ao carrinho com sucesso.');
     }
-    
+
     public function addToCart2(Request $request)
     {
         $cart = session()->get('cart', []);
@@ -349,7 +347,7 @@ class ChekoutController extends Controller
                 $valor = floatval($item['valor']);
                 $precoBorda = floatval($item['preco_borda'] ?? 0);
                 $quantidade = intval($item['quantidade']);
-                $totalItem = ($valor + $precoBorda)* $quantidade;
+                $totalItem = ($valor + $precoBorda) * $quantidade;
                 $totalPedido += $totalItem;
             }
 
