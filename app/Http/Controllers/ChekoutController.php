@@ -64,10 +64,10 @@ class ChekoutController extends Controller
                         'service_id' => null,
                         'active' => 1,
                         'await_answer' => null,
-                        'flow_stage' => 'fazendo_pedido',
+                        'flow_stage' => 'fazendo_pedido2',
                     ]);
                 } else {
-                    $chatExistente->update(['flow_stage' => 'fazendo_pedido']);
+                    $chatExistente->update(['flow_stage' => 'fazendo_pedido3']);
                 }
             }
         }
