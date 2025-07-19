@@ -49,7 +49,7 @@ class ChekoutController extends Controller
                         'flow_stage' => 'fazendo_pedido1',
                     ]);
                 } else {
-                    $chatAtivo->update(['flow_stage' => 'fazendo_pedido1']);
+                    $chatAtivo->update(['flow_stage' => 'fazendo_pedido4']);
                 }
             } else {
                 session()->forget('customer');
