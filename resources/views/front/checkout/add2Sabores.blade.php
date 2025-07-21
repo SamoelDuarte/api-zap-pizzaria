@@ -402,21 +402,9 @@
             </div>
 
             <div class="observation">
-                <i class="fa fa-pencil"></i><small>Pizza 1</small>
-                <textarea id="observation1" rows="2" maxlength="140" placeholder="Alguma Observação?"></textarea>
-                <div class="char-count" id="char-count1">0/140</div>
-            </div>
-
-            <div class="observation d-none">
-                <i class="fa fa-pencil"></i><small>Pizza 2</small>
-                <textarea id="observation2" rows="2" maxlength="140" placeholder="Alguma Observação?"></textarea>
-                <div class="char-count" id="char-count2">0/140</div>
-            </div>
-
-            <div class="observation">
-                <i class="fa fa-pencil"></i><small>Pizza 2</small>
-                <textarea id="observation3" rows="2" maxlength="140" placeholder="Alguma Observação?"></textarea>
-                <div class="char-count" id="char-count3">0/140</div>
+                <i class="fa fa-pencil"></i><small>Observação</small>
+                <textarea id="observation" rows="2" maxlength="140" placeholder="Alguma Observação?"></textarea>
+                <div class="char-count" id="char-count">0/140</div>
             </div>
         @endif
     </div>
@@ -540,7 +528,6 @@
                     checkbox.checked = true;
                     console.log(selectedProducts);
                     selectedProducts.push(productId);
-                    updateObservationText(productId, productName);
                 }
 
                 updateSwiper();
@@ -717,15 +704,11 @@
                 crustId = 1; // Defina 1 como o valor padrão se nenhum tipo de borda for selecionado
             }
             const observation1 = document.getElementById('observation1').value;
-            const observation2 = document.getElementById('observation2').value;
-            const observation3 = document.getElementById('observation3').value;
 
             const formData = new FormData();
             formData.append('product_ids', JSON.stringify(productIds));
             formData.append('crust_id', crustId);
-            formData.append('observation1', observation1);
-            formData.append('observation2', observation2);
-            formData.append('observation3', observation3);
+            formData.append('observation', observation1);
             formData.append('_token', '{{ csrf_token() }}');
             if (brotoCheckbox && brotoCheckbox.checked) {
                 formData.append('is_broto', '1');
