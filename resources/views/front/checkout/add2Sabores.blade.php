@@ -406,6 +406,7 @@
                 <textarea id="observation" rows="2" maxlength="140" placeholder="Alguma Observação?"></textarea>
                 <div class="char-count" id="char-count">0/140</div>
             </div>
+
         @endif
     </div>
     <div class="sobe" style="margin-top: 116px;"></div>
@@ -519,7 +520,6 @@
                     if (index > -1) {
                         selectedProducts.splice(index, 1);
                     }
-                    updateObservationText(productId, '');
                 } else {
                     if (selectedProducts.length >= 2) {
                         alert('Você só pode selecionar até dois sabores.');
@@ -540,22 +540,7 @@
             });
         });
 
-        function updateObservationText() {
-            const observations = document.querySelectorAll('.observation');
-
-            // Define as observações com base nos produtos selecionados
-            selectedProducts.forEach((productId, index) => {
-                const productName = document.querySelector(
-                    `.product-card[data-product-id="${productId}"] .product-title`).textContent;
-                observations[index].querySelector('small').innerHTML = productName;
-                observations[index].style.display = 'flex'; // Exibe a observação
-            });
-
-            // Oculta observações restantes
-            for (let i = selectedProducts.length; i < observations.length; i++) {
-                observations[i].style.display = 'none';
-            }
-        }
+       
 
 
         // Adicione um evento de clique para os elementos .crust-option
