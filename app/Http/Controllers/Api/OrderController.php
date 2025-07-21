@@ -31,6 +31,7 @@ class OrderController extends Controller
             'motoboy'
         ])
             ->whereBetween('created_at', [$inicio, $fim])
+            ->where('status' , 2)
             ->orderBy('created_at', 'desc')
             ->get();
 
