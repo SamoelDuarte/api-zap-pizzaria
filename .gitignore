@@ -20,3 +20,4 @@ yarn-error.log
 /.idea
 /.vscode
 index.php
+config/firebase/firebase_credentials.json
