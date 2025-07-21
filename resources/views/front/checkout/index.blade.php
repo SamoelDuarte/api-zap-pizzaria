@@ -355,11 +355,11 @@
 @endphp
 @section('scripts')
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(() => {
-                document.querySelector('.loading-overlay').style.display = 'none';
-            }, 1000); // Ajuste o tempo conforme necessário
-        });
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     setTimeout(() => {
+        //         document.querySelector('.loading-overlay').style.display = 'none';
+        //     }, 1000); // Ajuste o tempo conforme necessário
+        // });
     </script>
     <script>
         function redirectToCart() {

@@ -335,7 +335,7 @@ class ChekoutController extends Controller
                 'preco_borda' => $item['crust_price'] ?? 0,
                 'quantidade' => $item['quantity'],
                 'borda' => $item['crust'] ?? 'Tradicional',
-                'observacao' => $item['observation_primary'] ?? null,
+                'observacao' => $item['observation'] ?? null,
             ];
         }
 
@@ -379,7 +379,7 @@ class ChekoutController extends Controller
                     'quantity' => $quantidade,
                     'crust' => $item['borda'] ?? 'Tradicional',
                     'crust_price' => $precoBorda,
-                    'observation' => $item['observation'] ?? null,
+                    'observation' => $item['observacao'] ?? null,
                     'total' => $totalItem,
                 ]);
             }
