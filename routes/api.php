@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 Route::get('/pedidos', [OrderController::class, 'index']);
+Route::post('/salvar-token', [FirebaseTokenController::class, 'store']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
