@@ -24,7 +24,7 @@ class OrderController extends Controller
         }
 
         $pedidos = Order::with([
-            'customer.address',
+            'customer', // sem .address, pois os campos estão diretos
             'items.product',
             'pagamentos.paymentMethod',
             'status',
@@ -33,6 +33,7 @@ class OrderController extends Controller
             ->whereBetween('created_at', [$inicio, $fim])
             ->orderBy('created_at', 'desc')
             ->get();
+
 
         return response()->json([
             'success' => true,
