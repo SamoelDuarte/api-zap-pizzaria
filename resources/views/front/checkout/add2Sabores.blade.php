@@ -294,10 +294,6 @@
             right: 2px;
         }
 
-        .observation {
-            display: none;
-        }
-
         .broto-option {
             margin: 20px 0;
             display: flex;
@@ -402,21 +398,9 @@
             </div>
 
             <div class="observation">
-                <i class="fa fa-pencil"></i><small>Pizza 1</small>
-                <textarea id="observation1" rows="2" maxlength="140" placeholder="Alguma Observação?"></textarea>
-                <div class="char-count" id="char-count1">0/140</div>
-            </div>
-
-            <div class="observation">
-                <i class="fa fa-pencil"></i><small>Pizza 2</small>
-                <textarea id="observation2" rows="2" maxlength="140" placeholder="Alguma Observação?"></textarea>
-                <div class="char-count" id="char-count2">0/140</div>
-            </div>
-
-            <div class="observation">
-                <i class="fa fa-pencil"></i><small>Pizza 2</small>
-                <textarea id="observation3" rows="2" maxlength="140" placeholder="Alguma Observação?"></textarea>
-                <div class="char-count" id="char-count3">0/140</div>
+                <i class="fa fa-pencil"></i><small>Observação</small>
+                <textarea id="observation" rows="2" maxlength="140" placeholder="Alguma Observação?"></textarea>
+                <div class="char-count" id="char-count">0/140</div>
             </div>
         @endif
     </div>
@@ -481,7 +465,7 @@
             });
         });
     </script>
-  
+
     <script>
         const productCards = document.querySelectorAll('.product-card');
         const swipperContainer = document.getElementById('swipper-container');
@@ -492,23 +476,13 @@
         let selectedProducts = [];
         let selectedCrust = null;
 
-        document.getElementById('observation1').addEventListener('input', function() {
+        document.getElementById('observation').addEventListener('input', function() {
             const charCount = this.value.length;
             document.getElementById('char-count1').innerText = charCount + '/140';
             document.getElementById('observation-input1').value = this.value;
         });
 
-        document.getElementById('observation2').addEventListener('input', function() {
-            const charCount = this.value.length;
-            document.getElementById('char-count2').innerText = charCount + '/140';
-            document.getElementById('observation-input2').value = this.value;
-        });
-
-        document.getElementById('observation3').addEventListener('input', function() {
-            const charCount = this.value.length;
-            document.getElementById('char-count3').innerText = charCount + '/140';
-            document.getElementById('observation-input3').value = this.value;
-        });
+       
 
         productCards.forEach(card => {
             card.addEventListener('click', function() {
@@ -522,7 +496,6 @@
                     if (index > -1) {
                         selectedProducts.splice(index, 1);
                     }
-                    updateObservationText(productId, '');
                 } else {
                     if (selectedProducts.length >= 2) {
                         alert('Você só pode selecionar até dois sabores.');
@@ -531,7 +504,6 @@
                     checkbox.checked = true;
                     console.log(selectedProducts);
                     selectedProducts.push(productId);
-                    updateObservationText(productId, productName);
                 }
 
                 updateSwiper();
@@ -544,22 +516,7 @@
             });
         });
 
-        function updateObservationText() {
-            const observations = document.querySelectorAll('.observation');
-
-            // Define as observações com base nos produtos selecionados
-            selectedProducts.forEach((productId, index) => {
-                const productName = document.querySelector(
-                    `.product-card[data-product-id="${productId}"] .product-title`).textContent;
-                observations[index].querySelector('small').innerHTML = productName;
-                observations[index].style.display = 'flex'; // Exibe a observação
-            });
-
-            // Oculta observações restantes
-            for (let i = selectedProducts.length; i < observations.length; i++) {
-                observations[i].style.display = 'none';
-            }
-        }
+       
 
 
         // Adicione um evento de clique para os elementos .crust-option
@@ -707,16 +664,12 @@
             if (crustId === null) {
                 crustId = 1; // Defina 1 como o valor padrão se nenhum tipo de borda for selecionado
             }
-            const observation1 = document.getElementById('observation1').value;
-            const observation2 = document.getElementById('observation2').value;
-            const observation3 = document.getElementById('observation3').value;
+            const observation = document.getElementById('observation').value;
 
             const formData = new FormData();
             formData.append('product_ids', JSON.stringify(productIds));
             formData.append('crust_id', crustId);
-            formData.append('observation1', observation1);
-            formData.append('observation2', observation2);
-            formData.append('observation3', observation3);
+            formData.append('observation', observation);
             formData.append('_token', '{{ csrf_token() }}');
             if (brotoCheckbox && brotoCheckbox.checked) {
                 formData.append('is_broto', '1');

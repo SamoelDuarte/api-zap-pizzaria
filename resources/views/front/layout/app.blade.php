@@ -35,6 +35,9 @@
         <div style="margin-top: 10px;">Carregando...</div>
     </div>
     @yield('content')
+     <!-- Bootstrap core JavaScript-->
+    <script src="{{ asset('/assets/admin/vendor/jquery/jquery.min.js') }} "></script>
+    <script src="{{ asset('/assets/admin/vendor/bootstrap/js/bootstrap.bundle.min.js') }} "></script>
     @yield('scripts')
 
     <script>
