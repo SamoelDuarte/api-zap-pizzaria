@@ -25,7 +25,7 @@ class OrderController extends Controller
 
         $pedidos = Order::with([
             'customer', // sem .address, pois os campos estão diretos
-            'items.product',
+            'items',
             'pagamentos.paymentMethod',
             'status',
             'motoboy'
