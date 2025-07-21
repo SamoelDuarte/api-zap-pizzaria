@@ -157,7 +157,7 @@
         <i class="fas fa-arrow-left" onclick="history.back()"></i>
         <span>Voltar</span>
     </div>
-    @if (!str_contains(strtolower($product->category->name), 'pizza'))
+    @if (str_contains(strtolower($product->category->name), 'Bebidas'))
         <div class="broto-toggle-container">
             <button type="button" id="brotoToggleBtn" class="broto-toggle-btn">🍕 PIZZA BROTO</button>
         </div>
