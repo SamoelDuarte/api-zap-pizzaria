@@ -11,7 +11,8 @@ class FirebaseNotificationHelper
 {
     public static function sendToMany(array $tokens, string $title, string $body, array $data = []): void
     {
-        $factory = (new Factory)->withServiceAccount(config('firebase.credentials'));
+       $factory = (new \Kreait\Firebase\Factory)
+    ->withServiceAccount(base_path('config/firebase/firebase_credentials.json'));
         $messaging = $factory->createMessaging();
 
         $notification = Notification::create($title, $body);
