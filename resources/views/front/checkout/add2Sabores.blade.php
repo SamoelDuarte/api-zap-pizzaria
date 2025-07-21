@@ -407,7 +407,17 @@
                 <div class="char-count" id="char-count1">0/140</div>
             </div>
 
-        
+            <div class="observation d-none">
+                <i class="fa fa-pencil"></i><small>Pizza 2</small>
+                <textarea id="observation2" rows="2" maxlength="140" placeholder="Alguma Observação?"></textarea>
+                <div class="char-count" id="char-count2">0/140</div>
+            </div>
+
+            <div class="observation">
+                <i class="fa fa-pencil"></i><small>Pizza 2</small>
+                <textarea id="observation3" rows="2" maxlength="140" placeholder="Alguma Observação?"></textarea>
+                <div class="char-count" id="char-count3">0/140</div>
+            </div>
         @endif
     </div>
     <div class="sobe" style="margin-top: 116px;"></div>
@@ -546,7 +556,13 @@
         function updateObservationText() {
             const observations = document.querySelectorAll('.observation');
 
-           
+            // Define as observações com base nos produtos selecionados
+            selectedProducts.forEach((productId, index) => {
+                const productName = document.querySelector(
+                    `.product-card[data-product-id="${productId}"] .product-title`).textContent;
+                observations[index].querySelector('small').innerHTML = productName;
+                observations[index].style.display = 'flex'; // Exibe a observação
+            });
 
             // Oculta observações restantes
             for (let i = selectedProducts.length; i < observations.length; i++) {
