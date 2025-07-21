@@ -272,18 +272,20 @@
         @foreach ($cart as $item)
             @php
                 $itemDetails = explode('/', $item['name']);
-                $pizzaName = trim($itemDetails[0]);
-                $flavorsCount = count($itemDetails) - 1;
-                $flavors = array_slice($itemDetails, 1);
+                $flavors = array_map('trim', $itemDetails);
+                $flavorsCount = count($flavors);
+
+                $pizzaTitle =
+                    $flavorsCount > 1
+                        ? implode(' / ', $flavors) // Exibe "Sabor 1 / Sabor 2"
+                        : $flavors[0];
+
                 $observations = explode(' / ', $item['observation']);
             @endphp
 
             <section class="item">
-                <h3 class="item-title">{{ $pizzaName }}</h3>
-                @if ($flavorsCount > 0)
-                    <p class="item-line"><strong>Tipo:</strong> {{ $flavorsCount + 1 }} Sabores</p>
-                    <p class="item-line"><strong>Sabores:</strong> {{ implode(', ', $flavors) }}</p>
-                @endif
+                <h3 class="item-title">{{ $pizzaTitle }}</h3>
+               
                 <p class="item-line"><strong>Borda:</strong> {{ $item['crust'] }} (R$
                     {{ number_format($item['crust_price'], 2, ',', '.') }})</p>
                 <p class="item-line"><strong>Quantidade:</strong> {{ $item['quantity'] }}</p>
