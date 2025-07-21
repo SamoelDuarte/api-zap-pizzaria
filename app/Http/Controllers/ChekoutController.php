@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\Base62Helper;
+use App\Helpers\FirebaseNotificationHelper;
 use App\Helpers\MessageHelper;
 use App\Models\Categories;
 use App\Models\Chat;
@@ -401,6 +402,14 @@ class ChekoutController extends Controller
             }
 
             DB::commit();
+
+            FirebaseNotificationHelper::sendToMany(
+                \App\Models\FirebaseToken::pluck('token')->toArray(),
+                "Novo pedido recebido",
+                "Pedido de {$cliente->name} no valor de R$ " . number_format($totalPedidoComEntrega, 2, ',', '.'),
+                ['order_id' => $pedido->id]
+            );
+
             session()->forget(['cart']);
 
             // Retornar igual no finish original
