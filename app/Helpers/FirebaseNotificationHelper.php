@@ -17,9 +17,12 @@ class FirebaseNotificationHelper
 
         $notification = Notification::create($title, $body);
 
-        $message = CloudMessage::new()
-            ->withNotification($notification)
-            ->withData($data);
+       $message = CloudMessage::new()
+    ->withNotification(Notification::create($title, $body))
+    ->withData([
+        'title' => $title,
+        'body' => $body,
+    ]);
 
         // Envia a mesma mensagem para todos os tokens
         $report = $messaging->sendMulticast($message, $tokens);
