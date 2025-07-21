@@ -15,6 +15,7 @@ class VerifyCsrfToken extends Middleware
         '/events',
         '/events/mensagemEmMassa',
         '/events/carrinhoAbandonado',
+        '/api/pedidos',
         'git-webhook',
         '/git-webhook',
         '/webhook',
