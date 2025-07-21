@@ -497,7 +497,17 @@
             document.getElementById('observation-input1').value = this.value;
         });
 
-     
+        document.getElementById('observation2').addEventListener('input', function() {
+            const charCount = this.value.length;
+            document.getElementById('char-count2').innerText = charCount + '/140';
+            document.getElementById('observation-input2').value = this.value;
+        });
+
+        document.getElementById('observation3').addEventListener('input', function() {
+            const charCount = this.value.length;
+            document.getElementById('char-count3').innerText = charCount + '/140';
+            document.getElementById('observation-input3').value = this.value;
+        });
 
         productCards.forEach(card => {
             card.addEventListener('click', function() {
@@ -536,13 +546,7 @@
         function updateObservationText() {
             const observations = document.querySelectorAll('.observation');
 
-            // Define as observações com base nos produtos selecionados
-            selectedProducts.forEach((productId, index) => {
-                const productName = document.querySelector(
-                    `.product-card[data-product-id="${productId}"] .product-title`).textContent;
-                observations[index].querySelector('small').innerHTML = productName;
-                observations[index].style.display = 'flex'; // Exibe a observação
-            });
+           
 
             // Oculta observações restantes
             for (let i = selectedProducts.length; i < observations.length; i++) {
@@ -697,11 +701,15 @@
                 crustId = 1; // Defina 1 como o valor padrão se nenhum tipo de borda for selecionado
             }
             const observation1 = document.getElementById('observation1').value;
+            const observation2 = document.getElementById('observation2').value;
+            const observation3 = document.getElementById('observation3').value;
 
             const formData = new FormData();
             formData.append('product_ids', JSON.stringify(productIds));
             formData.append('crust_id', crustId);
             formData.append('observation1', observation1);
+            formData.append('observation2', observation2);
+            formData.append('observation3', observation3);
             formData.append('_token', '{{ csrf_token() }}');
             if (brotoCheckbox && brotoCheckbox.checked) {
                 formData.append('is_broto', '1');
