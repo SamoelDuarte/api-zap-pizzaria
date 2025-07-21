@@ -481,16 +481,7 @@
             });
         });
     </script>
-    <script>
-        $(document).ajaxStart(function() {
-            $('#global-loader').css('display', 'flex'); // exibe com flex
-        });
-
-        $(document).ajaxStop(function() {
-            $('#global-loader').css('display', 'none'); // esconde
-        });
-    </script>
-
+  
     <script>
         const productCards = document.querySelectorAll('.product-card');
         const swipperContainer = document.getElementById('swipper-container');
