@@ -268,7 +268,7 @@ class OrderController extends Controller
                     'quantity' => $quantidade,
                     'crust' => $item['borda'] ?? 'Tradicional',
                     'crust_price' => $precoBorda, // <- borda separada
-                    'observation_primary' => $item['observacao'] ?? null,
+                    'observation' => $item['observacao'] ?? null,
                     'total' => $totalItem, // <- valor com borda
                 ]);
             }
