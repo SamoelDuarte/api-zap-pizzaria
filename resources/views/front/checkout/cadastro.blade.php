@@ -146,7 +146,7 @@
                         required>
                 </div>
                 <div class="form-group">
-                    <label for="complement">Complemento</label>
+                    <label for="complement">Ponto de Referência</label>
                     <input type="text" id="complement" name="complement" placeholder="Complemento"
                         value="{{ $customer->complement }}">
                 </div>
