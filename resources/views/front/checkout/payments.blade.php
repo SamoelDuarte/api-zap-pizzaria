@@ -360,7 +360,7 @@
                         <input type="checkbox" id="troco-checkbox"> Precisa de troco?
                     </label>
                     <div id="troco-field" style="display: none;">
-                        <label for="troco-amount">Valor do troco:</label>
+                        <label for="troco-amount">Troco para:</label>
                         <input type="text" id="troco-amount" class="money" min="0" step="0.01"
                             placeholder="0.00" name="troco_amount">
                     </div>
