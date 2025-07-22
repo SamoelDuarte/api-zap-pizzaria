@@ -28,13 +28,14 @@ class OrderController extends Controller
             'status',
             'motoboy'
         ])
-            ->whereBetween('created_at', [$inicio, $fim])
-            ->where('status_id', 2)
-            ->get()
-            ->groupBy(fn($pedido) => strtolower($pedido->customer->bairro ?? ''))
-            ->sortKeys()
-            ->flatMap(fn($group) => $group)
-            ->values();
+            ->join('customers', 'orders.customer_id', '=', 'customers.id')
+            ->whereBetween('orders.created_at', [$inicio, $fim])
+            ->where('orders.status_id', 2)
+            ->orderBy('customers.bairro', 'asc')
+            ->orderBy('orders.created_at', 'desc')
+            ->select('orders.*')
+            ->get();
+
 
         return response()->json([
             'success' => true,
