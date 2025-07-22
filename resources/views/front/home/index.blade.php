@@ -16,7 +16,7 @@
 </head>
 <body>
     <header>
-        <a href="#" class="logo">Benjamin  <i class="fa-solid fa-pizza-slice"></i> </a>
+        <a href="#" class="logo">Integra Pizzaria  <i class="fa-solid fa-pizza-slice"></i> </a>
         <nav class="navbar">
             <a href="#home">HOME</a>
             <a href="#dishes">PIZZA</a>

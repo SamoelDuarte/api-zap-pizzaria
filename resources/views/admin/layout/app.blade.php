@@ -66,7 +66,7 @@
 
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/dispositivo">
-                <div class="sidebar-brand-icon ">Benjamin</div>
+                <div class="sidebar-brand-icon ">Integra Pizzaria</div>
             </a>
             <!-- Divider -->
             <hr class="sidebar-divider my-0">

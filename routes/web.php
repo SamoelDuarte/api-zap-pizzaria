@@ -72,7 +72,6 @@ Route::prefix('/admin')->controller(AdminController::class)->group(function () {
 
 Route::prefix('/')->controller(HomeController::class)->group(function () {
     Route::get('/', 'index');
-    Route::get('/1', 'index2');
 });
 
 Route::prefix('/checkout')->controller(ChekoutController::class)->group(function () {
