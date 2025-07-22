@@ -1,245 +1,103 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
-/>
-<link rel="stylesheet" href="../style.css">
-    <title>Meu Site em Breve</title>
-    <!-- Adicione links para bibliotecas externas via CDN aqui, se necessário -->
-    <!-- Exemplo: <link rel="stylesheet" href="https://example.com/style.css"> -->
-    <!-- Exemplo: <script src="https://example.com/script.js"></script> -->
-    
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Integra Pizzaria</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      background: #fff8f0;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      text-align: center;
+    }
+
+    .container {
+      padding: 20px;
+      max-width: 400px;
+      width: 90%;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    p {
+      margin-bottom: 20px;
+      font-size: 1rem;
+    }
+
+    input[type="tel"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+
+    button {
+      background-color: #e63946;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: #d62828;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      color: #e63946;
+      margin-bottom: 20px;
+      display: inline-block;
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <a href="#" class="logo">Integra Pizzaria  <i class="fa-solid fa-pizza-slice"></i> </a>
-        <nav class="navbar">
-            <a href="#home">HOME</a>
-            <a href="#dishes">PIZZA</a>
-            <a href="#">BEBIDAS</a>
-            <a href="#">PORÇÕES</a>
-            <a href="#">CONTATO</a>
-        </nav>
 
-        <div class="icons">
-            <i class="fas fa-bars" id="menu-bars"></i>
-            <i class="fas fa-search" id="search-icon"></i>
-            <a href="#" class="fas fa-heart"></a>
-            <a href="checkout" class="fas fa-shopping-cart"></a>
-        </div>
-    </header>
+  <div class="container">
+    <div class="logo"><i class="fa-solid fa-pizza-slice"></i> Integra Pizzaria</div>
+    <h1>Bem-vindo!</h1>
+    <p>Faça seu pedido agora mesmo. Digite seu número de celular:</p>
+    
+    <input type="tel" id="phone" placeholder="Ex: 11999999999" />
+    <button onclick="fazerPedido()">Fazer Pedido</button>
+  </div>
 
-    <form action="" id="search-form">
-        <input type="search" placeholder="Procurar..." name="" id="search-box">
-        <label for="search-box" class="fas fa-search"></label>
-        <i class="fas fa-times" id="close"></i>
-    </form>
+  <script>
+    function fazerPedido() {
+      let phone = document.getElementById('phone').value.trim();
+      phone = phone.replace(/\D/g, ''); // Remove qualquer caractere que não for número
 
-    <section class="home" id="home">
+      if (phone.length < 10 || phone.length > 13) {
+        alert('Por favor, insira um número de celular válido.');
+        return;
+      }
 
-        <div class="swiper mySwiper home-slider">
+      if (!phone.startsWith('55')) {
+        phone = '55' + phone;
+      }
 
-            <div class="swiper-wrapper wrapper">
-                <div class="swiper-slide slide">
-                    <div class="content">
-                        <span>Pizzaria Bologne</span>
-                        <h3>Monte do seu jeito!</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-                        <a href="#" class="btn">Proximo</a>
-                    </div>
-                    <div class="image">
-                        <img src="https://img.freepik.com/fotos-premium/pizza-isolada-em-fundo-branco-ia-generativa_74760-6895.jpg" alt="">
-                    </div>
-                </div>
-
-
-                <div class="swiper-slide slide">
-                    <div class="content">
-                        <span>Pizzaria Bologne</span>
-                        <h3>Monte do seu jeito!</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-                        <a href="#" class="btn">Proximo</a>
-                    </div>
-                    <div class="image">
-                        <img src="https://i.pinimg.com/736x/30/74/75/3074756e1c21d6a7e8e14ee339df13e7.jpg" alt="">
-                    </div>
-                </div>
-
-                <div class="swiper-slide slide">
-                    <div class="content">
-                        <span>Pizzaria Bologne</span>
-                        <h3>Monte do seu jeito!</h3>
-                        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-                        <a href="#" class="btn">Proximo</a>
-                    </div>
-                    <div class="image">
-                        <img src="https://img.freepik.com/fotos-premium/uma-pizza-com-calabresa-em-um-fundo-branco_900101-25781.jpg" alt="">
-                    </div>
-                </div>
-
-
-            </div>
-            <div class="swiper-pagination"></div>
-        </div>
-    </section>
-
-    <section class="dishes" id="dishes">
-        <h3 class="sub-heading">Pizzas</h3>
-        <h1 class="heading">Bejamim Pizzas</h1>
-
-        <div class="box-container">
-            <div class="box">
-                <a href="#" class="fas fa-heart"></a>
-                <a href="#" class="fas fa-eye"></a>
-                <img src="#" alt="">
-                <h3>Delyveri</h3>
-                <div class="stars">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star-half-alt"></i>
-                </div>
-                <span>Valor $$$</span>
-                <a href="#" class="btn"> add ao carrinho</a>
-            </div>
-
-            <div class="box">
-                <a href="#" class="fas fa-heart"></a>
-                <a href="#" class="fas fa-eye"></a>
-                <img src="#" alt="">
-                <h3>Delyveri</h3>
-                <div class="stars">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star-half-alt"></i>
-                </div>
-                <span>Valor $$$</span>
-                <a href="#" class="btn"> add ao carrinho</a>
-            </div>
-
-            <div class="box">
-                <a href="#" class="fas fa-heart"></a>
-                <a href="#" class="fas fa-eye"></a>
-                <img src="#" alt="">
-                <h3>Delyveri</h3>
-                <div class="stars">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star-half-alt"></i>
-                </div>
-                <span>Valor $$$</span>
-                <a href="#" class="btn"> add ao carrinho</a>
-            </div>
-
-            <div class="box">
-                <a href="#" class="fas fa-heart"></a>
-                <a href="#" class="fas fa-eye"></a>
-                <img src="#" alt="">
-                <h3>Delyveri</h3>
-                <div class="stars">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star-half-alt"></i>
-                </div>
-                <span>Valor $$$</span>
-                <a href="#" class="btn"> add ao carrinho</a>
-            </div>
-
-            <div class="box">
-                <a href="#" class="fas fa-heart"></a>
-                <a href="#" class="fas fa-eye"></a>
-                <img src="#" alt="">
-                <h3>Delyveri</h3>
-                <div class="stars">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star-half-alt"></i>
-                </div>
-                <span>Valor $$$</span>
-                <a href="#" class="btn"> add ao carrinho</a>
-            </div>
-
-            <div class="box">
-                <a href="#" class="fas fa-heart"></a>
-                <a href="#" class="fas fa-eye"></a>
-                <img src="#" alt="">
-                <h3>Delyveri</h3>
-                <div class="stars">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star-half-alt"></i>
-                </div>
-                <span>Valor $$$</span>
-                <a href="#" class="btn"> add ao carrinho</a>
-            </div>
-
-            <div class="box">
-                <a href="#" class="fas fa-heart"></a>
-                <a href="#" class="fas fa-eye"></a>
-                <img src="#" alt="">
-                <h3>Delyveri</h3>
-                <div class="stars">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star-half-alt"></i>
-                </div>
-                <span>Valor $$$</span>
-                <a href="#" class="btn"> add ao carrinho</a>
-            </div>
-
-            <div class="box">
-                <a href="#" class="fas fa-heart"></a>
-                <a href="#" class="fas fa-eye"></a>
-                <img src="#" alt="">
-                <h3>Delyveri</h3>
-                <div class="stars">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star-half-alt"></i>
-                </div>
-                <span>Valor $$$</span>
-                <a href="#" class="btn"> add ao carrinho</a>
-            </div>
-
-            <div class="box">
-                <a href="#" class="fas fa-heart"></a>
-                <a href="#" class="fas fa-eye"></a>
-                <img src="#" alt="">
-                <h3>Delyveri</h3>
-                <div class="stars">
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star"></i>
-                    <i class="fas fa-star-half-alt"></i>
-                </div>
-                <span>Valor $$$</span>
-                <a href="#" class="btn"> add ao carrinho</a>
-            </div>
-        </div>
-    </section> 
-
-
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script src="../script.js"></script>
+      window.location.href = `/checkout/pedido/${phone}`;
+    }
+  </script>
 </body>
 </html>
