@@ -28,17 +28,12 @@ class OrderController extends Controller
             'status',
             'motoboy'
         ])
-            ->join('customers', 'orders.customer_id', '=', 'customers.id')
-            ->whereBetween('orders.created_at', [$inicio, $fim])
-            ->where('orders.status_id', 2)
-            ->orderBy('orders.created_at', 'asc')
-            ->orderBy('customers.neighborhood', 'asc')
-            ->select('orders.*')
-            ->get();
+            ->whereBetween('created_at', [$inicio, $fim])
+            ->where('status_id', 2)
+            ->get()
+            ->groupBy(fn($pedido) => strtolower($pedido->customer->neighborhood ?? '')) // agrupando por bairro em minúsculas
+            ->flatMap(fn($group) => $group); // junta de volta em uma lista linear mantendo agrupamento
 
-        $pedidos = $pedidos->groupBy(function ($pedido) {
-            return strtolower(trim($pedido->customer->bairro));
-        })->flatten();
 
 
         return response()->json([
