@@ -24,7 +24,8 @@ class CreateOrderStatusesTable extends Migration
         DB::table('order_statuses')->insert([
             ['name' => 'Pendente', 'color' => '#FFA500'], // Laranja
             ['name' => 'Processando', 'color' => '#FFD700'], // Dourado
-            ['name' => 'Completo', 'color' => '#32CD32'], // Verde
+            ['name' => 'Finalizado', 'color' => '#32CD32'], // Verde
+            ['name' => 'Aguardando Motoboy', 'color' => '#9724ccff'], 
             ['name' => 'Cancelado', 'color' => '#FF0000'], // Vermelho
             ['name' => 'Saiu Para Entrega', 'color' => '#4169E1'], // Azul Royal
         ]);

@@ -243,15 +243,20 @@ class OrderController extends Controller
 
             // Troco (se houver)
             $troco = $totalPago > $totalPedidoComEntrega ? $totalPago - $totalPedidoComEntrega : 0;
-            // dd($troco);
-            // Cria pedido com troco
+
+
+            // Verifica se algum pagamento é via Pix
+            $pagamentoViaPix = collect($pagamentos)->contains(function ($pagamento) {
+                return strtolower($pagamento['forma']) === 'pix';
+            });
+            $statusId = $pagamentoViaPix ? 1 : 2; // ou outro valor se quiser quando **não** for Pix
+
             $pedido = Order::create([
                 'customer_id' => $cliente->id,
-                'status_id' => '1',
+                'status_id' => $statusId,
                 'change_for' => $troco > 0 ? $troco : null,
                 'delivery_fee' => floatval($request->input('delivery_fee', 0)),
             ]);
-
             // Salva os itens
             foreach ($todosProdutos as $item) {
                 $valor = floatval($item['valor']);

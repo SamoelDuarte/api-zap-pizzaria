@@ -321,6 +321,10 @@ class ChekoutController extends Controller
                 $observation = 'Troco para: R$ ' . number_format($trocoAmount, 2, ',', '.');
             }
         }
+        $statusId = 2;
+        if ($paymentMethod == 'Pix') {
+            $statusId = 1;
+        }
 
         // --- Aqui começa a lógica do storeFromAdmin adaptada ---
 
@@ -360,7 +364,7 @@ class ChekoutController extends Controller
             // Cria pedido (sem total_price)
             $pedido = Order::create([
                 'customer_id' => $cliente->id,
-                'status_id' => 1,
+                'status_id' => $statusId,
                 'change_for' => $troco > 0 ? $troco : null,
                 'delivery_fee' => $taxaEntrega,
                 'observation' => $observation,
@@ -403,12 +407,12 @@ class ChekoutController extends Controller
 
             DB::commit();
 
-            FirebaseNotificationHelper::sendToMany(
-                \App\Models\FirebaseToken::pluck('token')->toArray(),
-                "Novo pedido recebido",
-                "Pedido de {$cliente->name} no valor de R$ " . number_format($totalPedidoComEntrega, 2, ',', '.'),
-                ['order_id' => $pedido->id]
-            );
+            // FirebaseNotificationHelper::sendToMany(
+            //     \App\Models\FirebaseToken::pluck('token')->toArray(),
+            //     "Novo pedido recebido",
+            //     "Pedido de {$cliente->name} no valor de R$ " . number_format($totalPedidoComEntrega, 2, ',', '.'),
+            //     ['order_id' => $pedido->id]
+            // );
 
             session()->forget(['cart']);
 
