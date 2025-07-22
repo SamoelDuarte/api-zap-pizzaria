@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\admin\MotoboyController;
 use App\Http\Controllers\Api\FirebaseTokenController;
 use App\Http\Controllers\Api\OrderController;
 use Illuminate\Http\Request;
@@ -18,6 +19,13 @@ use Illuminate\Support\Facades\Route;
 Route::get('/pedidos', [OrderController::class, 'index']);
 Route::post('/salvar-token', [FirebaseTokenController::class, 'store']);
 Route::post('/pedidos/{id}/finalizar', [OrderController::class, 'marcarComoFeito']);
+
+// routes/api.php
+Route::get('/motoboys', [MotoboyController::class, 'get']);
+// routes/api.php
+Route::post('/atribuir-motoboy', [OrderController::class, 'atribuirMotoboy']);
+
+
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

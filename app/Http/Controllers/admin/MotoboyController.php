@@ -3,6 +3,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Motoboy;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class MotoboyController extends Controller
@@ -16,6 +17,12 @@ class MotoboyController extends Controller
     public function create()
     {
         return view('admin.motoboy.create');
+    }
+    public function get(): JsonResponse
+    {
+        $motoboys = Motoboy::select('id', 'name', 'phone')->get();
+
+        return response()->json($motoboys);
     }
 
     public function store(Request $request)
