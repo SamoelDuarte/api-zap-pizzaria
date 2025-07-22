@@ -67,7 +67,7 @@ class OrderController extends Controller
 
         // Atualiza o pedido
         $order->motoboy_id = $motoboy->id;
-        $order->status_id = 2; // Exemplo: status "Saiu para entrega"
+        $order->status_id = 6; // Exemplo: status "Saiu para entrega"
         $order->save();
 
         // -----------------------------
