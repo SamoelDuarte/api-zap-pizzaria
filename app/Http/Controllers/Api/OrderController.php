@@ -41,4 +41,13 @@ class OrderController extends Controller
             'data' => $pedidos
         ]);
     }
+
+    public function marcarComoFeito($id)
+    {
+        $order = Order::findOrFail($id);
+        $order->status_id = 4;
+        $order->save();
+
+        return response()->json(['success' => true, 'message' => 'Pedido finalizado']);
+    }
 }
