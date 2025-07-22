@@ -31,8 +31,8 @@ class OrderController extends Controller
             ->join('customers', 'orders.customer_id', '=', 'customers.id')
             ->whereBetween('orders.created_at', [$inicio, $fim])
             ->where('orders.status_id', 2)
+            ->orderBy('orders.created_at', 'asc')
             ->orderBy('customers.neighborhood', 'asc')
-            ->orderBy('orders.created_at', 'desc')
             ->select('orders.*')
             ->get();
 
