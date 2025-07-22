@@ -24,16 +24,18 @@ class OrderController extends Controller
         }
 
         $pedidos = Order::with([
-            'customer', // sem .address, pois os campos estão diretos
+            'customer',
             'items',
             'pagamentos.paymentMethod',
             'status',
             'motoboy'
         ])
             ->whereBetween('created_at', [$inicio, $fim])
-            ->where('status_id' , 2)
-            ->orderBy('created_at', 'asc')
-            ->get();
+            ->where('status_id', 2)
+            ->get()
+            ->groupBy(fn($pedido) => strtolower($pedido->customer->bairro ?? '')) // agrupando por bairro em minúsculas
+            ->flatMap(fn($group) => $group); // junta de volta em uma lista linear mantendo agrupamento
+
 
 
         return response()->json([
