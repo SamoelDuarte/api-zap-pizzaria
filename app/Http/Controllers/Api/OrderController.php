@@ -14,26 +14,31 @@ class OrderController extends Controller
         $agora = Carbon::now();
 
         if ($agora->hour < 4) {
-            // Ainda conta como "ontem"
-            $inicio = $agora->copy()->subDay()->setTime(4, 0, 0); // ontem às 04:00
+            $inicio = $agora->copy()->subDay()->setTime(4, 0, 0);
             $fim = $agora;
         } else {
-            // Dia atual a partir das 04:00
             $inicio = $agora->copy()->setTime(4, 0, 0);
-            $fim = Carbon::now(); // agora
+            $fim = Carbon::now();
         }
 
         $pedidos = Order::with([
-            'customer', // sem .address, pois os campos estão diretos
+            'customer',
             'items',
             'pagamentos.paymentMethod',
             'status',
             'motoboy'
         ])
-            ->whereBetween('created_at', [$inicio, $fim])
-            ->where('status_id' , 2)
-            ->orderBy('created_at', 'asc')
+            ->join('customers', 'orders.customer_id', '=', 'customers.id')
+            ->whereBetween('orders.created_at', [$inicio, $fim])
+            ->where('orders.status_id', 2)
+            ->orderBy('customers.neighborhood', 'asc')
+            ->orderBy('orders.created_at', 'desc')
+            ->select('orders.*')
             ->get();
+
+        $pedidos = $pedidos->groupBy(function ($pedido) {
+            return strtolower(trim($pedido->customer->bairro));
+        })->flatten();
 
 
         return response()->json([
