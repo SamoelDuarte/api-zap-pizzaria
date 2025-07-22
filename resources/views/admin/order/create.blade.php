@@ -16,7 +16,7 @@
                                 <div class="mb-3 position-relative">
                                     <label for="telefone" class="form-label">Telefone do Cliente</label>
                                     <input type="text" class="form-control" id="telefone" name="telefone"
-                                        autocomplete="off" required
+                                        autocomplete="off" 
                                         oninvalid="this.setCustomValidity('O campo Telefone deve ser preenchido.')"
                                         oninput="this.setCustomValidity('')">
 
@@ -40,7 +40,7 @@
                                 <div class="mb-3">
                                     <label for="logradouro" class="form-label">Logradouro</label>
                                     <input type="text" class="form-control" id="logradouro" name="logradouro"
-                                        autocomplete="off" required
+                                        autocomplete="off" 
                                         oninvalid="this.setCustomValidity('O campo Logradouro deve ser preenchido.')"
                                         oninput="this.setCustomValidity('')">
                                 </div>
@@ -49,7 +49,7 @@
                                 <div class="mb-3">
                                     <label for="numero" class="form-label">Número</label>
                                     <!-- Número -->
-                                    <input type="text" class="form-control" id="numero" name="numero" required
+                                    <input type="text" class="form-control" id="numero" name="numero" 
                                         oninvalid="this.setCustomValidity('O campo Número deve ser preenchido.')"
                                         oninput="this.setCustomValidity('')">
                                 </div>
@@ -326,6 +326,34 @@
     <script>
         const inputBroto = document.getElementById('produto_unidade_broto');
         const checkboxBroto = document.getElementById('meia_broto');
+    </script>
+
+    <script>
+        document.getElementById('formPedido').addEventListener('submit', function(e) {
+            const pagamentosContainer = document.getElementById('inputs_pagamentos');
+            const produtosContainer = document.getElementById(
+            'inputs_ocultos'); // ou o container onde você insere os inputs hidden dos produtos
+            const pizzasMeiaContainer = document.getElementById('inputs_ocultos_meia');
+            const produtosSimplesContainer = document.getElementById('inputs_ocultos_simples');
+
+            const temPagamento = pagamentosContainer.children.length > 0;
+            // Considerando produtos: pode ter pizzas inteira, meia a meia e produto simples
+            const temProduto = produtosContainer.children.length > 0 ||
+                pizzasMeiaContainer.children.length > 0 ||
+                produtosSimplesContainer.children.length > 0;
+
+            if (!temProduto) {
+                e.preventDefault();
+                alert('Por favor, adicione pelo menos um produto ao pedido.');
+                return false;
+            }
+
+            if (!temPagamento) {
+                e.preventDefault();
+                alert('Por favor, adicione pelo menos uma forma de pagamento.');
+                return false;
+            }
+        });
     </script>
 
     {{-- susgestaode cliente --}}

@@ -177,7 +177,7 @@ class ProductController extends Controller
     {
         $nome = $request->get('nome');
         $produtos = Product::where('name', 'like', "%{$nome}%")
-            ->whereNotIn('category_id', [1, 2, 3, 4])
+            ->whereNotIn('category_id', [1, 2])
             ->select('id', 'name', 'price')
             ->limit(10)
             ->get();
