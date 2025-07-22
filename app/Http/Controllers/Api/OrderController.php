@@ -32,9 +32,12 @@ class OrderController extends Controller
         ])
             ->whereBetween('created_at', [$inicio, $fim])
             ->where('status_id', 2)
-            ->get()
-            ->groupBy(fn($pedido) => strtolower($pedido->customer->bairro ?? '')) // agrupando por bairro em minúsculas
-            ->flatMap(fn($group) => $group); // junta de volta em uma lista linear mantendo agrupamento
+            ->join('customers', 'orders.customer_id', '=', 'customers.id')
+            ->orderBy('customers.bairro') // ordena por bairro
+            ->orderBy('orders.created_at', 'desc')
+            ->select('orders.*') // importante: selecionar só a tabela orders
+            ->get();
+
 
 
 
