@@ -36,6 +36,10 @@ class OrderController extends Controller
             ->select('orders.*')
             ->get();
 
+        $pedidos = $pedidos->groupBy(function ($pedido) {
+            return strtolower(trim($pedido->customer->bairro));
+        })->flatten();
+
 
         return response()->json([
             'success' => true,
