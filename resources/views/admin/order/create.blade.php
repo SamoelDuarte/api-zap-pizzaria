@@ -1378,7 +1378,8 @@
                 const inputContainer = document.getElementById('inputs_ocultos_simples');
 
                 // Limpa os inputs ocultos antigos
-                document.querySelectorAll('[id^="produto_simples_"]').forEach(el => el.remove());
+                document.querySelectorAll('#inputs_ocultos_simples [id^="produto_simples_"]').forEach(el => el.remove());
+
 
                 produtosSimples.forEach((produto, index) => {
                     const total = produto.total.toFixed(2);
