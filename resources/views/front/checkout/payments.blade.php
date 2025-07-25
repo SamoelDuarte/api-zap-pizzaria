@@ -383,7 +383,7 @@
                 <div id="pix-options" style="display: none;">
                     <p>Use o seguinte código PIX para pagamento:</p>
                     <div style="display: flex; align-items: center;">
-                        <textarea id="pix-code" rows="4" cols="50" readonly>11986123660</textarea>
+                        <textarea id="pix-code" rows="4" cols="50" readonly>59.423.821.0001-83</textarea>
                         <button type="button" id="copy-pix-btn" style="margin-left: 10px;">Copiar</button>
                     </div>
                     <small style="color: #ed291e;">Após efetuar o pagamento ,envie o comprovante para finalizar o
