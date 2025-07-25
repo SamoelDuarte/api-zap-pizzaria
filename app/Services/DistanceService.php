@@ -73,8 +73,10 @@ class DistanceService
     {
         if ($distance <= 1) {
             return 3.00;
+        } elseif ($distance <= 2) {
+            return 5.00;
         } else {
-            return 3.00 + ceil($distance - 1) * 1.00;
+            return 5.00 + ceil($distance - 2) * 1.00;
         }
     }
 }
