@@ -22,6 +22,40 @@ class WebhookController extends Controller
         $raw = $request->getContent();
         $data = json_decode($raw, true);
 
+
+        $fromMe = $data['data']['key']['fromMe'] ?? null;
+        if ($fromMe === true) {
+            $numeroCompleto = $data['data']['key']['remoteJid'] ?? null;
+            if (!$numeroCompleto) {
+                return response()->json(['erro' => 'Número não encontrado'], 422);
+            }
+
+            $numero = preg_replace('/[^0-9]/', '', $numeroCompleto);
+            if (str_starts_with($numero, '55')) {
+                $numero = substr($numero, 2);
+            }
+
+            $jid = "55{$numero}";
+
+            // Cria ou atualiza chat com stage "eu_iniciei"
+            $chat = Chat::updateOrCreate(
+                ['jid' => $jid],
+                [
+                    'active' => true,
+                    'flow_stage' => 'eu_iniciei',
+                    'erro' => 0,
+                    'await_answer' => null,
+                    'session_id' => Device::where('status', 'open')->first()?->id,
+                    'service_id' => null,
+                ]
+            );
+
+            Log::info("Chat criado/iniciado por mim mesmo ({$jid}), sem enviar mensagem.");
+
+            return response()->json(['status' => 'Chat criado a partir de mensagem minha, sem envio de mensagem']);
+        }
+
+
         if (json_last_error() !== JSON_ERROR_NONE) {
             return response()->json(['erro' => 'JSON inválido'], 400);
         }
