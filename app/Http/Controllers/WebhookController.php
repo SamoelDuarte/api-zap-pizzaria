@@ -17,6 +17,8 @@ class WebhookController extends Controller
 {
     public function evento(Request $request)
     {
+
+
         $raw = $request->getContent();
         $data = json_decode($raw, true);
 
@@ -36,7 +38,13 @@ class WebhookController extends Controller
         }
 
         $jid = "55{$numero}";
-
+        $agora = \Carbon\Carbon::now();
+        if ($agora->hour >= 1 && $agora->hour < 18) {
+            Log::info("Mensagem não enviada para {$jid}, horário entre 01:00 e 18:00.");
+            return response()->json([
+                'status' => 'Fora do horário permitido para envio (somente entre 18:00 e 00:59)',
+            ]);
+        }
         // Verifica se já existe um chat ativo
         $chat = Chat::where('jid', $jid)->where('active', true)->first();
 
