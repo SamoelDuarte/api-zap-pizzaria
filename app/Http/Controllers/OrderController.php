@@ -34,8 +34,12 @@ class OrderController extends Controller
             'motoboy'
         ]);
 
+        // Pega pedidos de hoje até as 4h da manhã do dia seguinte
+        $start = Carbon::today(); // 00:00 de hoje
+        $end = Carbon::tomorrow()->setHour(4); // 04:00 do dia seguinte
 
-        $query->whereDate('created_at', Carbon::today());
+        $query->whereBetween('created_at', [$start, $end]);
+
         $orders = $query->latest()->get();
         $motoboys = Motoboy::all();
         Order::where('notify', 0)->update(['notify' => 1]);
@@ -43,6 +47,7 @@ class OrderController extends Controller
 
         return view('admin.order.index', compact('orders', 'statuses', 'motoboys'));
     }
+
 
 
     public function motoboyLista()
