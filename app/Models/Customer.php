@@ -84,7 +84,7 @@ class Customer extends Model
 
     public function getDeliveryFeeAttribute()
     {
-        $address1 = 'Rua Nova Providência, 593, Parque Bologne, SP';
+        $address1 = 'Rua José Alves da silva , 429, Parque Novo Santo Amaro, SP';
         $address2 = "{$this->number} {$this->public_place}, {$this->neighborhood}, {$this->city}, {$this->state}";
 
         $coords1 = $this->getCoordinates($address1);
@@ -174,12 +174,13 @@ class Customer extends Model
     {
         if ($distance <= 1) {
             return 3.00;
-        } elseif ($distance > 1 && $distance <= 2) {
-            return 4.00;
+        } elseif ($distance <= 2) {
+            return 5.00;
         } else {
-            return 4.00 + (($distance - 2) * 2.00);
+            return 5.00 + ceil($distance - 2) * 1.00;
         }
     }
+
 
     public function orders()
     {
