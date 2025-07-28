@@ -63,6 +63,18 @@
                                 <button id="limpar-filtros" class="btn btn-secondary w-100">Limpar</button>
                             </div>
                         </div>
+                        <div class="col-md-4">
+                            <form method="GET" action="{{ route('admin.order.index') }}">
+                                <div class="input-group">
+                                    <input type="date" name="start_date" class="form-control"
+                                        value="{{ request('start_date') ?? $start->format('Y-m-d') }}">
+                                    <span class="input-group-text">a</span>
+                                    <input type="date" name="end_date" class="form-control"
+                                        value="{{ request('end_date') ?? $end->format('Y-m-d') }}">
+                                    <button type="submit" class="btn btn-primary">Filtrar</button>
+                                </div>
+                            </form>
+                        </div>
 
                         <div class="table-device">
                             <table class="table table-bordered" id="table-order">

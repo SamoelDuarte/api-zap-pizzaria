@@ -24,37 +24,31 @@ use Yajra\DataTables\Facades\DataTables;
 
 class OrderController extends Controller
 {
-   public function index(Request $request)
-{
-    $now = Carbon::now();
+    public function index(Request $request)
+    {
+        $start = $request->query('start_date')
+            ? Carbon::parse($request->query('start_date'))->startOfDay()
+            : (Carbon::now()->hour < 4 ? Carbon::yesterday() : Carbon::today());
 
-    // Se agora for antes das 4h, consideramos "o dia ainda é ontem"
-    if ($now->hour < 4) {
-        $start = Carbon::yesterday();
-        $end = Carbon::today()->setHour(4);
-    } else {
-        $start = Carbon::today();
-        $end = Carbon::tomorrow()->setHour(4);
+        $end = $request->query('end_date')
+            ? Carbon::parse($request->query('end_date'))->endOfDay()
+            : (Carbon::now()->hour < 4 ? Carbon::today()->setHour(4) : Carbon::tomorrow()->setHour(4));
+
+        $query = Order::with([
+            'customer',
+            'items',
+            'payments.paymentMethod',
+            'status',
+            'motoboy'
+        ])->whereBetween('created_at', [$start, $end]);
+
+        $orders = $query->latest()->get();
+        $motoboys = Motoboy::all();
+        Order::where('notify', 0)->update(['notify' => 1]);
+        $statuses = \App\Models\OrderStatus::all();
+
+        return view('admin.order.index', compact('orders', 'statuses', 'motoboys', 'start', 'end'));
     }
-
-    $query = Order::with([
-        'customer',
-        'items',
-        'payments.paymentMethod',
-        'status',
-        'motoboy'
-    ])->whereBetween('created_at', [$start, $end]);
-
-    $orders = $query->latest()->get();
-    $motoboys = Motoboy::all();
-    Order::where('notify', 0)->update(['notify' => 1]);
-    $statuses = \App\Models\OrderStatus::all();
-
-    return view('admin.order.index', compact('orders', 'statuses', 'motoboys'));
-}
-
-
-
 
     public function motoboyLista()
     {
