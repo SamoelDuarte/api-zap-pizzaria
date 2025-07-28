@@ -11,12 +11,13 @@
                 <div class="card-body">
                     <form action="{{ route('admin.pedidos.finalizar') }}" id="formPedido" method="POST">
                         @csrf
+
                         <div class="row">
                             <div class="col-md-2">
                                 <div class="mb-3 position-relative">
                                     <label for="telefone" class="form-label">Telefone do Cliente</label>
                                     <input type="text" class="form-control" id="telefone" name="telefone"
-                                        autocomplete="off" 
+                                        autocomplete="off"
                                         oninvalid="this.setCustomValidity('O campo Telefone deve ser preenchido.')"
                                         oninput="this.setCustomValidity('')">
 
@@ -40,7 +41,7 @@
                                 <div class="mb-3">
                                     <label for="logradouro" class="form-label">Logradouro</label>
                                     <input type="text" class="form-control" id="logradouro" name="logradouro"
-                                        autocomplete="off" 
+                                        autocomplete="off"
                                         oninvalid="this.setCustomValidity('O campo Logradouro deve ser preenchido.')"
                                         oninput="this.setCustomValidity('')">
                                 </div>
@@ -49,7 +50,7 @@
                                 <div class="mb-3">
                                     <label for="numero" class="form-label">Número</label>
                                     <!-- Número -->
-                                    <input type="text" class="form-control" id="numero" name="numero" 
+                                    <input type="text" class="form-control" id="numero" name="numero"
                                         oninvalid="this.setCustomValidity('O campo Número deve ser preenchido.')"
                                         oninput="this.setCustomValidity('')">
                                 </div>
@@ -62,9 +63,9 @@
                                     <input type="text" class="form-control" id="cidade" name="cidade">
                                 </div>
                             </div>
+
                         </div>
                         <div class="row">
-
                             <div class="col-md-2">
                                 <div class="mb-3">
                                     <label for="referencia" class="form-label">Ponto de Referência</label>
@@ -75,6 +76,15 @@
                                 <div class="mb-3">
                                     <label for="bairro" class="form-label">Bairro</label>
                                     <input type="text" class="form-control" id="bairro" name="bairro">
+                                </div>
+                            </div>
+                           <div class="col-md-1 d-flex align-items-center">
+                                            <div class="form-check mt-4">
+                                    <label class="form-label" for="retirada">
+                                        Para retirada
+                                    </label>
+                                    <input class="form-input form-control" type="checkbox" id="retirada" name="retirada"
+                                        value="1">
                                 </div>
                             </div>
 
@@ -332,7 +342,7 @@
         document.getElementById('formPedido').addEventListener('submit', function(e) {
             const pagamentosContainer = document.getElementById('inputs_pagamentos');
             const produtosContainer = document.getElementById(
-            'inputs_ocultos'); // ou o container onde você insere os inputs hidden dos produtos
+                'inputs_ocultos'); // ou o container onde você insere os inputs hidden dos produtos
             const pizzasMeiaContainer = document.getElementById('inputs_ocultos_meia');
             const produtosSimplesContainer = document.getElementById('inputs_ocultos_simples');
 
@@ -472,6 +482,56 @@
             });
         });
     </script>
+    {{-- retirada no local  --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const retiradaCheckbox = document.getElementById('retirada');
+            const numeroInput = document.getElementById('numero');
+            const cepInput = document.getElementById('cep');
+
+            retiradaCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    // Para retirada → zera a taxa e recalcula o total
+                    criarOuAtualizarInput('delivery_fee', 0);
+                    recalcularTotal();
+                } else {
+                    // Se desmarcar e tiver CEP + número, tenta recalcular a taxa
+                    const cep = cepInput.value.replace(/\D/g, '');
+                    const numero = numeroInput.value.trim();
+
+                    if (cep.length === 8 && numero) {
+                        const enderecoCompleto =
+                            `${document.getElementById('logradouro').value}, ${numero}, ${document.getElementById('bairro').value}, ${document.getElementById('cidade').value}, ${document.getElementById('uf')?.value || ''}`;
+
+                        fetch('/pedidos/calcular-taxa-entrega', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                        .content
+                                },
+                                body: JSON.stringify({
+                                    destino: enderecoCompleto
+                                })
+                            })
+                            .then(async response => {
+                                const result = await response.json();
+                                if (!response.ok) {
+                                    alert(result.erro || 'Erro ao calcular a taxa de entrega.');
+                                    return;
+                                }
+                                criarOuAtualizarInput('delivery_fee', result.taxa);
+                                recalcularTotal();
+                            })
+                            .catch(() => {
+                                alert('Erro ao se comunicar com o servidor.');
+                            });
+                    }
+                }
+            });
+        });
+    </script>
+
     {{-- busca cep --}}
     <script>
         document.getElementById('cep').addEventListener('input', function(e) {
@@ -487,6 +547,10 @@
 
         document.getElementById('cep').addEventListener('keyup', function(e) {
             const cep = this.value.replace(/\D/g, '');
+
+            // Verifica se está marcado para retirada
+            const isRetirada = document.getElementById('retirada')?.checked;
+            if (isRetirada) return; // se for retirada, não calcula a taxa
 
             if (cep.length === 8) {
                 fetch(`https://viacep.com.br/ws/${cep}/json/`)
@@ -511,6 +575,9 @@
                                 const numero = numeroInput.value.trim();
                                 if (!numero) return;
 
+                                // Verifica de novo se é retirada
+                                if (document.getElementById('retirada')?.checked) return;
+
                                 const enderecoCompleto =
                                     `${data.logradouro}, ${numero}, ${data.bairro}, ${data.localidade}, ${data.uf}`;
 
@@ -533,18 +600,17 @@
                                                 'Erro ao calcular a taxa de entrega.');
                                             return;
                                         }
-                                        recalcularTotal(); // <-- chama aqui!
+
                                         console.log('Taxa de entrega calculada:', result.taxa);
                                         criarOuAtualizarInput('delivery_fee', result.taxa);
                                         recalcularTotal();
-
                                     })
                                     .catch(() => {
                                         alert('Erro ao se comunicar com o servidor.');
                                     });
                             }, {
                                 once: true
-                            }); // adiciona o evento só uma vez
+                            });
                         }
                     })
                     .catch(() => {
@@ -552,6 +618,7 @@
                     });
             }
         });
+
 
         function criarOuAtualizarInput(name, valor) {
             let input = document.getElementById(name);
@@ -1378,7 +1445,8 @@
                 const inputContainer = document.getElementById('inputs_ocultos_simples');
 
                 // Limpa os inputs ocultos antigos
-                document.querySelectorAll('#inputs_ocultos_simples [id^="produto_simples_"]').forEach(el => el.remove());
+                document.querySelectorAll('#inputs_ocultos_simples [id^="produto_simples_"]').forEach(el => el
+                    .remove());
 
 
                 produtosSimples.forEach((produto, index) => {
