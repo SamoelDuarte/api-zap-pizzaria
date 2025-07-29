@@ -96,6 +96,13 @@
                     <span>Produtos</span>
                 </a>
             </li>
+
+               <li class="nav-item">
+                <a href="{{ route('admin.chat.index') }}" class="nav-link">
+                    <i class="fas fa-users"></i>
+                    <span>chats</span>
+                </a>
+            </li>
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
 
@@ -142,11 +149,11 @@
             <hr class="sidebar-divider my-0">
 
             <!-- Heading -->
-            <div class="sidebar-heading">
+            {{-- <div class="sidebar-heading">
                 Mensagens
-            </div>
+            </div> --}}
 
-            <li class="nav-item">
+            {{-- <li class="nav-item">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#message"
                     aria-expanded="true" aria-controls="message">
                     <i class="fas fa-mail-bulk"></i>
@@ -161,7 +168,7 @@
                     </div>
                 </div>
 
-            </li>
+            </li> --}}
 
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">

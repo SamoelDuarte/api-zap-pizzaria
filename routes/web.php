@@ -188,8 +188,13 @@ Route::middleware(['auth.user'])->group(function () {
             Route::get('/motoboys/lista','motoboyLista');
             Route::post('/atribuir-motoboy','atribuirMotoboy');  
             Route::post('/alterar-status', [OrderController::class, 'alterarStatus']);
-
         });
+
+         Route::prefix('/chat')->controller(ChatBotController::class)->group(function () {
+            Route::get('/', 'index')->name('admin.chat.index');
+        });
+
+
 
         Route::prefix('/config')->controller(ConfigController::class)->group(function () {
             Route::get('/', 'index')->name('admin.config.index');

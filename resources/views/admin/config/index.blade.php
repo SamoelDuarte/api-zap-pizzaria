@@ -26,19 +26,19 @@
                             @csrf
                             @method('PUT')
 
-                            <div class="form-group">
+                            {{-- <div class="form-group">
                                 <label for="motoboy_fone">Motoboy Telephone:</label>
                                 <input type="text" id="motoboy_fone" name="motoboy_fone"
                                     value="{{ $config->motoboy_fone }}" placeholder="(11) 9 1234-1234" class="form-control">
-                            </div>
+                            </div> --}}
 
-                            <div class="form-group">
+                            {{-- <div class="form-group">
                                 <div class="form-check">
                                     <input type="checkbox" id="status" name="status" class="form-check-input"
                                         {{ $config->status ? 'checked' : '' }}>
                                     <label for="status" class="form-check-label">Enviar Para Motoquiro</label>
                                 </div>
-                            </div>
+                            </div> --}}
 
                             <div class="card-header">tempo de Entrega</div>
                             <div class="form-group row">
@@ -55,13 +55,13 @@
                             
                           
 
-                            <div class="form-group d-none">
+                            {{-- <div class="form-group d-none">
                                 <div class="form-check">
                                     <input type="checkbox" id="chatbot" name="chatbot" class="form-check-input"
                                         {{ $config->chatbot ? 'checked' : '' }}>
                                     <label for="chatbot" class="form-check-label">Atendimento Automatico</label>
                                 </div>
-                            </div>
+                            </div> --}}
 
                             {{-- <div class="form-group d-none" >
                               <label for="">Mensagem de Resposta </label>
@@ -70,10 +70,13 @@
                           
 
                         </div>
+                          <button type="submit" class="btn btn-primary">Salvar</button>
                     </div>
+                     
                 </div>
+               
             </div>
-            <div class="row">
+            {{-- <div class="row">
                 @php
                     $days = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
                 @endphp
@@ -114,9 +117,10 @@
                         </div>
                     </div>
                 @endforeach
-            </div>
+            </div> --}}
+            
         </div>
-        <button type="submit" class="btn btn-primary">Salvar</button>
+      
     </form>
 @endsection
 
