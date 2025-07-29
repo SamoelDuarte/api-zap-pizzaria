@@ -51,6 +51,7 @@ class Chat extends Model
             'fazendo_cadastro' => '📝 Preenchendo cadastro',
             'confirmando' => '💳 Confirmando pagamento',
             'finalizado' => '✅ Pedido finalizado',
+            'eu_iniciei' => '✅ Pizzaria Iniciou a conversa',
             default => '🔍 Etapa desconhecida',
         };
     }
