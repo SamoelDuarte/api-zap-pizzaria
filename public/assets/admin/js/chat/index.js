@@ -35,7 +35,7 @@ $('#table-chat').DataTable({
 
         // status com lógica do tempo
         let statusHtml = '<label>' + data['flow_stage_label'] + '</label>';
-        if (data['flow_stage'] != "finalizado" && data['flow_stage'] != "eu_iniciei") {
+        if (data['flow_stage'] !== "finalizado" && data['flow_stage'] !== "eu_iniciei") {
             // diferença de tempo
             let updatedAt = new Date(data['updated_at']);
             let agora = new Date();
@@ -43,10 +43,11 @@ $('#table-chat').DataTable({
 
             if (diffMinutos > 3) {
                 statusHtml += `<br><span style="color:red; font-weight:bold;">
-                    Cliente está a muito tempo fazendo pedido, pode desistir! Atenção!
-                </span>`;
+            Cliente está a muito tempo fazendo pedido, pode desistir! Atenção!
+        </span>`;
             }
         }
+
         $('td:eq(1)', row).html(statusHtml);
 
         // ações
