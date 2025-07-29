@@ -33,7 +33,7 @@ $('#table-chat').DataTable({
         );
 
 
-        let statusHtml = '<label>' + data['display_status'] + '</label>';
+        let statusHtml = '<label>' + data['flow_stage'] + '</label>';
 
         // entra só se for fazendo_pedido e NÃO for eu_iniciei
         if (data['flow_stage'] == "fazendo_pedido" || data['flow_stage'] != "eu_iniciei") {
