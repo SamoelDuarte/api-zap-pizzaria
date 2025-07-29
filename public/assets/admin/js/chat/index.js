@@ -32,8 +32,8 @@ $('#table-chat').DataTable({
             `<label>${nome} / <a href="${linkWhatsapp}" target="_blank">${data['customer'].phone}</a></label>`
         );
 
-
-        let statusHtml = '<label>' + data['flow_stage'] + '</label>';
+        // status com lógica do tempo
+        let statusHtml = '<label>' + data['flow_stage_label'] + '</label>';
 
         // entra só se for fazendo_pedido e NÃO for eu_iniciei
         if (data['flow_stage'] == "fazendo_pedido" || data['flow_stage'] != "eu_iniciei") {
