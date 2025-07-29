@@ -35,7 +35,7 @@ $('#table-chat').DataTable({
 
         // status com lógica do tempo
         let statusHtml = '<label>' + data['flow_stage_label'] + '</label>';
-        if (data['flow_stage'] == "fazendo_pedido" || data['flow_stage'] == "aguardando") {
+        if (data['flow_stage'] != "finalizado") {
             // diferença de tempo
             let updatedAt = new Date(data['updated_at']);
             let agora = new Date();
