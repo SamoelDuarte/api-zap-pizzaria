@@ -36,7 +36,7 @@ $('#table-chat').DataTable({
         let statusHtml = '<label>' + data['display_status'] + '</label>';
 
         // entra só se for fazendo_pedido e NÃO for eu_iniciei
-        if (data['flow_stage'] == "fazendo_pedido" && data['flow_stage'] != "eu_iniciei") {
+        if (data['flow_stage'] == "fazendo_pedido" || data['flow_stage'] != "eu_iniciei") {
             let updatedAt = new Date(data['updated_at']);
             let agora = new Date();
             let diffMinutos = (agora - updatedAt) / 1000 / 60;
