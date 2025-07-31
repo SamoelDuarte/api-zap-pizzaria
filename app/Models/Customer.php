@@ -1,21 +1,23 @@
 <?php
-
 namespace App\Models;
 
+use App\Services\DistanceService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Http;
 
 class Customer extends Model
 {
     use HasFactory;
+
     protected $table = 'customers';
+
     protected $appends = [
         'phone',
         'location',
         'display_created_at',
-        'delivery_fee'
+        'delivery_fee',
     ];
+
     protected $fillable = [
         'name',
         'jid',
@@ -29,43 +31,27 @@ class Customer extends Model
         'created_at',
         'updated_at'
     ];
-
-    protected $googleApiKey;
+    protected DistanceService $distanceService;
 
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
-        $this->googleApiKey = env('GOOGLE_MAPS_API_KEY');
+        $this->distanceService = new DistanceService();
     }
-
 
     public function setJidAttribute($value)
     {
-        if (empty($value)) {
-            $this->attributes['jid'] = null;
-            return;
-        }
-
         $value = preg_replace('/[^0-9]/', '', $value);
-
         if (!str_starts_with($value, '55')) {
             $value = '55' . $value;
         }
-
-        $this->attributes['jid'] = $value;
+        $this->attributes['jid'] = $value ?: null;
     }
 
-
-
-
-
-    // Modifique o método getPhoneAttribute
     public function getPhoneAttribute()
     {
-        // Remova os primeiros 4 caracteres ("5511") antes de retornar o número de telefone
         return substr($this->jid, 2);
     }
-
 
     public function getDisplayCreatedAtAttribute()
     {
@@ -75,112 +61,42 @@ class Customer extends Model
     public function getLocationAttribute()
     {
         return 'CEP: ' . $this->zipcode . " " .
-            '' . $this->public_place . " " .
+            $this->public_place . " " .
             'N° : ' . $this->number . " -- " .
-            'Bairro: ' . $this->neighborhood . " \n " .
-            'Cidade: ' . $this->city . "-- " .
+            'Bairro: ' . $this->neighborhood . "\n" .
+            'Cidade: ' . $this->city . " -- " .
             'Estado: ' . $this->state;
     }
 
-    public function getDeliveryFeeAttribute()
+    public function getAddressForMapsAttribute()
     {
-        $address1 = 'Rua José Alves da silva , 429, Parque Novo Santo Amaro, SP';
-        $address2 = "{$this->number} {$this->public_place}, {$this->neighborhood}, {$this->city}, {$this->state}";
-
-        $coords1 = $this->getCoordinates($address1);
-        $coords2 = $this->getCoordinates($address2);
-
-        if ($coords1 && $coords2) {
-            list($distance, $duration) = $this->getDistance($coords1, $coords2);
-            return $this->calculateDeliveryFeeAmount($distance);
-        } else {
-            return null;
-        }
+        return "{$this->public_place} {$this->number}, {$this->city}, {$this->state}";
     }
 
     public function getLocationLink()
     {
-        $address1 = 'Rua José Alves da silva , 429, Parque Novo Santo Amaro, SP';
-        $origin = urlencode($address1);
+        $origin = urlencode('Rua José Alves da Silva, 429, Parque Novo Santo Amaro, São Paulo, SP');
         $destination = urlencode($this->address_for_maps);
         return "https://www.google.com/maps/dir/?api=1&origin={$origin}&destination={$destination}";
     }
-    public function getAddressForMapsAttribute()
+
+    public function getDeliveryFeeAttribute()
     {
-        return $this->public_place . ' ' . $this->number . ', ' .
-            $this->neighborhood . ', ' .
-            $this->city . ', ' .
-            $this->state;
-    }
+        $address2 = $this->getAddressForMapsAttribute();
 
-    public function getDistanceInKilometers()
-    {
-        $address1 = 'Rua Nova Providência, 593, Parque Bologne, SP';
-        $address2 = "{$this->number} {$this->public_place}, {$this->neighborhood}, {$this->city}, {$this->state}";
-
-        $coords1 = $this->getCoordinates($address1);
-        $coords2 = $this->getCoordinates($address2);
-        if ($coords1 && $coords2) {
-            list($distance, $duration) = $this->getDistance($coords1, $coords2);
-
-            return intval($distance);
-        } else {
-            return null;
-        }
-    }
-
-    private function getCoordinates($address)
-    {
-        $url = "https://maps.googleapis.com/maps/api/geocode/json";
-        $response = Http::get($url, [
-            'address' => $address,
-            'key' => $this->googleApiKey,
-        ]);
-
-        $data = $response->json();
-
-        if (!empty($data['results'])) {
-            $location = $data['results'][0]['geometry']['location'];
-            return [$location['lat'], $location['lng']];
+        $distance = $this->distanceService->getDistanceInKm($address2);
+        if ($distance !== null) {
+            return $this->distanceService->calculateDeliveryFeeAmount($distance);
         }
 
         return null;
     }
 
-    private function getDistance($originCoords, $destinationCoords)
+    public function getDistanceInKilometers()
     {
-        $origins = implode(',', $originCoords);
-        $destinations = implode(',', $destinationCoords);
-
-        $url = "https://maps.googleapis.com/maps/api/distancematrix/json";
-        $response = Http::get($url, [
-            'origins' => $origins,
-            'destinations' => $destinations,
-            'key' => $this->googleApiKey,
-        ]);
-
-        $data = $response->json();
-
-        if (!empty($data['rows'][0]['elements'][0]['distance']) && !empty($data['rows'][0]['elements'][0]['duration'])) {
-            $distanceText = $data['rows'][0]['elements'][0]['distance']['text'];
-            $distanceValue = $data['rows'][0]['elements'][0]['distance']['value'] / 1000; // Convert to kilometers
-            return [$distanceValue, $data['rows'][0]['elements'][0]['duration']['text']];
-        }
-
-        return [null, null];
+        $address2 = $this->getAddressForMapsAttribute();
+        return $this->distanceService->getDistanceInKm($address2);
     }
-
-    private function calculateDeliveryFeeAmount($distance)
-    {
-        if ($distance <= 1) {
-            return 3.00;
-        } elseif ($distance <= 2) {
-            return 5.00;
-        } else {
-            return 5.00 + ceil($distance - 2) * 1.00;
-        }
-    }
-
 
     public function orders()
     {

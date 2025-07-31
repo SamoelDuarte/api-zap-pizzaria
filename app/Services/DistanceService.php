@@ -6,67 +6,85 @@ use Illuminate\Support\Facades\Http;
 
 class DistanceService
 {
-    protected $googleApiKey;
-    protected $originAddress = 'Rua José Alves da Silva, 429, Parque Novo Santo Amaro, São Paulo, SP';
-
-
-    public function __construct()
-    {
-        $this->googleApiKey = env('GOOGLE_MAPS_API_KEY');
-    }
+    protected $graphhopperUrl = 'http://147.79.111.119:8989';
 
     public function getCoordinates($address)
     {
-        $url = "https://maps.googleapis.com/maps/api/geocode/json";
-        $response = Http::get($url, [
-            'address' => $address,
-            'key' => $this->googleApiKey,
-        ]);
+        $url = 'https://nominatim.openstreetmap.org/search';
+
+        $response = Http::accept('application/json')
+            ->withHeaders([
+                'User-Agent' => 'SeuApp/1.0 (seuemail@exemplo.com)', // obrigatório pelo Nominatim
+            ])
+            ->get($url, [
+                'q' => $address,
+                'format' => 'json',
+                'limit' => 1,
+            ]);
 
         $data = $response->json();
 
-        if (!empty($data['results'])) {
-            $location = $data['results'][0]['geometry']['location'];
-            return [$location['lat'], $location['lng']];
+        if (is_array($data) && count($data) > 0 && isset($data[0]['lat'], $data[0]['lon'])) {
+            return [(float)$data[0]['lat'], (float)$data[0]['lon']];
         }
 
         return null;
     }
 
+
+
+    // Função que faz a chamada para sua API GraphHopper
     public function getDistanceInKm($address2)
     {
-        $coords1 = $this->getCoordinates($this->originAddress);
+         $address1 = 'Rua José Alves da Silva, 429, São Paulo, SP';
+        $coords1 = $this->getCoordinates($address1);
         $coords2 = $this->getCoordinates($address2);
-
         if ($coords1 && $coords2) {
-            list($distance, $duration) = $this->getDistance($coords1, $coords2);
-            return $distance; // retorna em km
+            return $this->getDistance($coords1, $coords2);
         }
 
         return null;
     }
 
-    public function getDistance($originCoords, $destinationCoords)
+    // Chamada à API GraphHopper para calcular rota e extrair distância
+    public function getDistance(array $originCoords, array $destinationCoords)
     {
-        $origins = implode(',', $originCoords);
-        $destinations = implode(',', $destinationCoords);
+        // Monta os parâmetros point=lat,lon
+        $points = [
+            'point' => [
+                $originCoords[0] . ',' . $originCoords[1],
+                $destinationCoords[0] . ',' . $destinationCoords[1],
+            ],
+            'profile' => 'car',
+            'locale' => 'pt',
+            'calc_points' => 'false',  // não precisa dos pontos da rota
+            'instructions' => 'false', // sem instruções, só distância
+        ];
 
-        $url = "https://maps.googleapis.com/maps/api/distancematrix/json";
-        $response = Http::get($url, [
-            'origins' => $origins,
-            'destinations' => $destinations,
-            'key' => $this->googleApiKey,
+        // Como são múltiplos parâmetros "point", precisamos montar a query manualmente
+        $query = http_build_query([
+            'profile' => $points['profile'],
+            'locale' => $points['locale'],
+            'calc_points' => $points['calc_points'],
+            'instructions' => $points['instructions'],
         ]);
+        $query .= '&point=' . urlencode($points['point'][0]);
+        $query .= '&point=' . urlencode($points['point'][1]);
+
+        $url = $this->graphhopperUrl . '/route?' . $query;
+
+        $response = Http::get($url);
 
         $data = $response->json();
 
-        if (!empty($data['rows'][0]['elements'][0]['distance']) && !empty($data['rows'][0]['elements'][0]['duration'])) {
-            $distanceValue = $data['rows'][0]['elements'][0]['distance']['value'] / 1000; // km
-            $durationText = $data['rows'][0]['elements'][0]['duration']['text'];
-            return [$distanceValue, $durationText];
+        // Verifica se retornou a rota e extrai distância (em metros)
+        if (!empty($data['paths'][0]['distance'])) {
+            $distanceMeters = $data['paths'][0]['distance'];
+            $distanceKm = $distanceMeters / 1000;
+            return $distanceKm;
         }
 
-        return [null, null];
+        return null;
     }
 
     public function calculateDeliveryFeeAmount($distance)

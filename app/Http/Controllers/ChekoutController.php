@@ -579,13 +579,14 @@ class ChekoutController extends Controller
             $data['jid'] = $data['phone'];
             unset($data['phone']);
         }
-
+      
         // Verifica se já tem cliente na sessão
         if (session()->has('customer')) {
             $customerSession = session()->get('customer');
             $customer = Customer::find($customerSession->id);
             session()->put('customer', $customer);
             session()->put('taxa_entrega', $customer->delivery_fee ?? 0);
+            
         } else {
             if (!empty($data['id'])) {
                 $customer = Customer::find($data['id']);

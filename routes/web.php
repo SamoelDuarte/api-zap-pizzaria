@@ -185,12 +185,12 @@ Route::middleware(['auth.user'])->group(function () {
             Route::get('/getOrder', 'getOrder');
             Route::post('/calcular-taxa-entrega', 'calcularEntrega');
             Route::post('/novo-pedido', 'storeFromAdmin')->name('admin.pedidos.finalizar');
-            Route::get('/motoboys/lista','motoboyLista');
-            Route::post('/atribuir-motoboy','atribuirMotoboy');  
+            Route::get('/motoboys/lista', 'motoboyLista');
+            Route::post('/atribuir-motoboy', 'atribuirMotoboy');
             Route::post('/alterar-status', [OrderController::class, 'alterarStatus']);
         });
 
-         Route::prefix('/chat')->controller(ChatBotController::class)->group(function () {
+        Route::prefix('/chat')->controller(ChatBotController::class)->group(function () {
             Route::get('/', 'index')->name('admin.chat.index');
         });
 
@@ -236,28 +236,41 @@ Route::middleware(['auth.user'])->group(function () {
 
 
 Route::get('/teste', function () {
-    $filePath = base_path('/customers.csv'); // Atualize o caminho para o seu arquivo CSV
+    // $filePath = base_path('/customers.csv'); // Atualize o caminho para o seu arquivo CSV
 
-    // dd($filePath);
-    if (file_exists($filePath)) {
-        $csv = Reader::createFromPath($filePath, 'r');
-        $csv->setHeaderOffset(0); // Define a primeira linha como cabeçalho
+    // // dd($filePath);
+    // if (file_exists($filePath)) {
+    //     $csv = Reader::createFromPath($filePath, 'r');
+    //     $csv->setHeaderOffset(0); // Define a primeira linha como cabeçalho
 
-        $records = $csv->getRecords();
-        foreach ($records as $record) {
-            Customer::create([
-                'name' => $record['NOME'],
-                'jid' => $record['FONE1'],
-                'public_place' => $record['ENDERECO'],
-                'number' => $record['NUMERO'],
-                'neighborhood' => $record['BAIRRO'],
-                'zipcode' => '', // Adicione um valor padrão ou ajuste conforme necessário
-                'city' => '', // Adicione um valor padrão ou ajuste conforme necessário
-                'state' => '', // Adicione um valor padrão ou ajuste conforme necessário
-                'complement' => $record['REFERENCIA'] // Adicione este campo no seu modelo e migração se necessário
-            ]);
-        }
-    }
+    //     $records = $csv->getRecords();
+    //     foreach ($records as $record) {
+    //         Customer::create([
+    //             'name' => $record['NOME'],
+    //             'jid' => $record['FONE1'],
+    //             'public_place' => $record['ENDERECO'],
+    //             'number' => $record['NUMERO'],
+    //             'neighborhood' => $record['BAIRRO'],
+    //             'zipcode' => '', // Adicione um valor padrão ou ajuste conforme necessário
+    //             'city' => '', // Adicione um valor padrão ou ajuste conforme necessário
+    //             'state' => '', // Adicione um valor padrão ou ajuste conforme necessário
+    //             'complement' => $record['REFERENCIA'] // Adicione este campo no seu modelo e migração se necessário
+    //         ]);
+    //     }
+    // }
+
+    $service = new \App\Services\DistanceService();
+
+    $address1 = 'Rua José Alves da Silva, 429, Parque Novo Santo Amaro, São Paulo, SP';
+    $address2 = 'Rua bonifacio pasquali, 50, São Paulo, SP';
+
+    $distanceKm = $service->getDistanceInKm($address1, $address2);
+
+    echo "Distância: {$distanceKm} km\n";
+
+    $fee = $service->calculateDeliveryFeeAmount($distanceKm);
+
+    echo "Taxa de entrega: R$ {$fee}\n";
 });
 Route::get('/wh', function () {
 

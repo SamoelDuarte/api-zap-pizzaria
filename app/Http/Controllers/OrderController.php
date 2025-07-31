@@ -148,6 +148,7 @@ class OrderController extends Controller
     public function calcularEntrega(Request $request)
     {
         $destino = $request->input('destino');
+        // dd($destino);
 
         $distanceService = new DistanceService();
         $km = $distanceService->getDistanceInKm($destino);

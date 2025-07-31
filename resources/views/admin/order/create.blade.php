@@ -501,7 +501,7 @@
 
                     if (cep.length === 8 && numero) {
                         const enderecoCompleto =
-                            `${document.getElementById('logradouro').value}, ${numero}, ${document.getElementById('bairro').value}, ${document.getElementById('cidade').value}, ${document.getElementById('uf')?.value || ''}`;
+                            `${document.getElementById('logradouro').value}, ${numero}, ${document.getElementById('cidade').value}, ${document.getElementById('uf')?.value || ''}`;
 
                         fetch('/pedidos/calcular-taxa-entrega', {
                                 method: 'POST',
@@ -579,7 +579,7 @@
                                 if (document.getElementById('retirada')?.checked) return;
 
                                 const enderecoCompleto =
-                                    `${data.logradouro}, ${numero}, ${data.bairro}, ${data.localidade}, ${data.uf}`;
+                                    `${data.logradouro}, ${numero}, ${data.localidade}, ${data.uf}`;
 
                                 fetch('/pedidos/calcular-taxa-entrega', {
                                         method: 'POST',
