@@ -30,9 +30,10 @@ $(document).on('click', '.btn-ver-pedido', function () {
             crustHtml = `<br><small class="text-muted">Borda: ${item.crust} (+R$ ${crustPrice.toFixed(2).replace('.', ',')})</small>`;
         }
 
-        if (item.crust) {
-            obsHtml = `<br><small class="text-muted">Obs: ${item.observation}</small>`;
+        if (item.observation && item.observation.trim() !== '') {
+            obsHtml = `<br><small class="text-muted">Obs: ${item.observation.trim()}</small>`;
         }
+
 
         subtotal += itemTotal;
 
