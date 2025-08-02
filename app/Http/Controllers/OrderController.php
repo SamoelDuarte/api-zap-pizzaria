@@ -34,15 +34,9 @@ class OrderController extends Controller
             ? Carbon::parse($request->query('end_date'))->endOfDay()
             : (Carbon::now()->hour < 4 ? Carbon::today()->setHour(4) : Carbon::tomorrow()->setHour(4));
 
-        $query = Order::with([
-            'customer',
-            'items',
-            'payments.paymentMethod',
-            'status',
-            'motoboy'
-        ])->whereBetween('created_at', [$start, $end]);
-
-        $orders = $query->latest()->get();
+        $orders = Order::with(['customer', 'status', 'payments.paymentMethod', 'motoboy'])
+            ->whereBetween('created_at', [$start, $end])
+            ->get();
         $motoboys = Motoboy::all();
         Order::where('notify', 0)->update(['notify' => 1]);
         $statuses = \App\Models\OrderStatus::all();

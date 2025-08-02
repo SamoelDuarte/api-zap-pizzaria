@@ -579,14 +579,21 @@ class ChekoutController extends Controller
             $data['jid'] = $data['phone'];
             unset($data['phone']);
         }
-      
+
         // Verifica se já tem cliente na sessão
         if (session()->has('customer')) {
             $customerSession = session()->get('customer');
             $customer = Customer::find($customerSession->id);
             session()->put('customer', $customer);
-            session()->put('taxa_entrega', $customer->delivery_fee ?? 0);
-            
+            $taxaEntregaCalculada = 0;
+            // se tiver endereço completo para calcular
+            if (isset($customer->zipcode, $customer->public_place, $customer->number, $customer->city)) {
+                $address = "{$customer->public_place}, {$customer->number}, {$customer->city}";
+                $distanceService = new \App\Services\DistanceService();
+                $distance = $distanceService->getDistanceInKm($address);
+                $taxaEntregaCalculada = $distanceService->calculateDeliveryFeeAmount($distance);
+            }
+            session()->put('taxa_entrega', $taxaEntregaCalculada);
         } else {
             if (!empty($data['id'])) {
                 $customer = Customer::find($data['id']);
@@ -601,7 +608,15 @@ class ChekoutController extends Controller
             }
 
             session()->put('customer', $customer);
-            session()->put('taxa_entrega', $customer->delivery_fee ?? 0);
+            $taxaEntregaCalculada = 0;
+            // se tiver endereço completo para calcular
+            if (isset($customer->zipcode, $customer->public_place, $customer->number, $customer->city)) {
+                $address = "{$customer->public_place}, {$customer->number}, {$customer->city}";
+                $distanceService = new \App\Services\DistanceService();
+                $distance = $distanceService->getDistanceInKm($address);
+                $taxaEntregaCalculada = $distanceService->calculateDeliveryFeeAmount($distance);
+            }
+            session()->put('taxa_entrega', $taxaEntregaCalculada);
         }
 
         // ✅ Atualiza ou cria Chat com flow_stage = 'fazendo_cadastro'
