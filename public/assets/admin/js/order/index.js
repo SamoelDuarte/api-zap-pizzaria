@@ -30,7 +30,7 @@ $(document).on('click', '.btn-ver-pedido', function () {
             crustHtml = `<br><small class="text-muted">Borda: ${item.crust} (+R$ ${crustPrice.toFixed(2).replace('.', ',')})</small>`;
         }
 
-        if (item.observation) {
+        if (item.crust) {
             obsHtml = `<br><small class="text-muted">Obs: ${item.observation}</small>`;
         }
 
