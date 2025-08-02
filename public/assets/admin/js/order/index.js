@@ -22,6 +22,7 @@ $(document).on('click', '.btn-ver-pedido', function () {
     // Itens do pedido
     pedido.items.forEach(function (item) {
         let crustHtml = '';
+        let obsHtml = '';
         let itemTotal = parseFloat(item.total) || 0;
         let crustPrice = parseFloat(item.crust_price) || 0;
 
@@ -29,18 +30,24 @@ $(document).on('click', '.btn-ver-pedido', function () {
             crustHtml = `<br><small class="text-muted">Borda: ${item.crust} (+R$ ${crustPrice.toFixed(2).replace('.', ',')})</small>`;
         }
 
+        if (item.observation && item.observation.trim() !== '') {
+            obsHtml = `<br><small class="text-muted">Obs: ${item.observation}</small>`;
+        }
+
         subtotal += itemTotal;
 
         $('#table-items').append(`
-            <tr>
-                <td>
-                    ${item.name} ${item.quantity > 1 ? `x${item.quantity}` : ''}
-                    ${crustHtml}
-                </td>
-                <td>R$ ${itemTotal.toFixed(2).replace('.', ',')}</td>
-            </tr>
-        `);
+        <tr>
+            <td>
+                ${item.name} ${item.quantity > 1 ? `x${item.quantity}` : ''}
+                ${crustHtml}
+                ${obsHtml}
+            </td>
+            <td>R$ ${itemTotal.toFixed(2).replace('.', ',')}</td>
+        </tr>
+    `);
     });
+
 
     // Pagamentos (montar com base no array)
     let pagamentosTexto = '';
