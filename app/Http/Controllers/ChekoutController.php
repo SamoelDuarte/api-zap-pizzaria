@@ -588,7 +588,7 @@ class ChekoutController extends Controller
             $taxaEntregaCalculada = 0;
             // se tiver endereço completo para calcular
             if (isset($customer->zipcode, $customer->public_place, $customer->number, $customer->city)) {
-                $address = "{$customer->public_place}, {$customer->number}, {$customer->city}";
+                $address = "{$customer->public_place}, {$customer->number}, São Paulo, SP";
                 $distanceService = new \App\Services\DistanceService();
                 $distance = $distanceService->getDistanceInKm($address);
                 $taxaEntregaCalculada = $distanceService->calculateDeliveryFeeAmount($distance);
