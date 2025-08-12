@@ -29,6 +29,7 @@ class ChekoutController extends Controller
 {
     public function index($phone = null)
     {
+
         $customer = null;
         $semCadastro = false;
         $taxaEntrega = 0;
