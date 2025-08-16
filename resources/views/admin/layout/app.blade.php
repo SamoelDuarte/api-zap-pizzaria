@@ -35,6 +35,7 @@
         integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
 
     @yield('css')
+    @yield('head')
 
 
 
@@ -68,6 +69,17 @@
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/dispositivo">
                 <div class="sidebar-brand-icon ">Integra Pizzaria</div>
             </a>
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+            
+            <!-- Dashboard -->
+            <li class="nav-item">
+                <a href="{{ route('admin.dashboard') }}" class="nav-link">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>📊 Dashboard</span>
+                </a>
+            </li>
+            
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
             <!-- Heading -->

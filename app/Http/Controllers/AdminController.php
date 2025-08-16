@@ -3,20 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Http\Controllers\Utils;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
     public function index()
     {
-        return view('admin/dashboard/index');
+        return redirect()->route('admin.dashboard');
     }
 
     public function login()
     {
 
         if (session('authenticated')) {
-            return redirect()->route('dashboard');
+            return redirect()->route('admin.dashboard');
         }
 
         return view('admin/login/index');
@@ -46,7 +47,7 @@ class AdminController extends Controller
         if (session("userData")->role == "user") {
             return redirect('/formulario');
         } else {
-            return redirect('/dashboard');
+            return redirect()->route('admin.dashboard');
         }
     }
 

@@ -135,8 +135,9 @@ Route::middleware(['auth.user'])->group(function () {
 
 
 
-        Route::prefix('/dashboard')->controller(DeviceController::class)->group(function () {
-            Route::get('/', 'dash')->name('dashboard');
+        Route::prefix('/dashboard')->controller(\App\Http\Controllers\admin\DashboardController::class)->group(function () {
+            Route::get('/', 'index')->name('admin.dashboard');
+            Route::get('/chart-data', 'getChartData')->name('admin.dashboard.chart-data');
         });
         Route::prefix('/dispositivo')->controller(DeviceController::class)->group(function () {
             Route::get('/', 'index')->name('admin.device.index');
