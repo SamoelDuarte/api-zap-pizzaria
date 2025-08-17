@@ -36,6 +36,7 @@ class OrderController extends Controller
 
         $orders = Order::with(['customer', 'status', 'payments.paymentMethod', 'motoboy'])
             ->whereBetween('created_at', [$start, $end])
+            ->orderBy('created_at', 'desc') // Adicionado ordenação decrescente
             ->get();
         $motoboys = Motoboy::all();
         Order::where('notify', 0)->update(['notify' => 1]);
