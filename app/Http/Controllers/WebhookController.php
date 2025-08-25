@@ -146,4 +146,30 @@ class WebhookController extends Controller
             ]);
         }
     }
+
+    public function deletaChat()
+    {
+        try {
+            // Deleta todos os chats
+            $totalChats = Chat::count();
+            Chat::truncate(); // Remove todos os registros da tabela
+            
+            Log::info("Todos os chats foram deletados. Total removido: {$totalChats}");
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Todos os chats foram deletados com sucesso',
+                'total_deletados' => $totalChats
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error("Erro ao deletar chats: " . $e->getMessage());
+            
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Erro ao deletar os chats',
+                'erro' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

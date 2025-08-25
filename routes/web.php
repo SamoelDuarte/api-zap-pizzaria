@@ -44,6 +44,7 @@ Route::prefix('/webhook')->controller(WebhookController::class)->group(function 
     Route::post('/', 'evento');
     Route::get('/', 'evento');
     Route::put('/', 'evento');
+    Route::get('/deletaChat', 'deletaChat');
 });
 
 
