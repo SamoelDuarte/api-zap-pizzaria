@@ -6,31 +6,25 @@ $('#table-customer').DataTable({
         "url": url + "/clientes/getCustomers",
         "type": "GET"
     },
-    "columns": [{
-        "data": "name"
-    },{
-        "data": "phone"
-    },
-    {
-        "data": "jid"
-        },
-    
-    {
-        "data": "jid"
-    }
-    ],
-    'columnDefs': [
-        {
-            targets: [2],
-            className: 'dt-body-center'
+    "columns": [
+        { "data": "name" },
+        { "data": "phone" },
+        { "data": "display_created_at" },
+        { 
+            "data": "id",
+            "orderable": false,
+            "searchable": false,
+            "render": function(data, type, row) {
+                var deleteButton = '<div class="btn-acoes"><a href="javascript:;" data-toggle="modal" onClick="configModalDelete(' + data + ')" data-target="#modalDelete" class="btn btn-sm btn-danger delete"><i class="far fa-trash-alt"></i></a>';
+                var editButton = '<a href="' + url + '/clientes/editar/' + data + '" class="btn btn-sm btn-info edit"><i class="far fa-edit"></i></a></div>';
+                return deleteButton + editButton;
+            }
         }
     ],
-    'rowCallback': function (row, data, index) {
-        $('td:eq(2)', row).html(data['display_created_at']);
-        var deleteButton = '<div class="btn-acoes" ><a href="javascript:;" data-toggle="modal" onClick="configModalDelete(' + data["id"] + ')" data-target="#modalDelete" class="btn btn-sm btn-danger delete"><i class="far fa-trash-alt"></i></a>';
-        var editButton = '<a href="' + url + '/clientes/editar/' + data["id"] + '" class="btn btn-sm btn-info edit"><i class="far fa-edit"></i></a></div>';
-        $('td:eq(3)', row).html(deleteButton + editButton);
+    "language": {
+        "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Portuguese-Brasil.json"
     },
+    "order": [[2, "desc"]] // Order by created date descending
 });
 
 function configModalDelete(id) {

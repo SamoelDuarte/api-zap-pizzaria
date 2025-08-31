@@ -29,52 +29,83 @@
                         <form action="/clientes/update/{{ $customer->id }}" method="POST">
                             @csrf
                             @method('PUT')
-                            <div class="form-group">
-                                <label for="name">Nome</label>
-                                <input type="text" name="name" class="form-control title-case" id="name"
-                                    value="{{ $customer->name }}" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="jid">Telefone</label>
-                                <input type="text" name="jid" class="form-control" id="jid"
-                                    value="{{ $customer->phone }}" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="zipcode">CEP</label>
-                                <input type="text" name="zipcode" class="form-control" id="zipcode"
-                                    value="{{ $customer->zipcode }}" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="public_place">Logradouro</label>
-                                <input type="text" name="public_place" class="form-control" id="public_place"
-                                    value="{{ $customer->public_place }}" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="number">Número</label>
-                                <input type="text" name="number" class="form-control" id="number"
-                                    value="{{ $customer->number }}" required>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="name">Nome</label>
+                                        <input type="text" name="name" class="form-control title-case" id="name"
+                                            value="{{ $customer->name }}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="jid">Telefone</label>
+                                        <input type="text" name="jid" class="form-control" id="jid"
+                                            value="{{ $customer->phone }}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="tax">Taxa de Entrega Fixa</label>
+                                        <input type="number" step="0.01" name="tax" class="form-control" id="tax"
+                                            value="{{ $customer->tax }}" placeholder="0.00">
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="form-group">
-                                <label for="complement">Complemento</label>
-                                <input type="text" name="complement" class="form-control" id="complement"
-                                value="{{ $customer->complement }}"
-                                    placeholder="Complemento" >
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="zipcode">CEP</label>
+                                        <input type="text" name="zipcode" class="form-control" id="zipcode"
+                                            value="{{ $customer->zipcode }}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="public_place">Logradouro</label>
+                                        <input type="text" name="public_place" class="form-control" id="public_place"
+                                            value="{{ $customer->public_place }}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="number">Número</label>
+                                        <input type="text" name="number" class="form-control" id="number"
+                                            value="{{ $customer->number }}" required>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label for="neighborhood">Bairro</label>
-                                <input type="text" name="neighborhood" class="form-control" id="neighborhood"
-                                    value="{{ $customer->neighborhood }}" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="city">Cidade</label>
-                                <input type="text" name="city" class="form-control" id="city"
-                                    value="{{ $customer->city }}" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="state">Estado</label>
-                                <input type="text" name="state" class="form-control" id="state"
-                                    value="{{ $customer->state }}" required>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="complement">Complemento</label>
+                                        <input type="text" name="complement" class="form-control" id="complement"
+                                            value="{{ $customer->complement }}" placeholder="Complemento">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="neighborhood">Bairro</label>
+                                        <input type="text" name="neighborhood" class="form-control" id="neighborhood"
+                                            value="{{ $customer->neighborhood }}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="city">Cidade</label>
+                                        <input type="text" name="city" class="form-control" id="city"
+                                            value="{{ $customer->city }}" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <div class="form-group">
+                                        <label for="state">UF</label>
+                                        <input type="text" name="state" class="form-control" id="state"
+                                            value="{{ $customer->state }}" required>
+                                    </div>
+                                </div>
                             </div>
                          
                             <button type="submit" class="btn btn-primary">Salvar</button>
@@ -107,16 +138,23 @@
                 }
             });
 
-            var phoneMaskBehavior = function(val) {
-                    return val.replace(/\D/g, '').length === 9 ? '00000-0000' : '0000-00009';
-                },
-                phoneOptions = {
-                    onKeyPress: function(val, e, field, options) {
-                        field.mask(phoneMaskBehavior.apply({}, arguments), options);
-                    }
-                };
+          var phoneMaskBehavior = function(val) {
+    var numbers = val.replace(/\D/g, '');
+    if(numbers.length > 10) { // 11 para DDD + 9 dígitos
+        return '(00) 00000-0000';
+    } else {
+        return '(00) 0000-00009';
+    }
+};
 
-            $('#jid').mask(phoneMaskBehavior, phoneOptions);
+var phoneOptions = {
+    onKeyPress: function(val, e, field, options) {
+        field.mask(phoneMaskBehavior.apply({}, arguments), options);
+    }
+};
+
+$('#jid').mask(phoneMaskBehavior, phoneOptions);
+
         });
     </script>
 @endsection

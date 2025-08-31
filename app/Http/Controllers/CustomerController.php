@@ -16,7 +16,15 @@ class CustomerController extends Controller
     public function getCustomers()
     {
         $customer = Customer::orderBy('id');
-        return DataTables::of($customer)->make(true);
+        return DataTables::of($customer)
+            ->addColumn('phone', function($customer) {
+                return substr($customer->jid, 2); // Remove the '55' prefix
+            })
+            ->addColumn('display_created_at', function($customer) {
+                return $customer->created_at ? $customer->created_at->format('d/m/Y') : '';
+            })
+            ->rawColumns(['action'])
+            ->make(true);
     }
 
     public function create()
@@ -36,6 +44,7 @@ class CustomerController extends Controller
             'city' => 'required|string|max:255',
             'state' => 'required|string|max:255',
             'number' => 'required|string|max:255',
+            'tax' => 'nullable|numeric',
         ]);
 
         Customer::create($data);
@@ -61,6 +70,7 @@ class CustomerController extends Controller
             'city' => 'required|string|max:255',
             'state' => 'required|string|max:255',
             'number' => 'required|string|max:255',
+            'tax' => 'nullable|numeric',
         ]);
 
         try {

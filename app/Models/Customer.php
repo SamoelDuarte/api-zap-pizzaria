@@ -15,7 +15,6 @@ class Customer extends Model
         'phone',
         'location',
         'display_created_at',
-        // 'delivery_fee',
     ];
 
     protected $fillable = [
@@ -28,6 +27,7 @@ class Customer extends Model
         'complement',
         'state',
         'number',
+        'tax',
         'created_at',
         'updated_at'
     ];
@@ -79,18 +79,6 @@ class Customer extends Model
         $destination = urlencode($this->address_for_maps);
         return "https://www.google.com/maps/dir/?api=1&origin={$origin}&destination={$destination}";
     }
-
-    // public function getDeliveryFeeAttribute()
-    // {
-    //     $address2 = $this->getAddressForMapsAttribute();
-
-    //     $distance = $this->distanceService->getDistanceInKm($address2);
-    //     if ($distance !== null) {
-    //         return $this->distanceService->calculateDeliveryFeeAmount($distance);
-    //     }
-
-    //     return null;
-    // }
 
     public function getDistanceInKilometers()
     {

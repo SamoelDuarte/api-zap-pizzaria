@@ -285,8 +285,7 @@
             display: inline-block;
         }
 
-        #dinheiro-options,
-        #pix-options {
+        #dinheiro-options {
             padding: 20px;
             background: white;
             border: double;
@@ -380,15 +379,6 @@
                     <i class="fas fa-check"></i>
                     <span class="pizza-price">Pix</span>
                 </label>
-                <div id="pix-options" style="display: none;">
-                    <p>Use o seguinte código PIX para pagamento:</p>
-                    <div style="display: flex; align-items: center;">
-                        <textarea id="pix-code" rows="4" cols="50" readonly>59.423.821.0001-83</textarea>
-                        <button type="button" id="copy-pix-btn" style="margin-left: 10px;">Copiar</button>
-                    </div>
-                    <small style="color: #ed291e;">Após efetuar o pagamento ,envie o comprovante para finalizar o
-                        pedido</small>
-                </div>
             </div>
         </form>
     </div>
@@ -427,16 +417,10 @@
                 $(this).addClass('selected');
                 $(this).find('input[type="radio"]').prop('checked', true);
                 const paymentMethod = $(this).find('input[type="radio"]').val();
-                if (paymentMethod === 'Pix') {
-                    $('#pix-options').show();
-                    $('#dinheiro-options').hide();
-                    // generatePixCode(); // Chama a função para gerar o código PIX
-                } else if (paymentMethod === 'Dinheiro') {
+                if (paymentMethod === 'Dinheiro') {
                     $('#dinheiro-options').show();
-                    $('#pix-options').hide();
                 } else {
                     $('#dinheiro-options').hide();
-                    $('#pix-options').hide();
                 }
             });
 
@@ -477,33 +461,7 @@
                 }
             });
 
-            $('#copy-pix-btn').on('click', function() {
-                const pixCode = $('#pix-code').text().trim();
 
-                navigator.clipboard.writeText(pixCode).then(() => {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Código PIX copiado!',
-                        text: 'Para concluir o pedido, envie o comprovante e finalize a compra.',
-                        showCancelButton: true,
-                        confirmButtonText: 'Finalizar Pedido',
-                        cancelButtonText: 'Continuar Navegando',
-                        reverseButtons: true,
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            // Clica automaticamente no botão "Finalizar Compra"
-                            $('#submit-button').trigger('click');
-                        }
-                    });
-                }).catch(err => {
-                    console.error('Erro ao copiar o PIX:', err);
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Erro ao copiar',
-                        text: 'Não foi possível copiar o código PIX.',
-                    });
-                });
-            });
 
 
             // Função para verificar se uma forma de pagamento foi selecionada ao clicar em "Finalizar Pedido"

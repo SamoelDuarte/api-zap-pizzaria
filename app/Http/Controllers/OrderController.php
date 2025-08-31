@@ -143,8 +143,24 @@ class OrderController extends Controller
     public function calcularEntrega(Request $request)
     {
         $destino = $request->input('destino');
-        // dd($destino);
+        $telefone = $request->input('telefone');
+        
+        // Se tiver telefone, procura cliente
+        if ($telefone) {
+            $telefone = preg_replace('/[^0-9]/', '', $telefone);
+            $cliente = Customer::where('jid', '55' . $telefone)->first();
+            
+            // Se encontrou cliente e ele tem taxa definida, retorna ela
+            if ($cliente && $cliente->tax !== null) {
+                return response()->json([
+                    'km' => null, // não precisa calcular distância
+                    'taxa' => number_format($cliente->tax, 2, '.', ''),
+                    'taxa_fixa' => true
+                ]);
+            }
+        }
 
+        // Se não tem cliente ou taxa fixa, calcula normalmente
         $distanceService = new DistanceService();
         $km = $distanceService->getDistanceInKm($destino);
 
@@ -156,7 +172,8 @@ class OrderController extends Controller
 
         return response()->json([
             'km' => $km,
-            'taxa' => number_format($taxa, 2, '.', '')
+            'taxa' => number_format($taxa, 2, '.', ''),
+            'taxa_fixa' => false
         ]);
     }
 
@@ -200,6 +217,7 @@ class OrderController extends Controller
         ];
         if (!$cliente) {
             // Se não existe, cria com os dados
+            $dadosCliente['tax'] = floatval($request->input('delivery_fee', 0));
             $cliente = Customer::create(array_merge(['jid' => $telefone], $dadosCliente));
         } else {
             // Se já existe, só atualiza se mudou algum dado realmente

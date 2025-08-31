@@ -29,10 +29,10 @@ class ChekoutController extends Controller
 {
     public function index($phone = null)
     {
-
         $customer = null;
         $semCadastro = false;
         $taxaEntrega = 0;
+        $distanceService = new \App\Services\DistanceService();
 
         if ($phone) {
             session()->put('jid', $phone); // ← Salva o JID na sessão
@@ -40,7 +40,24 @@ class ChekoutController extends Controller
             $customer = Customer::where('jid', $phone)->first();
             if ($customer) {
                 session()->put('customer', $customer);
-                $taxaEntrega = $customer->delivery_fee ?? 0;
+                // Use saved tax if available
+                if ($customer->tax !== null) {
+                    $taxaEntrega = $customer->tax;
+                } else {
+                    // Calculate tax if we have complete address
+                    if (isset($customer->zipcode, $customer->public_place, $customer->number, $customer->city)) {
+                        $address = "{$customer->public_place}, {$customer->number}, {$customer->city}";
+                        $distanceService = new \App\Services\DistanceService();
+                        $distance = $distanceService->getDistanceInKm($address);
+                        $taxaEntrega = $distanceService->calculateDeliveryFeeAmount($distance);
+                        
+                        // Save calculated tax for future use
+                        $customer->tax = $taxaEntrega;
+                        $customer->save();
+                    } else {
+                        $taxaEntrega = 0;
+                    }
+                }
             } else {
                 session()->forget('customer');
                 $semCadastro = true;
@@ -232,6 +249,28 @@ class ChekoutController extends Controller
             return view('front.checkout.va_pro_zap');
         }
 
+        // If customer has a saved tax, use it
+        if (!empty($customer->id)) {
+            $customer = Customer::find($customer->id);
+            if ($customer && $customer->tax !== null) {
+                session()->put('taxa_entrega', $customer->tax);
+            }
+            // Only calculate if no tax is saved
+            else if (isset($customer->zipcode, $customer->public_place, $customer->number, $customer->city)) {
+                $address = "{$customer->public_place}, {$customer->number}, {$customer->city}";
+                $distanceService = new \App\Services\DistanceService();
+                $distance = $distanceService->getDistanceInKm($address);
+                $taxaEntrega = $distanceService->calculateDeliveryFeeAmount($distance);
+                
+                if ($customer) {
+                    $customer->tax = $taxaEntrega;
+                    $customer->save();
+                }
+                
+                session()->put('taxa_entrega', $taxaEntrega);
+            }
+        }
+
         $produtosBebidas = Product::whereHas('category', function ($query) {
             $query->where('name', 'bebidas');
         })->get();
@@ -363,6 +402,12 @@ class ChekoutController extends Controller
             $troco = $trocoAmount;
 
             // Cria pedido (sem total_price)
+            // Save the delivery fee to the customer if address hasn't changed
+            if (!$cliente->tax) {
+                $cliente->tax = $taxaEntrega;
+                $cliente->save();
+            }
+
             $pedido = Order::create([
                 'customer_id' => $cliente->id,
                 'status_id' => $statusId,
@@ -586,13 +631,23 @@ class ChekoutController extends Controller
             $customerSession = session()->get('customer');
             $customer = Customer::find($customerSession->id);
             session()->put('customer', $customer);
-            $taxaEntregaCalculada = 0;
-            // se tiver endereço completo para calcular
-            if (isset($customer->zipcode, $customer->public_place, $customer->number, $customer->city)) {
-                $address = "{$customer->public_place}, {$customer->number}, São Paulo, SP";
-                $distanceService = new \App\Services\DistanceService();
-                $distance = $distanceService->getDistanceInKm($address);
-                $taxaEntregaCalculada = $distanceService->calculateDeliveryFeeAmount($distance);
+            
+            // If customer has a saved tax, use it
+            if ($customer->tax !== null) {
+                $taxaEntregaCalculada = $customer->tax;
+            } else {
+                $taxaEntregaCalculada = 0;
+                // se tiver endereço completo para calcular
+                if (isset($customer->zipcode, $customer->public_place, $customer->number, $customer->city)) {
+                    $address = "{$customer->public_place}, {$customer->number}, {$customer->city}";
+                    $distanceService = new \App\Services\DistanceService();
+                    $distance = $distanceService->getDistanceInKm($address);
+                    $taxaEntregaCalculada = $distanceService->calculateDeliveryFeeAmount($distance);
+                    
+                    // Save the calculated tax for future use
+                    $customer->tax = $taxaEntregaCalculada;
+                    $customer->save();
+                }
             }
             session()->put('taxa_entrega', $taxaEntregaCalculada);
         } else {
@@ -610,13 +665,33 @@ class ChekoutController extends Controller
 
             session()->put('customer', $customer);
             $taxaEntregaCalculada = 0;
-            // se tiver endereço completo para calcular
-            if (isset($customer->zipcode, $customer->public_place, $customer->number, $customer->city)) {
+
+            // Check if address has changed by comparing with the data
+            $addressChanged = false;
+            if (isset($data['zipcode'], $data['public_place'], $data['number'], $data['city'])) {
+                $addressChanged = 
+                    $data['zipcode'] != $customer->zipcode ||
+                    $data['public_place'] != $customer->public_place ||
+                    $data['number'] != $customer->number ||
+                    $data['city'] != $customer->city;
+            }
+
+            // If customer has a saved tax and address hasn't changed, use the saved tax
+            if ($customer->tax && !$addressChanged) {
+                $taxaEntregaCalculada = $customer->tax;
+            }
+            // Otherwise calculate new tax if we have complete address
+            elseif (isset($customer->zipcode, $customer->public_place, $customer->number, $customer->city)) {
                 $address = "{$customer->public_place}, {$customer->number}, {$customer->city}";
                 $distanceService = new \App\Services\DistanceService();
                 $distance = $distanceService->getDistanceInKm($address);
                 $taxaEntregaCalculada = $distanceService->calculateDeliveryFeeAmount($distance);
+                
+                // Update customer's tax since address changed or there was no saved tax
+                $customer->tax = $taxaEntregaCalculada;
+                $customer->save();
             }
+            
             session()->put('taxa_entrega', $taxaEntregaCalculada);
         }
 

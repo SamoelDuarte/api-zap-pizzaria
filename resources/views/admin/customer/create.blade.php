@@ -28,50 +28,83 @@
                     <div class="card-body">
                         <form action="{{ route('admin.customer.store') }}" method="POST">
                             @csrf
-                            <div class="form-group">
-                                <label for="name">Nome</label>
-                                <input type="text" name="name" class="form-control title-case" id="name"
-                                    placeholder="Nome do Cliente" required>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="name">Nome</label>
+                                        <input type="text" name="name" class="form-control title-case" id="name"
+                                            placeholder="Nome do Cliente" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="jid">Telefone</label>
+                                        <input type="text" name="jid" class="form-control" id="jid"
+                                            placeholder="Ex. 91234-5678" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="tax">Taxa de Entrega Fixa</label>
+                                        <input type="number" step="0.01" name="tax" class="form-control" id="tax"
+                                            placeholder="0.00">
+                                    </div>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label for="jid">Telefone</label>
-                                <input type="text" name="jid" class="form-control" id="jid"
-                                    placeholder="Ex. 91234-5678" required>
+
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="zipcode">CEP</label>
+                                        <input type="text" name="zipcode" class="form-control" id="zipcode" placeholder="CEP"
+                                            required>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="public_place">Logradouro</label>
+                                        <input type="text" name="public_place" class="form-control" id="public_place"
+                                            placeholder="Logradouro" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="number">Número</label>
+                                        <input type="text" name="number" class="form-control" id="number"
+                                            placeholder="Número" required>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label for="zipcode">CEP</label>
-                                <input type="text" name="zipcode" class="form-control" id="zipcode" placeholder="CEP"
-                                    required>
-                            </div>
-                            <div class="form-group">
-                                <label for="public_place">Logradouro</label>
-                                <input type="text" name="public_place" class="form-control" id="public_place"
-                                    placeholder="Logradouro" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="number">Número</label>
-                                <input type="text" name="number" class="form-control" id="number"
-                                    placeholder="Número" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="complement">Complemento</label>
-                                <input type="text" name="complement" class="form-control" id="complement"
-                                    placeholder="Complemento" >
-                            </div>
-                            <div class="form-group">
-                                <label for="neighborhood">Bairro</label>
-                                <input type="text" name="neighborhood" class="form-control" id="neighborhood"
-                                    placeholder="Bairro" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="city">Cidade</label>
-                                <input type="text" name="city" class="form-control" id="city"
-                                    placeholder="Cidade" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="state">Estado</label>
-                                <input type="text" name="state" class="form-control" id="state"
-                                    placeholder="Estado" required>
+
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="complement">Complemento</label>
+                                        <input type="text" name="complement" class="form-control" id="complement"
+                                            placeholder="Complemento">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="neighborhood">Bairro</label>
+                                        <input type="text" name="neighborhood" class="form-control" id="neighborhood"
+                                            placeholder="Bairro" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for="city">Cidade</label>
+                                        <input type="text" name="city" class="form-control" id="city"
+                                            placeholder="Cidade" required>
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <div class="form-group">
+                                        <label for="state">UF</label>
+                                        <input type="text" name="state" class="form-control" id="state"
+                                            placeholder="UF" required>
+                                    </div>
+                                </div>
                             </div>
                          
                             <button type="submit" class="btn btn-primary">Salvar</button>
