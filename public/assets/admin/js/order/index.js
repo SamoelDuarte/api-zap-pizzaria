@@ -7,6 +7,7 @@ $(document).on('click', '.btn-ver-pedido', function () {
     $('#customer-name').val(pedido.customer.name);
     $('#customer-phone').val(pedido.customer.phone);
     $('#customer-address').text(pedido.customer.location ?? '---');
+    $('#customer-complement').val(pedido.customer.complement ?? '---');
 
     $('#table-items').empty();
     let subtotal = 0;

@@ -172,6 +172,10 @@
                             <label class="form-label">Endereço</label>
                             <textarea id="customer-address" class="form-control" rows="2" readonly></textarea>
                         </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label">Complemento</label>
+                            <input type="text" id="customer-complement" class="form-control" readonly>
+                        </div>
                     </div>
 
                     <!-- Itens do Pedido -->
