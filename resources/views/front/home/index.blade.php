@@ -69,6 +69,25 @@
       margin-bottom: 20px;
       display: inline-block;
     }
+
+    .footer {
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+      text-align: center;
+    }
+
+    .footer a {
+      color: #666;
+      text-decoration: none;
+      font-size: 0.9rem;
+      margin: 0 10px;
+    }
+
+    .footer a:hover {
+      color: #e63946;
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -80,6 +99,11 @@
     
     <input type="tel" id="phone" placeholder="Ex: 11999999999" />
     <button onclick="fazerPedido()">Fazer Pedido</button>
+
+    <div class="footer">
+      <a href="{{ route('privacy.policy') }}">📋 Política de Privacidade</a>
+      <a href="mailto:contato@integrapizzaria.com.br">📧 Contato</a>
+    </div>
   </div>
 
   <script>

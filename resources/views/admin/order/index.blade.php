@@ -174,7 +174,7 @@
                         </div>
                         <div class="col-12 mb-3">
                             <label class="form-label">Complemento</label>
-                            <input type="text" id="customer-complement" class="form-control" readonly>
+                            <input type="text" gitid="customer-complement" class="form-control" readonly>
                         </div>
                     </div>
 
@@ -188,13 +188,13 @@
                                     <th>Valor</th>
                                 </tr>
                             </thead>
-                            <tbody id="table-items">
+                            <tbody id="table-items">45tg54g54g45g45
                                 <!-- Populado via JavaScript -->
                             </tbody>
                         </table>
                     </div>
                     <!-- Motivo do Cancelamento -->
-                    <div id="motivo-cancelamento-box" class="mt-3" style="display: none;">
+                    <div id="motivo-cancelamentdwqdqwdo-box" class="mt-3" style="display: none;">
                         <h5 class="text-danger">❌ Motivo do Cancelamento</h5>
                         <p id="motivo-cancelamento" class="text-muted"></p>
                     </div>

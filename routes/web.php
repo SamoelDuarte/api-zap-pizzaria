@@ -75,6 +75,11 @@ Route::prefix('/')->controller(HomeController::class)->group(function () {
     Route::get('/', 'index');
 });
 
+// Política de Privacidade
+Route::get('/politica-privacidade', function () {
+    return view('privacy-policy');
+})->name('privacy.policy');
+
 Route::prefix('/checkout')->controller(ChekoutController::class)->group(function () {
     Route::get('/pedido/{phone}', 'index');
     Route::post('/generate-pix', 'gerarPix')->name('generate-pix');
