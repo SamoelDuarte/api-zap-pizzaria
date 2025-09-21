@@ -404,14 +404,12 @@
 </div>
 
 <!-- Modal Motoboy -->
-<div class="modal fade" id="modalMotoboy" tabindex="-1">
+<div class="modal fade" id="modalMotoboy" tabindex="-1" aria-labelledby="modalMotoboyLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title"><i class="fas fa-motorcycle text-warning"></i> Selecionar Motoboy</h5>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
+                <h5 class="modal-title" id="modalMotoboyLabel"><i class="fas fa-motorcycle text-warning"></i> Selecionar Motoboy</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="lista-motoboys">
@@ -502,19 +500,50 @@ function marcarComoFeito(pedidoId) {
  * Abre modal para selecionar motoboy
  */
 function abrirModalMotoboy(pedidoId) {
+    console.log('=== INICIANDO abrirModalMotoboy ===');
+    console.log('Pedido ID:', pedidoId);
+    console.log('Bootstrap object:', typeof bootstrap);
+    
     pedidoIdSelecionado = pedidoId;
     carregarMotoboys();
-    $('#modalMotoboy').modal('show');
+    
+    try {
+        // Usar Bootstrap 5 nativo ao invés de jQuery
+        const modalElement = document.getElementById('modalMotoboy');
+        console.log('Modal element:', modalElement);
+        
+        if (!modalElement) {
+            console.error('Modal element não encontrado!');
+            return;
+        }
+        
+        if (typeof bootstrap === 'undefined') {
+            console.error('Bootstrap não está carregado!');
+            return;
+        }
+        
+        const modal = new bootstrap.Modal(modalElement);
+        console.log('Modal object criado:', modal);
+        
+        modal.show();
+        console.log('Modal.show() chamado');
+    } catch (error) {
+        console.error('Erro ao abrir modal:', error);
+    }
 }
 
 /**
  * Carrega lista de motoboys
  */
 function carregarMotoboys() {
+    console.log('Iniciando carregamento de motoboys...');
     document.getElementById('lista-motoboys').innerHTML = 
         '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Carregando...</div>';
     
-    fetch('{{ route('admin.forneiro.motoboys') }}', {
+    const url = '{{ route('admin.forneiro.motoboys') }}';
+    console.log('URL da requisição:', url);
+    
+    fetch(url, {
         headers: {
             'Accept': 'application/json',
             'X-CSRF-TOKEN': csrfToken
@@ -522,13 +551,14 @@ function carregarMotoboys() {
     })
         .then(response => {
             console.log('Motoboys response status:', response.status);
+            console.log('Motoboys response headers:', response.headers);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.json();
         })
         .then(motoboys => {
-            console.log('Motoboys data:', motoboys);
+            console.log('Motoboys data recebidos:', motoboys);
             let html = '';
             motoboys.forEach(motoboy => {
                 html += `
@@ -551,6 +581,7 @@ function carregarMotoboys() {
             }
             
             document.getElementById('lista-motoboys').innerHTML = html;
+            console.log('Lista de motoboys atualizada no DOM');
         })
         .catch(error => {
             console.error('Erro ao carregar motoboys:', error);
@@ -594,8 +625,12 @@ function atribuirMotoboy(motoboyId, motoboyNome) {
             btnMotoboy.innerHTML = `<i class="fas fa-motorcycle"></i> ${motoboyNome}`;
             btnMotoboy.classList.add('atribuido');
             
-            // Fecha o modal
-            $('#modalMotoboy').modal('hide');
+            // Fecha o modal usando Bootstrap 5 nativo
+            const modalElement = document.getElementById('modalMotoboy');
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (modal) {
+                modal.hide();
+            }
             
             mostrarAlerta('success', data.message || 'Motoboy atribuído com sucesso!');
         } else {
@@ -648,9 +683,7 @@ function mostrarAlerta(tipo, mensagem) {
     alerta.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
     alerta.innerHTML = `
         <i class="fas fa-${icone}"></i> ${mensagem}
-        <button type="button" class="close" data-dismiss="alert">
-            <span>&times;</span>
-        </button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     `;
     
     document.body.appendChild(alerta);
@@ -668,5 +701,8 @@ setInterval(() => {
     location.reload();
 }, 120000);
 </script>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

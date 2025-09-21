@@ -50,13 +50,13 @@ Route::prefix('/webhook')->controller(WebhookController::class)->group(function 
 
 
 Route::post('/git-webhook', [GitWebhookController::class, 'handle']);
-Route::get('/notificacoes', 'NotificacaoController@index')->name('notificacoes.index');
-Route::post('/marcar-como-lida/{id}', 'NotificacaoController@marcarComoLida')->name('notificacoes.marcar_como_lida');
+Route::get('/notificacoes', [NotificacaoController::class, 'index'])->name('notificacoes.index');
+Route::post('/marcar-como-lida/{id}', [NotificacaoController::class, 'marcarComoLida'])->name('notificacoes.marcar_como_lida');
 
 // routes/web.php
 
-Route::get('/admin/notifications', 'NotificationController@index')->name('admin.notifications.index');
-Route::get('/admin/notifications/mark-as-read/{id}',  'NotificationController@markAsRead')->name('admin.notifications.markAsRead');
+Route::get('/admin/notifications', [NotificacaoController::class, 'index'])->name('admin.notifications.index');
+Route::get('/admin/notifications/mark-as-read/{id}', [NotificacaoController::class, 'markAsRead'])->name('admin.notifications.markAsRead');
 Route::get('/admin/notifications/check', [NotificacaoController::class, 'check'])->name('admin.notifications.check');
 
 
