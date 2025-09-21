@@ -67,7 +67,7 @@
 
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/dispositivo">
-                <div class="sidebar-brand-icon ">Integra Pizzaria</div>
+                <div class="sidebar-brand-icon ">{{ $globalConfig->nome_pizzaria ?? 'Integra Pizzaria' }}</div>
             </a>
             <!-- Divider -->
             <hr class="sidebar-divider my-0">
@@ -154,6 +154,16 @@
                 <a href="{{ route('admin.motoboy.index') }}" class="nav-link">
                     <i class="fas fa-motorcycle"></i>
                     <span>Motoboys</span>
+                </a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <li class="nav-item">
+                <a href="{{ route('admin.forneiro.index') }}" class="nav-link">
+                    <i class="fas fa-utensils"></i>
+                    <span>Forneiro</span>
                 </a>
             </li>
 

@@ -497,37 +497,58 @@ class ChekoutController extends Controller
             return response()->json(['success' => false, 'message' => 'Conversa ativa não encontrada.']);
         }
 
-        // Decodifica e salva a imagem
-        $imagemBase64 = $request->input('imagem');
-        if (!$imagemBase64) {
-            return response()->json(['success' => false, 'message' => 'Imagem não enviada.']);
+        // Buscar o último pedido do cliente
+        $order = Order::with(['customer', 'items', 'payments.paymentMethod', 'status'])
+            ->where('customer_id', $customer->id)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        if (!$order) {
+            return response()->json(['success' => false, 'message' => 'Pedido não encontrado.']);
         }
 
-        $imagem = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $imagemBase64));
-        $nomeArquivo = uniqid() . '.png';
-        $caminhoArquivo = 'imagens/' . $nomeArquivo;
-
-        Storage::disk('public')->put($caminhoArquivo, $imagem);
-        $imagemUrl = asset('storage/' . $caminhoArquivo);
-
-        // Enviar a imagem com helper
-        MessageHelper::enviarImagem($customer->jid, $imagemUrl);
-
-        // Mensagens padrão
+        // Mensagens de confirmação
         $horaAtual = Carbon::now('America/Sao_Paulo');
         $config = Config::firstOrFail();
         $horaPrevista = $horaAtual->copy()->addMinutes($config->minuts);
 
-        MessageHelper::enviarMensagem($customer->jid, 'Pedido feito com Sucesso.');
-        MessageHelper::enviarMensagem($customer->jid, 'Previsão da entrega: ' . $horaPrevista->format('H:i'));
-        MessageHelper::enviarMensagem($customer->jid, 'Muito Obrigado!');
+        MessageHelper::enviarMensagem($customer->jid, 'Pedido feito com Sucesso! ✅');
+        MessageHelper::enviarMensagem($customer->jid, 'Previsão da entrega: ' . $horaPrevista->format('H:i') . ' ⏰');
+
+        // Montar resumo do pedido igual ao atribuirMotoboy
+        $clienteNome = $order->customer->name;
+        
+        $msgResumo = "🍕 Ola {$clienteNome}, aqui esta o resumo do seu pedido:\n\n";
+        
+        $msgResumo .= "📦 Produtos:\n";
+        foreach ($order->items as $item) {
+            $qtd = $item->quantity > 1 ? " x{$item->quantity}" : '';
+            $msgResumo .= "- {$item->name}{$qtd} (R$ " . number_format($item->total, 2, ',', '.') . ")\n";
+        }
+
+        $msgResumo .= "\n💰 Pagamento:\n";
+        foreach ($order->payments as $p) {
+            $msgResumo .= "- {$p->paymentMethod->name}: R$ " . number_format($p->amount, 2, ',', '.') . "\n";
+        }
+
+        // Troco, se houver
+        if ($order->change_for) {
+            $msgResumo .= "💸 Troco: R$ " . number_format($order->change_for, 2, ',', '.') . "\n";
+        }
+
+        $msgResumo .= "\n🚚 Taxa de entrega: R$ " . number_format($order->delivery_fee, 2, ',', '.');
+        $msgResumo .= "\n💵 Total: R$ " . number_format($order->total_geral, 2, ',', '.');
+        $msgResumo .= "\n\nAgradecemos por pedir com a gente! ❤";
+
+        // Enviar resumo do pedido
+        MessageHelper::enviarMensagem($customer->jid, $msgResumo);
 
         $service->update(['await_answer' => 'finish']);
 
         // Limpar a sessão
         session()->forget(['customer', 'taxa_entrega', 'cart']);
 
-        return response()->json(['success' => true, 'message' => 'Imagem enviada com sucesso.']);
+        return response()->json(['success' => true, 'message' => 'Resumo do pedido enviado com sucesso.']);
     }
     // public function sendImage($session, $phone, $nomeImagen, $detalhes)
     // {

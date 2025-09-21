@@ -11,11 +11,20 @@ class Config extends Model
 
     protected $table = 'config';
     protected $fillable = [
+        'nome_pizzaria',
         'motoboy_fone',
         'status',
         'minuts',
         'chatbot',
         'resposta',
+        'telefone',
+        'cep',
+        'endereco',
+        'numero',
+        'complemento',
+        'bairro',
+        'cidade',
+        'estado',
     ];
 
     protected $casts = [

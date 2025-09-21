@@ -36,7 +36,19 @@ class DistanceService
     // Função que faz a chamada para sua API GraphHopper
     public function getDistanceInKm($address2)
     {
-         $address1 = 'Rua José Alves da Silva, 429, São Paulo, SP';
+        // Buscar endereço da pizzaria na configuração
+        $config = \App\Models\Config::first();
+        $address1 = '';
+        
+        if ($config && $config->endereco) {
+            $address1 = "{$config->endereco}, {$config->numero}";
+           
+            $address1 .= ", {$config->bairro}, {$config->cidade}, {$config->estado}";
+        } else {
+            // Fallback para o endereço padrão
+            $address1 = 'Rua José Alves da Silva, 429, São Paulo, SP';
+        }
+        
         $coords1 = $this->getCoordinates($address1);
         $coords2 = $this->getCoordinates($address2);
         if ($coords1 && $coords2) {

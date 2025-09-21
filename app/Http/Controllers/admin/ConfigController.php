@@ -27,42 +27,38 @@ class ConfigController extends Controller
     public function update(Request $request)
     {
 
-        foreach ($request->days as $day => $data) {
-            // Ajuste aqui para verificar a existência das horas
-            if (!empty($data['start_time']) && !empty($data['end_time'])) {
-                $slot = AvailableSlotConfig::where('day_of_week', $day)->first();
+       
     
-                if ($slot) {
-                    // Atualiza apenas se o checkbox 'active' estiver marcado
-                    if (isset($data['active'])) {
-                        $slot->update([
-                            'start_time' => $data['start_time'],
-                            'end_time' => $data['end_time'],
-                        ]);
-                    } else {
-                        $slot->delete();
-                    }
-                } else {
-                    // Cria um novo registro apenas se o checkbox 'active' estiver marcado
-                    if (isset($data['active'])) {
-                        AvailableSlotConfig::create([
-                            'day_of_week' => $day,
-                            'start_time' => $data['start_time'],
-                            'end_time' => $data['end_time'],
-                        ]);
-                    }
-                }
-            }
-        }
-
-         // Calcular o total de minutos
-    $totalMinutos = ($request->input('hora') * 60) + $request->input('minutos');
         $config = Config::firstOrFail(); // Supondo que você tenha apenas uma entrada na tabela config
 
-        $config->motoboy_fone = Utils::sanitizePhone($request->input('motoboy_fone'));
+      
         $config->status = $request->has('status');
         $config->chatbot = $request->has('chatbot');
-        $config->minuts = $totalMinutos;
+        
+        // Nome da pizzaria
+        $config->nome_pizzaria = $request->input('nome_pizzaria');
+        
+        // Processar telefone da pizzaria com código do país
+        if ($request->filled('telefone')) {
+            $telefone = preg_replace('/\D/', '', $request->input('telefone')); // Remove todos os não dígitos
+            
+            // Garantir que sempre comece com 55
+            if (!str_starts_with($telefone, '55')) {
+                $telefone = '55' . $telefone;
+            }
+            
+            $config->telefone = $telefone;
+        }
+        
+        // Campos de endereço
+        $config->cep = $request->input('cep');
+        $config->endereco = $request->input('endereco');
+        $config->numero = $request->input('numero');
+        $config->complemento = $request->input('complemento');
+        $config->bairro = $request->input('bairro');
+        $config->cidade = $request->input('cidade');
+        $config->estado = $request->input('estado');
+        
         $config->save();
 
         return redirect()->back()->with('success', 'Configurações atualizadas com sucesso!');

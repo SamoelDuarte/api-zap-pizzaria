@@ -75,7 +75,22 @@ class Customer extends Model
 
     public function getLocationLink()
     {
-        $origin = urlencode('Rua José Alves da Silva, 429, Parque Novo Santo Amaro, São Paulo, SP');
+        // Buscar endereço da pizzaria na configuração
+        $config = \App\Models\Config::first();
+        $pizzariaAddress = '';
+        
+        if ($config && $config->endereco) {
+            $pizzariaAddress = "{$config->endereco}, {$config->numero}";
+            if ($config->complemento) {
+                $pizzariaAddress .= ", {$config->complemento}";
+            }
+            $pizzariaAddress .= ", {$config->bairro}, {$config->cidade}, {$config->estado}";
+        } else {
+            // Fallback para o endereço padrão
+            $pizzariaAddress = 'Rua José Alves da Silva, 429, Parque Novo Santo Amaro, São Paulo, SP';
+        }
+        
+        $origin = urlencode($pizzariaAddress);
         $destination = urlencode($this->address_for_maps);
         return "https://www.google.com/maps/dir/?api=1&origin={$origin}&destination={$destination}";
     }

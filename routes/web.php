@@ -12,6 +12,7 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\EventsController;
 use App\Http\Controllers\FormController;
+use App\Http\Controllers\ForneiroController;
 use App\Http\Controllers\GitWebhookController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NotificacaoController;
@@ -98,7 +99,6 @@ Route::prefix('/checkout')->controller(ChekoutController::class)->group(function
     Route::post('/update-taxa-entrega', 'updateTaxaEntrega')->name('update-taxa-entrega');
     Route::get('/cart/update-quantity/{index}/{quantity}', 'updateCartItemQuantity')->name('cart.update-quantity');
 });
-
 
 Route::prefix('/events')->controller(EventsController::class)->group(function () {
     Route::post('/', 'index')->name('admin.events.index');
@@ -208,6 +208,8 @@ Route::middleware(['auth.user'])->group(function () {
             Route::put('/', 'update')->name('admin.config.update');
         });
 
+       
+
         Route::prefix('/rota')->controller(RouteController::class)->group(function () {
             Route::get('/', 'index')->name('admin.route.index');
             Route::post('/novo', 'store')->name('admin.route.store');
@@ -237,6 +239,13 @@ Route::middleware(['auth.user'])->group(function () {
             Route::get('/edita', 'edit')->name('admin.product.edit');
             Route::get('/buscar-pizza-por-nome', 'buscarPizzaPorNome');
             Route::get('/buscar-produto-por-nome', 'buscarProdutoPorNome');
+        });
+
+         Route::prefix('/forneiro')->controller(ForneiroController::class)->name('admin.forneiro.')->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::post('/marcar-feito/{id}', 'marcarFeito')->name('marcar-feito');
+            Route::post('/atribuir-motoboy', 'atribuirMotoboy')->name('atribuir-motoboy');
+            Route::get('/motoboys', 'getMotoboys')->name('motoboys');
         });
     });
 });
@@ -268,10 +277,9 @@ Route::get('/teste', function () {
 
     $service = new \App\Services\DistanceService();
 
-    $address1 = 'Rua José Alves da Silva, 429, Parque Novo Santo Amaro, São Paulo, SP';
     $address2 = 'Rua bonifacio pasquali, 50, São Paulo, SP';
 
-    $distanceKm = $service->getDistanceInKm($address1, $address2);
+    $distanceKm = $service->getDistanceInKm($address2);
 
     echo "Distância: {$distanceKm} km\n";
 

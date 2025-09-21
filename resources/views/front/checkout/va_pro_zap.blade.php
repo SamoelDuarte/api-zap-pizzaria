@@ -70,8 +70,8 @@
 </style>
 
 <body>
-    <h3>Bem Vindo ao</h3>
-    <h1>Integra Pizzaria!</h1>
+    <h3>Bem Vindo a</h3>
+    <h1>{{ $globalConfig->nome_pizzaria ?? 'Integra Pizzaria' }}!</h1>
     <P>Vamos iniciar nossa atendemento</P>
     <div class="icons">
         <a href="https://api.whatsapp.com/send?phone=5511933361625"><i class="fa-brands fa-whatsapp"></i></a>

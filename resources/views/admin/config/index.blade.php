@@ -52,6 +52,92 @@
                                 <input type="number" id="minutos" name="minutos" value="{{ $config->minuts % 60 }}" class="form-control">
                                </div>
                             </div>
+
+                            <!-- Informações da Pizzaria -->
+                            <div class="card-header mt-3">📍 Informações da Pizzaria</div>
+                            
+                            <div class="form-group">
+                                <label for="nome_pizzaria">🍕 Nome da Pizzaria:</label>
+                                <input type="text" id="nome_pizzaria" name="nome_pizzaria" 
+                                    value="{{ $config->nome_pizzaria }}" 
+                                    placeholder="Nome da Pizzaria" 
+                                    class="form-control">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="telefone">📞 Telefone da Pizzaria:</label>
+                                <input type="text" id="telefone" name="telefone" 
+                                    value="{{ $config->telefone }}" 
+                                    placeholder="(11) 9 1234-5678" 
+                                    class="form-control">
+                                <small class="text-muted">Digite apenas os números, o código do país (55) será adicionado automaticamente</small>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="cep">📮 CEP:</label>
+                                <input type="text" id="cep" name="cep" 
+                                    value="{{ $config->cep }}" 
+                                    placeholder="00000-000" 
+                                    class="form-control">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="endereco">🏠 Endereço:</label>
+                                <input type="text" id="endereco" name="endereco" 
+                                    value="{{ $config->endereco }}" 
+                                    placeholder="Rua/Avenida" 
+                                    class="form-control" readonly>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="numero">🔢 Número:</label>
+                                        <input type="text" id="numero" name="numero" 
+                                            value="{{ $config->numero }}" 
+                                            placeholder="123" 
+                                            class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="complemento">🏢 Complemento:</label>
+                                        <input type="text" id="complemento" name="complemento" 
+                                            value="{{ $config->complemento }}" 
+                                            placeholder="Apto 101, Bloco A" 
+                                            class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="bairro">🏘️ Bairro:</label>
+                                <input type="text" id="bairro" name="bairro" 
+                                    value="{{ $config->bairro }}" 
+                                    placeholder="Centro" 
+                                    class="form-control" readonly>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="form-group">
+                                        <label for="cidade">🏙️ Cidade:</label>
+                                        <input type="text" id="cidade" name="cidade" 
+                                            value="{{ $config->cidade }}" 
+                                            placeholder="São Paulo" 
+                                            class="form-control" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="estado">🗺️ Estado:</label>
+                                        <input type="text" id="estado" name="estado" 
+                                            value="{{ $config->estado }}" 
+                                            placeholder="SP" 
+                                            class="form-control" readonly>
+                                    </div>
+                                </div>
+                            </div>
                             
                           
 
@@ -128,9 +214,39 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     <script>
-           $(document).ready(function(){
+        $(document).ready(function(){
+            // Máscaras
             $('#motoboy_fone').mask('(00) 0 0000-0000');
+            $('#telefone').mask('(00) 0 0000-0000');
+            $('#cep').mask('00000-000');
+
+            // Busca CEP
+            $('#cep').on('blur', function() {
+                var cep = $(this).val().replace(/\D/g, '');
+                
+                if (cep.length === 8) {
+                    $.ajax({
+                        url: `https://viacep.com.br/ws/${cep}/json/`,
+                        method: 'GET',
+                        success: function(data) {
+                            if (!data.erro) {
+                                $('#endereco').val(data.logradouro);
+                                $('#bairro').val(data.bairro);
+                                $('#cidade').val(data.localidade);
+                                $('#estado').val(data.uf);
+                                $('#numero').focus();
+                            } else {
+                                alert('CEP não encontrado!');
+                            }
+                        },
+                        error: function() {
+                            alert('Erro ao buscar CEP!');
+                        }
+                    });
+                }
+            });
         });
+
         function toggleStatus(element, headerId) {
             var header = document.getElementById(headerId);
             if (element.checked) {

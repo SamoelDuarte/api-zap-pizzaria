@@ -75,28 +75,7 @@ class OrderController extends Controller
         $linkGoogleMaps = $order->customer->getLocationLink();
 
         // Monta a mensagem para o cliente
-        $msgCliente = "🍕 Olá {$clienteNome}, seu pedido está a caminho com nosso motoboy! 🛵\n\n";
-
-        $msgCliente .= "📦 Produtos:\n";
-        foreach ($order->items as $item) {
-            $qtd = $item->quantity > 1 ? " x{$item->quantity}" : '';
-            $msgCliente .= "- {$item->name}{$qtd} (R$ " . number_format($item->total, 2, ',', '.') . ")\n";
-        }
-
-        // Formas de pagamento
-        $msgCliente .= "\n💰 Pagamento:\n";
-        foreach ($order->payments as $p) {
-            $msgCliente .= "- {$p->paymentMethod->name}: R$ " . number_format($p->amount, 2, ',', '.') . "\n";
-        }
-
-        // Troco, se houver
-        if ($order->change_for) {
-            $msgCliente .= "💸 Troco: R$ " . number_format($order->change_for, 2, ',', '.') . "\n";
-        }
-
-        $msgCliente .= "\n🚚 Taxa de entrega: R$ " . number_format($order->delivery_fee, 2, ',', '.');
-        $msgCliente .= "\n💵 Total: R$ " . number_format($order->total_geral, 2, ',', '.');
-        $msgCliente .= "\n\nAgradecemos por pedir com a gente! ❤️";
+        $msgCliente = "🍕 Seu pedido está a caminho com nosso motoboy! 🛵\n\n";
 
         // Monta a mensagem para o motoboy
         $msgMotoboy = "🛵 Novo pedido para entrega:\n\n";
