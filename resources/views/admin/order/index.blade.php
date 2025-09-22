@@ -188,7 +188,7 @@
                                     <th>Valor</th>
                                 </tr>
                             </thead>
-                            <tbody id="table-items">45tg54g54g45g45
+                            <tbody id="table-items">
                                 <!-- Populado via JavaScript -->
                             </tbody>
                         </table>
