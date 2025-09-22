@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('config', function (Blueprint $table) {
-            //
+            $table->string('nome_pizzaria')->default('Pizzaria')->after('id');
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('config', function (Blueprint $table) {
-            //
+            $table->dropColumn('nome_pizzaria');
         });
     }
 };

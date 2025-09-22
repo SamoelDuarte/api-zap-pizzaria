@@ -151,6 +151,16 @@
             <hr class="sidebar-divider my-0">
 
             <li class="nav-item">
+                <a href="{{ route('admin.users.index') }}" class="nav-link">
+                    <i class="fas fa-users"></i>
+                    <span>Usuários</span>
+                </a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <li class="nav-item">
                 <a href="{{ route('admin.motoboy.index') }}" class="nav-link">
                     <i class="fas fa-motorcycle"></i>
                     <span>Motoboys</span>

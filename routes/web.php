@@ -18,6 +18,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\NotificacaoController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\RouteController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\WebhookController;
 use Illuminate\Support\Facades\Route;
 use App\Models\Customer;
@@ -131,6 +132,18 @@ Route::middleware(['auth.user'])->group(function () {
             Route::get('/editar/{motoboy}', 'edit')->name('admin.motoboy.edit');
             Route::put('/atualizar/{motoboy}', 'update')->name('admin.motoboy.update');
             Route::delete('/deletar/{motoboy}', 'destroy')->name('admin.motoboy.destroy');
+        });
+
+        // CRUD de Usuários
+        Route::prefix('/users')->controller(UserController::class)->group(function () {
+            Route::get('/', 'index')->name('admin.users.index');
+            Route::get('/create', 'create')->name('admin.users.create');
+            Route::post('/', 'store')->name('admin.users.store');
+            Route::get('/{user}', 'show')->name('admin.users.show');
+            Route::get('/{user}/edit', 'edit')->name('admin.users.edit');
+            Route::put('/{user}', 'update')->name('admin.users.update');
+            Route::delete('/{user}', 'destroy')->name('admin.users.destroy');
+            Route::patch('/{user}/toggle-status', 'toggleStatus')->name('admin.users.toggle-status');
         });
 
 

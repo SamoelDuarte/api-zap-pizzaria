@@ -67,7 +67,7 @@
                             <div class="form-group">
                                 <label for="telefone">📞 Telefone da Pizzaria:</label>
                                 <input type="text" id="telefone" name="telefone" 
-                                    value="{{ $config->telefone }}" 
+                                    value="{{ preg_replace('/^55/', '', $config->telefone) }}" 
                                     placeholder="(11) 9 1234-5678" 
                                     class="form-control">
                                 <small class="text-muted">Digite apenas os números, o código do país (55) será adicionado automaticamente</small>
