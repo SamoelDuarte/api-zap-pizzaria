@@ -27,11 +27,11 @@ class AuthAdmin
         $freshUser = User::where('id', session('userData')->id)->where('active', 1)->first();
 
         if (!$freshUser) {
-            return redirect('/login');
+            return redirect('/admin');
         }
 
         if (!in_array($freshUser->role, $this->allowedRoles)) {
-            return redirect('/login');
+            return redirect('/admin');
         }
 
         session([
