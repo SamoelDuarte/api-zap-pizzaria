@@ -736,7 +736,7 @@
                 let nome = produto.name;
 
                 if (inputBroto.checked) {
-                    preco = Math.max(0, preco - 10);
+                    preco = Math.max(0, preco - {{ env('PIZZA_BROTO_DISCOUNT', 10) }});
                     nome += ' (Broto)';
                 }
                 inputNome.value = nome;
@@ -771,7 +771,7 @@
                                 let nome = produto.name;
 
                                 if (inputBroto.checked) {
-                                    preco = Math.max(0, preco - 10);
+                                    preco = Math.max(0, preco - {{ env('PIZZA_BROTO_DISCOUNT', 10) }});
                                     nome += ' (Broto)';
                                 }
 
@@ -1044,7 +1044,7 @@
                                 let nomeProduto = produto.name;
 
                                 if (checkboxBroto?.checked) {
-                                    preco = Math.max(0, preco - 10);
+                                    preco = Math.max(0, preco - {{ env('PIZZA_BROTO_DISCOUNT', 10) }});
                                     nomeProduto += ' (Broto)';
                                 }
 
@@ -1147,7 +1147,7 @@
                 let nome = produto.name;
 
                 if (checkboxBroto.checked) {
-                    preco = Math.max(0, preco - 10);
+                    preco = Math.max(0, preco - {{ env('PIZZA_BROTO_DISCOUNT', 10) }});
                     nome += ' (Broto)';
                 }
 
@@ -1164,7 +1164,7 @@
                 let nome = produto.name;
 
                 if (checkboxBroto.checked) {
-                    preco = Math.max(0, preco - 10);
+                    preco = Math.max(0, preco - {{ env('PIZZA_BROTO_DISCOUNT', 10) }});
                     nome += ' (Broto)';
                 }
 
@@ -1332,7 +1332,7 @@
                 let preco = parseFloat(produto.price);
 
                 if (produto.is_broto) {
-                    preco = Math.max(0, preco - 10); // Aplica desconto de R$10 se for broto
+                    preco = Math.max(0, preco - {{ env('PIZZA_BROTO_DISCOUNT', 10) }}); // Aplica desconto configurável se for broto
                 }
 
                 inputNome.value = produto.name + (produto.is_broto ? ' (Broto)' : '');

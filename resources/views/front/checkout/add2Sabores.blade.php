@@ -354,7 +354,7 @@
         <div class="broto-option">
             <input type="checkbox" id="brotoCheckbox" name="broto" hidden>
             <label for="brotoCheckbox" class="broto-label">
-                🍕 Pizza Broto (Pequena)
+                {{ env('PIZZA_BROTO_TEXT', '🍕 PIZZA BROTO') }}
             </label>
         </div>
 
@@ -441,7 +441,7 @@
                 let newPrice = originalPrice;
 
                 if (isBroto) {
-                    newPrice = Math.max(originalPrice - 10, 0); // evita preço negativo
+                    newPrice = Math.max(originalPrice - {{ env('PIZZA_BROTO_DISCOUNT', 10) }}, 0); // evita preço negativo
                 }
 
                 el.textContent = `R$ ${newPrice.toFixed(2).replace('.', ',')}`;

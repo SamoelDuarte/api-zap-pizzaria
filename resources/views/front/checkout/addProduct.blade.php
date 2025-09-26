@@ -159,7 +159,7 @@
     </div>
    @if (!str_contains(strtolower($product->category->name), 'bebidas'))
     <div class="broto-toggle-container">
-        <button type="button" id="brotoToggleBtn" class="broto-toggle-btn">🍕 PIZZA BROTO</button>
+        <button type="button" id="brotoToggleBtn" class="broto-toggle-btn">{{ env('PIZZA_BROTO_TEXT', '🍕 PIZZA BROTO') }}</button>
     </div>
 @endif
 
@@ -229,7 +229,7 @@
             let total = (productPrice + crustPrice) * quantity;
 
             if (isBroto) {
-                total -= 10;
+                total -= {{ env('PIZZA_BROTO_DISCOUNT', 10) }};
             }
 
             document.getElementById('total-price').innerText = 'R$ ' + total.toFixed(2).replace('.', ',');

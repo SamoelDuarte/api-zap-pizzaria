@@ -135,9 +135,10 @@ class ChekoutController extends Controller
         $product = Product::findOrFail($productId);
         $productPrice = floatval($product->price);
 
-        // Aplica desconto de R$ 10,00 se for broto
+        // Aplica desconto se for broto (valor configurável no .env)
         if ($isBroto) {
-            $productPrice -= 10;
+            $brotoDiscount = floatval(env('PIZZA_BROTO_DISCOUNT', 10));
+            $productPrice -= $brotoDiscount;
             if ($productPrice < 0) {
                 $productPrice = 0; // Evita total negativo
             }
@@ -194,9 +195,10 @@ class ChekoutController extends Controller
         // Define o preço base (maior preço entre os sabores)
         $basePrice = max($productPrices);
 
-        // Aplica desconto se for broto
+        // Aplica desconto se for broto (valor configurável no .env)
         if ($isBroto) {
-            $basePrice = max(0, $basePrice - 10);
+            $brotoDiscount = floatval(env('PIZZA_BROTO_DISCOUNT', 10));
+            $basePrice = max(0, $basePrice - $brotoDiscount);
         }
 
         // Define borda
