@@ -312,6 +312,30 @@
         <section class="totals">
             <p><strong>Subtotal:</strong> R$ {{ number_format(array_sum(array_column($cart, 'total')), 2, ',', '.') }}
             </p>
+            
+            @php
+                $promocaoAtiva = env('PROMOCAO_FRETE_GRATIS_ACIMA_2_PIZZAS', false);
+                $totalPizzas = 0;
+                
+                // Contar pizzas no carrinho
+                foreach ($cart as $item) {
+                    $productIds = explode(',', $item['product_id']);
+                    foreach ($productIds as $productId) {
+                        $product = \App\Models\Product::with('category')->find($productId);
+                        if ($product && $product->category && stripos($product->category->name, 'pizza') !== false) {
+                            $totalPizzas += $item['quantity'];
+                            break;
+                        }
+                    }
+                }
+            @endphp
+            
+            @if($promocaoAtiva && $taxaEntrega == 0 && $totalPizzas >= 2)
+                <p style="color: #28a745; font-weight: bold;">
+                    🎉 Promoção Ativa: Frete Grátis para 2+ Pizzas!
+                </p>
+            @endif
+            
             <p><strong>Taxa de Entrega:</strong> R$ {{ number_format($taxaEntrega, 2, ',', '.') }}</p>
             <p class="total-final"><strong>Total:</strong> R$ {{ number_format($totalPrice, 2, ',', '.') }}</p>
         </section>

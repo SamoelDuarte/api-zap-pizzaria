@@ -239,6 +239,10 @@
                                                 <h6 class="text-muted">Falta pagar: R$ <span id="total_falta">0.00</span>
                                                 </h6>
                                                 <h6>Total Pago: R$ <span id="total_pago">0.00</span></h6>
+                                                <!-- Taxa de Entrega -->
+                                                <h6 class="text-info">Taxa Entrega: R$ <span id="taxa_entrega_display">0.00</span></h6>
+                                                <!-- Área para exibir promoção de frete grátis -->
+                                                <div id="promocao-frete-gratis" style="display: none;"></div>
                                                 <!-- Novo campo para mostrar o troco -->
                                                 <h6 class="text-success"><span id="troco"></span></h6>
                                             </div>
@@ -336,6 +340,9 @@
     <script>
         const inputBroto = document.getElementById('produto_unidade_broto');
         const checkboxBroto = document.getElementById('meia_broto');
+        
+        // Debug da variável .env
+        console.log('🔧 DEBUG .env PROMOCAO_FRETE_GRATIS_ACIMA_2_PIZZAS:', @json(env('PROMOCAO_FRETE_GRATIS_ACIMA_2_PIZZAS', false)));
     </script>
 
     <script>
@@ -884,6 +891,10 @@
 
                     const row = document.createElement('div');
                     row.classList.add('row', 'g-2', 'align-items-start', 'mb-2');
+                    
+                    // Adicionar atributos para contagem de pizzas
+                    row.setAttribute('data-tipo', 'pizza_unitaria');
+                    row.setAttribute('data-quantidade', produto.quantidade);
 
                     row.innerHTML = `
             <div class="col-md-10">
@@ -1226,6 +1237,11 @@
                     // Adiciona a linha visível
                     const row = document.createElement('div');
                     row.classList.add('row', 'g-2', 'align-items-start', 'mb-2');
+                    
+                    // Adicionar atributos para contagem de pizzas
+                    row.setAttribute('data-tipo', 'pizza_meia');
+                    row.setAttribute('data-quantidade', produto.quantidade);
+                    
                     row.innerHTML = `
             <div class="col-md-10">
                 <strong>${nomeCompleto}</strong> (${produto.quantidade}x) - R$ ${total}<br>
@@ -1501,32 +1517,101 @@
             return parseFloat((valor || "0").toString().replace(',', '.'));
         }
 
+        // Função para contar pizzas no pedido
+        function contarPizzas() {
+            let totalPizzas = 0;
+            
+            // Contar pizzas de 1 sabor e meia a meia
+            const elementosPizza = document.querySelectorAll('[data-tipo="pizza_unitaria"], [data-tipo="pizza_meia"]');
+            
+            elementosPizza.forEach(item => {
+                const qtd = parseFloat(item.dataset.quantidade || 1);
+                totalPizzas += qtd;
+                console.log('Pizza encontrada:', {tipo: item.dataset.tipo, quantidade: qtd});
+            });
+            
+            console.log('Total de pizzas contadas:', totalPizzas);
+            return totalPizzas;
+        }
+
+        // Função para aplicar promoção de frete grátis
+        function aplicarPromocaoFreteGratis(taxaEntrega) {
+            const promocaoAtiva = @json(env('PROMOCAO_FRETE_GRATIS_ACIMA_2_PIZZAS', false)) === true;
+            const totalPizzas = contarPizzas();
+            
+            console.log('aplicarPromocaoFreteGratis:', {promocaoAtiva, totalPizzas, taxaEntrega});
+            
+            if (promocaoAtiva && totalPizzas >= 2) {
+                console.log('✅ Promoção aplicada - Frete grátis!');
+                return 0; // Frete grátis
+            }
+            
+            console.log('❌ Promoção não aplicada');
+            return taxaEntrega;
+        }
+
+        // Função para atualizar exibição da promoção
+        function atualizarExibicaoPromocao(taxaEntregaFinal) {
+            const promocaoAtiva = @json(env('PROMOCAO_FRETE_GRATIS_ACIMA_2_PIZZAS', false)) === true;
+            const totalPizzas = contarPizzas();
+            const taxaOriginal = parseValor(document.getElementById('delivery_fee')?.value || 0);
+            
+            console.log('DEBUG Promoção:', {promocaoAtiva, totalPizzas, taxaEntregaFinal, taxaOriginal});
+            
+            // Procurar elemento para exibir a promoção (agora já existe no HTML)
+            let promocaoDiv = document.getElementById('promocao-frete-gratis');
+            
+            if (promocaoAtiva && taxaEntregaFinal === 0 && totalPizzas >= 2 && taxaOriginal > 0) {
+                if (promocaoDiv) {
+                    promocaoDiv.innerHTML = '<h6 class="text-success">🎉 Promoção: Frete Grátis para 2+ Pizzas!</h6>';
+                    promocaoDiv.style.display = 'block';
+                }
+            } else if (promocaoDiv) {
+                promocaoDiv.style.display = 'none';
+            }
+        }
+
         function recalcularTotal() {
-            // Soma dos produtos — vamos atualizar isso depois quando os produtos forem adicionados
+            // Soma dos produtos
             let totalProdutos = 0;
 
-            // Exemplo: cada produto pode ter um input com class "valor-produto"
+            // Cada produto pode ter um input com class "valor-produto"
             document.querySelectorAll('.valor-produto').forEach(input => {
                 totalProdutos += parseValor(input.value);
             });
 
-            // Taxa de entrega (hidden input criado dinamicamente)
-            let taxaEntrega = parseValor(document.getElementById('delivery_fee')?.value || 0);
+            // Taxa de entrega original (hidden input criado dinamicamente)
+            let taxaEntregaOriginal = parseValor(document.getElementById('delivery_fee')?.value || 0);
 
-            // Total pago (caso você já tenha input ou cálculo futuro)
+            // Aplicar promoção de frete grátis
+            let taxaEntregaFinal = aplicarPromocaoFreteGratis(taxaEntregaOriginal);
+
+            // Total pago
             let totalPago = parseValor(document.getElementById('valor_pago')?.value || 0);
 
             // Total final
-            let totalGeral = totalProdutos + taxaEntrega;
+            let totalGeral = totalProdutos + taxaEntregaFinal;
+
+            console.log('DEBUG recalcularTotal:', {
+                totalProdutos, 
+                taxaEntregaOriginal, 
+                taxaEntregaFinal, 
+                totalGeral,
+                totalPizzas: contarPizzas()
+            });
 
             // Atualiza DOM
             document.getElementById('total_geral').innerText = totalGeral.toFixed(2);
             document.getElementById('total_falta').innerText = (totalGeral - totalPago).toFixed(2);
             document.getElementById('total_pago').innerText = totalPago.toFixed(2);
+            document.getElementById('taxa_entrega_display').innerText = taxaEntregaFinal.toFixed(2);
             document.getElementById('total_geral_input').value = totalGeral.toFixed(2);
 
             const troco = totalPago - totalGeral;
             document.getElementById('troco').innerText = troco > 0 ? `Troco: R$ ${troco.toFixed(2)}` : '';
+
+            // Atualizar exibição da promoção
+            atualizarExibicaoPromocao(taxaEntregaFinal);
         }
         // Exporte globalmente
         window.recalcularTotal = recalcularTotal;
@@ -1609,21 +1694,28 @@
                 totalProdutos += parseValor(input.value);
             });
 
-            let taxaEntrega = parseValor(document.getElementById('delivery_fee')?.value || 0);
+            // Taxa de entrega original
+            let taxaEntregaOriginal = parseValor(document.getElementById('delivery_fee')?.value || 0);
+            
+            // Aplicar promoção de frete grátis
+            let taxaEntregaFinal = aplicarPromocaoFreteGratis(taxaEntregaOriginal);
+            
             let totalPago = pagamentos.reduce((sum, p) => sum + p.valor, 0);
 
-            let totalGeral = totalProdutos + taxaEntrega;
+            let totalGeral = totalProdutos + taxaEntregaFinal;
             let falta = Math.max(totalGeral - totalPago, 0);
-            document.getElementById('total_falta').innerText = falta.toFixed(2);
-
 
             document.getElementById('total_geral').innerText = totalGeral.toFixed(2);
             document.getElementById('total_falta').innerText = falta.toFixed(2);
             document.getElementById('total_pago').innerText = totalPago.toFixed(2);
+            document.getElementById('taxa_entrega_display').innerText = taxaEntregaFinal.toFixed(2);
             document.getElementById('total_geral_input').value = totalGeral.toFixed(2);
 
             const troco = totalPago - totalGeral;
             document.getElementById('troco').innerText = troco > 0 ? `Troco: R$ ${troco.toFixed(2)}` : '';
+
+            // Atualizar exibição da promoção
+            atualizarExibicaoPromocao(taxaEntregaFinal);
 
             // 👇 Atualiza automaticamente o valor do próximo pagamento
             const valorInput = document.getElementById('valor_pagamento');

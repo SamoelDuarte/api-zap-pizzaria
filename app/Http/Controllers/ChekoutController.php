@@ -27,6 +27,44 @@ use Illuminate\Support\Facades\DB;
 
 class ChekoutController extends Controller
 {
+    /**
+     * Conta quantas pizzas existem no carrinho
+     * (considera produtos das categorias que contêm "Pizza")
+     */
+    private function contarPizzasNoCarrinho($cart)
+    {
+        $totalPizzas = 0;
+        
+        foreach ($cart as $item) {
+            // Verifica se o item é uma pizza verificando IDs dos produtos
+            $productIds = explode(',', $item['product_id']);
+            
+            foreach ($productIds as $productId) {
+                $product = Product::with('category')->find($productId);
+                if ($product && $product->category && stripos($product->category->name, 'pizza') !== false) {
+                    $totalPizzas += $item['quantity'];
+                    break; // Se encontrou uma pizza, não precisa verificar outros IDs do mesmo item
+                }
+            }
+        }
+        
+        return $totalPizzas;
+    }
+
+    /**
+     * Aplica promoção de frete grátis se ativo e tiver 2+ pizzas
+     */
+    private function aplicarPromocaoFreteGratis($taxaEntrega, $cart)
+    {
+        $promocaoAtiva = env('PROMOCAO_FRETE_GRATIS_ACIMA_2_PIZZAS', false);
+        
+        if ($promocaoAtiva && $this->contarPizzasNoCarrinho($cart) >= 2) {
+            return 0; // Frete grátis
+        }
+        
+        return $taxaEntrega;
+    }
+
     public function index($phone = null)
     {
         $customer = null;
@@ -68,6 +106,10 @@ class ChekoutController extends Controller
 
         $categories = Categories::with('products')->get();
         $cart = session()->get('cart', []);
+
+        // Aplicar promoção de frete grátis se ativo e tiver 2+ pizzas
+        $taxaEntregaFinal = $this->aplicarPromocaoFreteGratis($taxaEntrega, $cart);
+        session()->put('taxa_entrega', $taxaEntregaFinal);
 
         return view('front.checkout.index', compact('categories', 'cart', 'customer', 'semCadastro'));
     }
@@ -161,6 +203,11 @@ class ChekoutController extends Controller
         $cart[] = $cartItem;
         session()->put('cart', $cart);
 
+        // Recalcular taxa de entrega com promoção
+        $taxaEntregaAtual = session('taxa_entrega', 0);
+        $taxaEntregaFinal = $this->aplicarPromocaoFreteGratis($taxaEntregaAtual, $cart);
+        session()->put('taxa_entrega', $taxaEntregaFinal);
+
         return redirect()->route('checkout.home')->with('success', 'Produto adicionado ao carrinho com sucesso.');
     }
 
@@ -233,6 +280,11 @@ class ChekoutController extends Controller
         $cart[] = $cartItem;
         session()->put('cart', $cart);
 
+        // Recalcular taxa de entrega com promoção
+        $taxaEntregaAtual = session('taxa_entrega', 0);
+        $taxaEntregaFinal = $this->aplicarPromocaoFreteGratis($taxaEntregaAtual, $cart);
+        session()->put('taxa_entrega', $taxaEntregaFinal);
+
         return redirect()->route('checkout.home')->with('success', 'Produto(s) adicionado(s) ao carrinho com sucesso.');
     }
 
@@ -277,6 +329,11 @@ class ChekoutController extends Controller
             $query->where('name', 'bebidas');
         })->get();
 
+        // Aplicar promoção de frete grátis se ativo e tiver 2+ pizzas
+        $taxaEntregaAtual = session('taxa_entrega', 0);
+        $taxaEntregaFinal = $this->aplicarPromocaoFreteGratis($taxaEntregaAtual, $cart);
+        session()->put('taxa_entrega', $taxaEntregaFinal);
+
         return view('front.checkout.cart', compact('cart', 'produtosBebidas', 'customer'));
     }
 
@@ -285,7 +342,13 @@ class ChekoutController extends Controller
     {
         $cart = session()->get('cart', []);
         unset($cart[$index]);
-        session()->put('cart', array_values($cart));
+        $cart = array_values($cart);
+        session()->put('cart', $cart);
+
+        // Recalcular taxa de entrega com promoção
+        $taxaEntregaAtual = session('taxa_entrega', 0);
+        $taxaEntregaFinal = $this->aplicarPromocaoFreteGratis($taxaEntregaAtual, $cart);
+        session()->put('taxa_entrega', $taxaEntregaFinal);
 
         return back()->with('success', 'Removido com sucesso.');
     }
@@ -335,6 +398,11 @@ class ChekoutController extends Controller
         }
 
         session()->put('cart', $cart);
+
+        // Recalcular taxa de entrega com promoção
+        $taxaEntregaAtual = session('taxa_entrega', 0);
+        $taxaEntregaFinal = $this->aplicarPromocaoFreteGratis($taxaEntregaAtual, $cart);
+        session()->put('taxa_entrega', $taxaEntregaFinal);
 
         return back()->with('success', 'Alterado com sucesso.');
     }
@@ -742,6 +810,11 @@ class ChekoutController extends Controller
         $produtosBebidas = Product::whereHas('category', function ($query) {
             $query->where('name', 'bebidas');
         })->get();
+
+        // Aplicar promoção de frete grátis se ativo e tiver 2+ pizzas
+        $taxaEntregaAtual = session('taxa_entrega', 0);
+        $taxaEntregaFinal = $this->aplicarPromocaoFreteGratis($taxaEntregaAtual, $cart);
+        session()->put('taxa_entrega', $taxaEntregaFinal);
 
         return view('front.checkout.payments', compact('produtosBebidas', 'cart'));
     }

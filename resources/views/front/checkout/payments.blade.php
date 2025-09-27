@@ -390,6 +390,29 @@
                     <div>
                         Itens : {{ number_format(array_sum(array_column($cart, 'total')), 2, ',', '.') }}
                     </div>
+                    @php
+                        $promocaoAtiva = env('PROMOCAO_FRETE_GRATIS_ACIMA_2_PIZZAS', false);
+                        $totalPizzas = 0;
+                        
+                        // Contar pizzas no carrinho
+                        foreach ($cart as $item) {
+                            $productIds = explode(',', $item['product_id']);
+                            foreach ($productIds as $productId) {
+                                $product = \App\Models\Product::with('category')->find($productId);
+                                if ($product && $product->category && stripos($product->category->name, 'pizza') !== false) {
+                                    $totalPizzas += $item['quantity'];
+                                    break;
+                                }
+                            }
+                        }
+                    @endphp
+                    
+                    @if($promocaoAtiva && session('taxa_entrega') == 0 && $totalPizzas >= 2)
+                        <div style="color: #28a745; font-weight: bold; margin-bottom: 5px;">
+                            🎉 Promoção Ativa: Frete Grátis para 2+ Pizzas!
+                        </div>
+                    @endif
+                    
                     Taxa entrega : R$ <span
                         id="taxa-entrega">{{ number_format(session('taxa_entrega'), 2, ',', '.') }}</span>
                 </div>
