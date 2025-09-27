@@ -104,7 +104,7 @@ class WebhookController extends Controller
         Log::info("Chat criado ou atualizado para o número 55{$numero}");
 
         // Envia mensagem com link
-        $link = "https://integrapizzaria.com.br/checkout/pedido/55{$numero}";
+        $link = url("checkout/pedido/55{$numero}");
         $mensagem = "🍕 Olá! Que tal fazer seu pedido pelo nosso app? 😄 Acesse agora: $link\n\nEstamos te esperando com muito carinho e sabor! ❤️";
 
         $device = Device::where('status', "open")->first();
